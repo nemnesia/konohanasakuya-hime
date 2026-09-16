@@ -1,0 +1,50 @@
+.agents/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build and packaging
+build/
+dist/
+*.egg-info/
+shoestring/lang/*/LC_MESSAGES/*.mo
+
+# Tests and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Linters and type checkers
+.mypy_cache/
+.ruff_cache/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Shoestring local artifacts
+/ca.key.pem
+/ca.pubkey.pem
+/node.key.pem
+/node.pubkey.pem
+/harvesters.dat
+/linking_transaction.dat
+/shoestring.ini
+/overrides.ini
+/rest_overrides.json
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

@@ -1,0 +1,138 @@
+---
+version: '2'
+services:
+  db:
+    image: '{{ mongo_image }}'
+    user: '{{ user }}'
+    command: mongod --dbpath=/dbdata
+    stop_signal: SIGINT
+    ports:
+      - 127.0.0.1:27017:27017
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./dbdata:/dbdata:rw
+      - ./dbdata:/data:rw
+
+  initiate:
+    image: '{{ mongo_image }}'
+    user: '{{ user }}'
+    command: /bin/bash /startup/mongors.sh /real_data/startup/mongo-initialized
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./startup:/startup:ro
+      - ./mongo:/mongo:ro
+      - ./dbdata:/dbdata:rw
+      - ./dbdata:/data:rw
+      - ./data:/real_data
+    depends_on:
+      - db
+
+  client:
+    image: '{{ catapult_client_image }}'
+    user: '{{ user }}'
+    logging:
+      driver: json-file
+      options:
+        max-size: 25M
+        max-file: '10'
+{%- if recovery %}
+    command: /bin/bash /startup/wait.sh /data/startup/mongo-initialized /startup/startRecovery.sh
+{%- else %}
+    command: /bin/bash /startup/wait.sh /data/startup/mongo-initialized /startup/startServer.sh
+{%- endif %}
+    environment:
+      - LD_LIBRARY_PATH=/usr/catapult/lib:/usr/catapult/deps
+    stop_signal: SIGINT
+    stop_grace_period: 300s
+    ports:
+      - 7900:7900
+    working_dir: /
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./startup:/startup:ro
+      - ./userconfig:/userconfig:ro
+      - ./seed:/seed:ro
+      - ./keys/cert:/certificates:ro
+      - ./data:/data
+      - ./logs:/logs
+      - ./keys/voting:/votingkeys
+
+{%- if not recovery %}
+  broker:
+    image: '{{ catapult_client_image }}'
+    user: '{{ user }}'
+    cap_add:
+      - SYS_PTRACE
+    command: /bin/bash /startup/wait.sh /data/startup/datadir-initialized /startup/startBroker.sh
+    environment:
+      - LD_LIBRARY_PATH=/usr/catapult/lib:/usr/catapult/deps
+    stop_signal: SIGINT
+    stop_grace_period: 60s
+    working_dir: /
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./startup:/startup:ro
+      - ./userconfig:/userconfig:ro
+      - ./keys/cert:/certificates:ro
+      - ./data:/data
+      - ./logs:/logs
+
+  rest-api:
+    image: '{{ catapult_rest_image }}'
+    user: '{{ user }}'
+    command: /bin/bash /startup/delayrestapi.sh
+    environment:
+      - HOME=/symbol-workdir
+      - NODE_ENV=production
+    working_dir: /symbol-workdir
+{%- if not api_https %}
+    ports:
+      - 3000:3000
+{%- endif %}
+    volumes:
+      - ./startup:/startup:ro
+      - ./userconfig:/userconfig:ro
+      - ./keys/cert:/certificates:ro
+      - ./data:/data
+      - ./logs:/logs
+      - ./rest-cache:/symbol-workdir
+    networks:
+      default:
+        ipv4_address: 172.20.0.25
+{% if api_https %}
+  rest-api-https-proxy:
+    image: steveltn/https-portal:1
+    ports:
+      - 80:80
+      - 3000:80
+      - 3001:443
+    links:
+      - rest-api
+    environment:
+      - DOMAINS={{ domainname }} -> http://rest-api:3000
+      - WEBSOCKET=true
+      - STAGE=production
+      - FORCE_RENEW=false
+    volumes:
+      - ./https-proxy:/var/lib/https-portal
+      - ./https-proxy/nginx.conf.erb:/var/lib/nginx-conf/{{ domainname }}.conf.erb:ro
+{% endif %}
+{% endif %}
+networks:
+  default:
+    name: catapult-node-network
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
