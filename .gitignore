@@ -1,4 +1,5 @@
 .agents/
+docs/
 
 # Python
 __pycache__/

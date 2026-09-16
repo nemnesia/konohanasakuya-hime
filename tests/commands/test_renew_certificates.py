@@ -84,9 +84,9 @@ async def _assert_can_renew_node_certificate(ca_password=None, retain_key=False,
 
 		# Act:
 		await main([
+			'--directory', str(node_path),
 			'renew-certificates',
 			'--config', str(config_filepath_2),
-			'--directory', str(node_path),
 			'--ca-key-path', str(ca_key_path),
 			*(['--retain-node-key'] if retain_key else []),
 			*(['--force'] if force else [])
@@ -172,9 +172,9 @@ async def _assert_can_renew_ca_and_node_certificates(ca_password=None, use_relat
 
 			# Act:
 			await main([
+				'--directory', output_directory,
 				'renew-certificates',
 				'--config', str(config_filepath_2),
-				'--directory', output_directory,
 				'--ca-key-path', str(ca_key_path),
 				'--renew-ca'
 			])
@@ -229,9 +229,9 @@ async def test_cannot_renew_ca_and_node_certificates_when_ca_key_path_does_not_e
 		# Act + Assert:
 		with pytest.raises(RuntimeError):
 			await main([
+				'--directory', output_directory,
 				'renew-certificates',
 				'--config', str(config_filepath_2),
-				'--directory', output_directory,
 				'--ca-key-path', f'{ca_key_path}.non-existent',
 				'--renew-ca'
 			])

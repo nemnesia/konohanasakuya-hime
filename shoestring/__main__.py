@@ -6,6 +6,8 @@ import os
 import sys
 from pathlib import Path
 
+from shoestring.internal.Directory import resolve_directory
+
 
 def register_subcommand(subparsers, name, help_text):
 	parser = subparsers.add_parser(name, help=help_text)
@@ -15,6 +17,7 @@ def register_subcommand(subparsers, name, help_text):
 
 def parse_args(args):
 	parser = argparse.ArgumentParser(description=_('main-title'))
+	parser.add_argument('--directory', help=_('argument-help-directory'))
 	subparsers = parser.add_subparsers(title='subcommands', help=_('main-subcommands-help'))
 
 	register_subcommand(subparsers, 'announce-transaction', _('main-announce-transaction-help'))
@@ -33,6 +36,7 @@ def parse_args(args):
 	register_subcommand(subparsers, 'upgrade', _('main-upgrade-help'))
 
 	args = parser.parse_args(args)
+	args.directory = resolve_directory(args.directory)
 	if not hasattr(args, 'func'):
 		parser.print_help()
 		raise SystemExit()

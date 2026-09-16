@@ -119,9 +119,9 @@ async def test_renew_voting_keys_fails_when_node_is_not_voter(server, caplog):  
 
 			# Act:
 			await main([
+				'--directory', output_directory,
 				'renew-voting-keys',
 				'--config', str(config_filepath),
-				'--directory', output_directory
 			])
 
 			# Assert: error is raised
@@ -143,9 +143,9 @@ async def test_can_renew_voting_keys_when_none_are_present(server, caplog):  # p
 
 			# Act:
 			await main([
+				'--directory', output_directory,
 				'renew-voting-keys',
 				'--config', str(config_filepath),
-				'--directory', output_directory
 			])
 
 			# Assert: warning is raised
@@ -185,9 +185,9 @@ async def test_can_renew_voting_keys_when_some_are_present_and_active(server):  
 
 			# Act:
 			await main([
+				'--directory', output_directory,
 				'renew-voting-keys',
 				'--config', str(config_filepath),
-				'--directory', output_directory
 			])
 
 			# Assert: existing voting keys files are preserved and new voting keys file is created
@@ -230,9 +230,9 @@ async def test_can_renew_voting_keys_when_some_are_present_and_inactive(server):
 
 			# Act:
 			await main([
+				'--directory', output_directory,
 				'renew-voting-keys',
 				'--config', str(config_filepath),
-				'--directory', output_directory
 			])
 
 			# Assert: inactive voting keys files are deleted, active voting keys files are preserved and new voting keys file is created
@@ -284,9 +284,9 @@ async def test_cannot_renew_voting_keys_when_max_keys_are_active(server, caplog)
 
 			# Act:
 			await main([
+				'--directory', output_directory,
 				'renew-voting-keys',
 				'--config', str(config_filepath),
-				'--directory', output_directory
 			])
 
 			# Assert: error is raised

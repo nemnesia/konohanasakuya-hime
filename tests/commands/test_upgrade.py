@@ -156,13 +156,13 @@ async def _assert_can_upgrade_node(
 			common_args = [
 				'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 				'--package', f'file://{Path(package_directory) / "resources.zip"}',
-				'--directory', output_directory,
 				'--overrides', str(Path(package_directory) / 'user_overrides.ini')
 			]
 
 			with tempfile.TemporaryDirectory() as ca_directory:
 				# - prepare directory by running initial setup command
 				await main([
+					'--directory', output_directory,
 					'setup',
 					'--security', 'insecure',
 					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
@@ -183,7 +183,7 @@ async def _assert_can_upgrade_node(
 
 				# Act: upgrade (with different overrides)
 				_prepare_overrides(package_directory, 'name from upgrade')
-				await main(['upgrade'] + common_args)
+				await main(['--directory', output_directory, 'upgrade'] + common_args)
 
 				# Assert: spot check all expected output files and permissions
 				assert_expected_files_and_permissions(output_directory, expected_output_files)

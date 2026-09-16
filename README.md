@@ -53,6 +53,28 @@ If you need to renew voting key files, it is recommended to use `renew-voting-ke
 
 # CLI Commands
 
+The CLI exposes a common installation directory context for commands that use local node state. The directory is resolved in this order:
+
+1. top-level `--directory`
+2. `SHOESTRING_HOME`
+3. the current working directory
+
+Examples:
+
+```sh
+shoestring --directory /srv/symbol health --config /path/to/shoestring.ini
+shoestring --directory /srv/symbol upgrade --config /path/to/shoestring.ini
+
+cd /srv/symbol
+shoestring health --config /path/to/shoestring.ini
+shoestring upgrade --config /path/to/shoestring.ini
+
+export SHOESTRING_HOME=/srv/symbol
+shoestring health --config /path/to/shoestring.ini
+```
+
+`--directory` is a top-level option and must appear before the subcommand.
+
 In commands that require `--package` switch, the list of currently supported network aliases are:
  * mainnet
  * sai (current testnet)
@@ -147,7 +169,6 @@ Sets up a Symbol node from scratch
 setup \
     --config CONFIG \
     [--package PACKAGE] \
-    [--directory DIRECTORY] \
     [--overrides OVERRIDES] \
     [--rest-overrides REST_OVERRIDES] \
     [--security {default,paranoid,insecure}] \
@@ -155,7 +176,6 @@ setup \
 
   --config CONFIG                       path to shoestring configuration file
   --package PACKAGE                     Network configuration package. Possible values: (name | file:///filename | http(s)://uri) (default: mainnet)
-  --directory DIRECTORY                 installation directory (default: $HOME)
   --overrides OVERRIDES                 path to custom user settings
   --rest-overrides REST_OVERRIDES       path to custom user REST settings (this is only valid for API roles)
   --security                            security mode (default: default)
@@ -198,10 +218,9 @@ Checks the health of the local Symbol node.
 
 
 ```
-health [-h] --config CONFIG [--directory DIRECTORY]
+health [-h] --config CONFIG
 
   --config CONFIG       path to shoestring configuration file
-  --directory DIRECTORY installation directory (default: $HOME)
 ```
 
 ## Upgrade Commands
@@ -214,13 +233,11 @@ Upgrades a node to the latest client version.
 upgrade \
     --config CONFIG \
     [--package PACKAGE] \
-    [--directory DIRECTORY] \
     [--overrides OVERRIDES] \
     [--rest-overrides REST_OVERRIDES]
 
   --config CONFIG                       path to shoestring configuration file
   --package PACKAGE                     Network configuration package. Possible values: (name | file:///filename | http(s)://uri) (default: mainnet)
-  --directory DIRECTORY                 installation directory (default: $HOME)
   --overrides OVERRIDES                 path to custom user settings
   --rest-overrides REST_OVERRIDES       path to custom user REST settings (this is only valid for API roles)
 ```
@@ -230,10 +247,9 @@ upgrade \
 Renews peer certificates.
 
 ```
-renew-certificates --config CONFIG [--directory DIRECTORY] --ca-key-path CA_KEY_PATH [--renew-ca] [--retain-node-key]
+renew-certificates --config CONFIG --ca-key-path CA_KEY_PATH [--renew-ca] [--retain-node-key]
 
   --config CONFIG           path to shoestring configuration file
-  --directory DIRECTORY     installation directory (default: $HOME)
   --ca-key-path CA_KEY_PATH path to main private key PEM file
   --renew-ca                renews CA certificate too
   --retain-node-key         retain node key
@@ -247,10 +263,9 @@ When `--renew-ca` is set, both CA and node certificates will be regenerated. Oth
 Renews voting keys.
 
 ```
-renew-voting-keys --config CONFIG [--directory DIRECTORY]
+renew-voting-keys --config CONFIG
 
   --config CONFIG           path to shoestring configuration file
-  --directory DIRECTORY     installation directory (default: $HOME)
 ```
 
 This command will generate a transaction that will need to be sent to the network using `announce-transaction` to update the network state.
@@ -260,10 +275,9 @@ This command will generate a transaction that will need to be sent to the networ
 Resets blockchain state to allow a resync from scratch.
 
 ```
-reset-data --config CONFIG [--directory DIRECTORY] [--purge-harvesters]
+reset-data --config CONFIG [--purge-harvesters]
 
   --config CONFIG           path to shoestring configuration file
-  --directory DIRECTORY     installation directory (default: $HOME)
   --purge-harvesters        purge harvesters.dat file
 ```
 

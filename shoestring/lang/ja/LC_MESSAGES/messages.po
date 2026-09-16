@@ -34,12 +34,9 @@ msgstr "メイン秘密鍵PEMファイルへのパス"
 msgid "argument-help-config"
 msgstr "shoestring設定ファイルへのパス"
 
-#: shoestring/commands/health.py:75
-#: shoestring/commands/renew_certificates.py:39
-#: shoestring/commands/renew_voting_keys.py:113
-#: shoestring/commands/reset_data.py:87 shoestring/commands/setup.py:149
+#: shoestring/__main__.py:19
 msgid "argument-help-directory"
-msgstr "インストールディレクトリ（デフォルト: {default_path}）"
+msgstr "インストールディレクトリ（優先順位: --directory、SHOESTRING_HOME、カレントディレクトリ）"
 
 #: shoestring/commands/import_bootstrap.py:50
 msgid "argument-help-import-bootstrap-bootstrap"
@@ -917,4 +914,3 @@ msgstr "ようこそ"
 #: shoestring/wizard/screens/welcome.py:39
 msgid "wizard-welcome-upgrade"
 msgstr "アップグレード"
-

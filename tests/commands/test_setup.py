@@ -178,11 +178,11 @@ async def _assert_can_prepare_node(
 
 				# Act:
 				await main([
+					'--directory', output_directory,
 					'setup',
 					'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 					'--security', 'insecure',
 					'--package', f'file://{Path(package_directory) / "resources.zip"}',
-					'--directory', output_directory,
 					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 					'--overrides', str(Path(package_directory) / 'user_overrides.ini')
 				])
@@ -278,11 +278,11 @@ async def test_can_prepare_node_with_relative_output_directory(server):  # pylin
 			with tempfile.TemporaryDirectory() as ca_directory:
 				# Act:
 				await main([
+					'--directory', str(Path(output_directory).relative_to(os.getcwd())),
 					'setup',
 					'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 					'--security', 'insecure',
 					'--package', f'file://{Path(package_directory) / "resources.zip"}',
-					'--directory', str(Path(output_directory).relative_to(os.getcwd())),
 					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 					'--overrides', str(Path(package_directory) / 'user_overrides.ini')
 				])
@@ -317,11 +317,11 @@ async def _assert_can_prepare_with_hostname(server, hostname, node_features, api
 			with tempfile.TemporaryDirectory() as ca_directory:
 				# Act:
 				await main([
+					'--directory', output_directory,
 					'setup',
 					'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 					'--security', 'insecure',
 					'--package', f'file://{Path(package_directory) / "resources.zip"}',
-					'--directory', output_directory,
 					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 					'--overrides', str(user_overrides_filepath)
 				])
@@ -363,11 +363,11 @@ async def test_can_apply_custom_rest_overrides(server):  # pylint: disable=redef
 			with tempfile.TemporaryDirectory() as ca_directory:
 				# Act:
 				await main([
+					'--directory', output_directory,
 					'setup',
 					'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 					'--security', 'insecure',
 					'--package', f'file://{Path(package_directory) / "resources.zip"}',
-					'--directory', output_directory,
 					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 					'--overrides', str(Path(package_directory) / 'user_overrides.ini'),
 					'--rest-overrides', str(rest_overrides_filepath)
@@ -421,11 +421,11 @@ async def _assert_cannot_prepare_with_hostname(
 				# Act + Assert:
 				with pytest.raises(RuntimeError) as excinfo:
 					await main([
+						'--directory', output_directory,
 						'setup',
 						'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 						'--security', 'insecure',
 						'--package', f'file://{Path(package_directory) / "resources.zip"}',
-						'--directory', output_directory,
 						'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 						'--overrides', str(user_overrides_filepath)
 					])
@@ -479,11 +479,11 @@ async def test_cannot_rerun_setup_when_directory_exists(server):  # pylint: disa
 				# Act + Assert:
 				with pytest.raises(SystemExit) as ex_info:
 					await main([
+						'--directory', output_directory,
 						'setup',
 						'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 						'--security', 'insecure',
 						'--package', f'file://{Path(package_directory) / "resources.zip"}',
-						'--directory', output_directory,
 						'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 						'--overrides', str(Path(package_directory) / 'user_overrides.ini')
 					])
@@ -511,11 +511,11 @@ async def _assert_can_regenerate_links(server, node_features):  # pylint: disabl
 			with tempfile.TemporaryDirectory() as ca_directory:
 				# - run initial setup
 				setup_command_args = [
+					'--directory', output_directory,
 					'setup',
 					'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
 					'--security', 'insecure',
 					'--package', f'file://{Path(package_directory) / "resources.zip"}',
-					'--directory', output_directory,
 					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 					'--overrides', str(Path(package_directory) / 'user_overrides.ini')
 				]

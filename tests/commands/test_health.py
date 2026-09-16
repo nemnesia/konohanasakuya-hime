@@ -103,9 +103,9 @@ async def test_can_run_health_command(caplog):
 
 				# Act:
 				await main([
+					'--directory', output_directory,
 					'health',
 					'--config', str(config_filepath),
-					'--directory', output_directory
 				])
 
 				# Assert:

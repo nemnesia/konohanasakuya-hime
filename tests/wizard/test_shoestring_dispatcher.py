@@ -64,13 +64,13 @@ async def test_can_dispatch_setup_command():
 				_create_executor(dispatched_args))
 
 			# Assert:
-			for i in (2, 8):
+			for i in (4, 8):
 				dispatched_args[i] = _strip_folder(dispatched_args[i])  # strip temporary folder used during setup
 
 			assert [
+				'--directory', output_directory,
 				'setup',
 				'--config', 'shoestring.ini',
-				'--directory', output_directory,
 				'--ca-key-path', str(Path(package_directory) / 'ca.pem'),
 				'--overrides', 'overrides.ini',
 				'--package', f'file://{Path(package_directory) / "resources.zip"}',
@@ -98,13 +98,13 @@ async def test_can_dispatch_setup_command_with_custom_rest_overrides():
 				_create_executor(dispatched_args))
 
 			# Assert:
-			for i in (2, 8, 14):
+			for i in (4, 8, 12):
 				dispatched_args[i] = _strip_folder(dispatched_args[i])  # strip temporary folder used during setup
 
 			assert [
+				'--directory', output_directory,
 				'setup',
 				'--config', 'shoestring.ini',
-				'--directory', output_directory,
 				'--ca-key-path', str(Path(package_directory) / 'ca.pem'),
 				'--overrides', 'overrides.ini',
 				'--package', f'file://{Path(package_directory) / "resources.zip"}',
@@ -164,9 +164,9 @@ async def test_can_dispatch_upgrade_command():
 
 		# Assert:
 		assert [
+			'--directory', package_directory,
 			'upgrade',
 			'--config', f'{shoestring_directory}/shoestring.ini',
-			'--directory', package_directory,
 			'--overrides', f'{shoestring_directory}/overrides.ini',
 			'--package', 'sai'
 		] == dispatched_args

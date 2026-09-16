@@ -42,9 +42,9 @@ def build_shoestring_command(
 		command_name = 'renew-voting-keys'
 
 	shoestring_args = [
+		'--directory', str(destination_directory),
 		command_name,
-		'--config', str(Path(shoestring_directory) / 'shoestring.ini'),
-		'--directory', str(destination_directory)
+		'--config', str(Path(shoestring_directory) / 'shoestring.ini')
 	]
 
 	if requires_ca_key_path(operation):

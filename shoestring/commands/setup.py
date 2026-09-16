@@ -146,7 +146,6 @@ async def run_main(args):
 def add_arguments(parser, is_initial_setup=True):
 	parser.add_argument('--config', help=_('argument-help-config'), required=True)
 	parser.add_argument('--package', help=_('argument-help-setup-package'), default='mainnet')
-	parser.add_argument('--directory', help=_('argument-help-directory').format(default_path=Path.home()), default=str(Path.home()))
 	parser.add_argument('--overrides', help=_('argument-help-setup-overrides'))
 	parser.add_argument('--rest-overrides', help=_('argument-help-setup-rest-overrides'))
 

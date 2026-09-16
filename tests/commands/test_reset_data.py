@@ -32,9 +32,9 @@ async def _assert_reset_data(node_features, expected_recreated_subdirectories, l
 
 		# Act:
 		await main([
+			'--directory', output_directory,
 			'reset-data',
 			'--config', str(config_filepath),
-			'--directory', output_directory
 		])
 
 		# Assert: all folders should be present and folders not recreated should still have placeholder files
@@ -111,9 +111,9 @@ async def _assert_reset_data_with_harvester_state(additional_command_args, expec
 
 		# Act:
 		await main([
+			'--directory', output_directory,
 			'reset-data',
 			'--config', str(config_filepath),
-			'--directory', output_directory
 		] + additional_command_args)
 
 		# Assert: check files and contents
@@ -157,9 +157,9 @@ async def _assert_reset_data_with_voter_state(votes_backup_epochs, expected_data
 
 		# Act:
 		await main([
+			'--directory', output_directory,
 			'reset-data',
 			'--config', str(config_filepath),
-			'--directory', output_directory
 		])
 
 		# Assert: check files and contents

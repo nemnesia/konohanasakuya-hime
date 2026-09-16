@@ -23,9 +23,9 @@ def _assert_can_build_shoestring_command_setup(has_custom_rest_overrides, expect
 
 	# Assert:
 	assert [
+		'--directory', 'symbol',
 		'setup',
 		'--config', 'shoestring/shoestring.ini',
-		'--directory', 'symbol',
 		'--ca-key-path', 'cert/ca.key.pem',
 		'--overrides', 'shoestring/overrides.ini',
 		'--package', 'sai',
@@ -47,9 +47,9 @@ def test_can_build_shoestring_command_upgrade():
 
 	# Assert:
 	assert [
+		'--directory', 'symbol',
 		'upgrade',
 		'--config', 'shoestring/shoestring.ini',
-		'--directory', 'symbol',
 		'--overrides', 'shoestring/overrides.ini',
 		'--package', 'sai'
 	] == args
@@ -61,9 +61,9 @@ def test_can_build_shoestring_command_reset_data():
 
 	# Assert:
 	assert [
+		'--directory', 'symbol',
 		'reset-data',
 		'--config', 'shoestring/shoestring.ini',
-		'--directory', 'symbol'
 	] == args
 
 
@@ -73,9 +73,9 @@ def test_can_build_shoestring_command_renew_certificates():
 
 	# Assert:
 	assert [
+		'--directory', 'symbol',
 		'renew-certificates',
 		'--config', 'shoestring/shoestring.ini',
-		'--directory', 'symbol',
 		'--ca-key-path', 'cert/ca.key.pem'
 	] == args
 
@@ -86,9 +86,9 @@ def test_can_build_shoestring_command_renew_voting_keys():
 
 	# Assert:
 	assert [
+		'--directory', 'symbol',
 		'renew-voting-keys',
 		'--config', 'shoestring/shoestring.ini',
-		'--directory', 'symbol',
 	] == args
 
 # endregion
