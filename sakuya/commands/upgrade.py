@@ -3,13 +3,11 @@ import tempfile
 from argparse import Namespace
 from pathlib import Path
 
-from zenlog import log
-
 from sakuya.internal.AtomicFileSystem import replace_paths
 from sakuya.internal.ConfigurationManager import ConfigurationManager
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 from .setup import add_arguments as add_setup_arguments
 from .setup import run_main as run_setup_main
@@ -48,7 +46,7 @@ def _prepare_staged_directories(staged_directories, config):
 
 
 async def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 	output_directory = Path(args.directory).absolute()
 	directories = Preparer.DirectoryLocator(None, output_directory)
 

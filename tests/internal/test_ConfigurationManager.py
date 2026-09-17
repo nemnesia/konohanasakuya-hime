@@ -4,8 +4,8 @@ from pathlib import Path
 
 from sakuya.internal.ConfigurationManager import (
 	ConfigurationManager,
+	load_configuration_patches_from_file,
 	load_patches_from_file,
-	load_shoestring_patches_from_file,
 	merge_json_configuration,
 	parse_time_span
 )
@@ -263,24 +263,24 @@ class ConfigurationManagerTest(unittest.TestCase):
 
 	# endregion
 
-	# region load_shoestring_patches_from_file
+	# region load_configuration_patches_from_file
 
-	def _assert_cannot_load_shoestring_patches_from_file(self, lines, only_sections=None):
+	def _assert_cannot_load_configuration_patches_from_file(self, lines, only_sections=None):
 		# Arrange:
 		with tempfile.TemporaryDirectory() as temp_directory:
-			shoestring_filepath = Path(temp_directory) / 'shoe_not.ini'
-			with open(shoestring_filepath, 'wt', encoding='utf8') as outfile:
+			configuration_filepath = Path(temp_directory) / 'invalid.ini'
+			with open(configuration_filepath, 'wt', encoding='utf8') as outfile:
 				outfile.write('\n'.join(lines))
 
 			# Act + Assert:
 			with self.assertRaises(Exception):
-				load_shoestring_patches_from_file(shoestring_filepath, only_sections)
+				load_configuration_patches_from_file(configuration_filepath, only_sections)
 
-	def _assert__can_load_shoestring_patches_from_file(self, expected_patches, only_sections=None):
+	def _assert__can_load_configuration_patches_from_file(self, expected_patches, only_sections=None):
 		# Arrange:
 		with tempfile.TemporaryDirectory() as temp_directory:
-			shoestring_filepath = Path(temp_directory) / 'shoe.ini'
-			with open(shoestring_filepath, 'wt', encoding='utf8') as outfile:
+			configuration_filepath = Path(temp_directory) / 'configuration.ini'
+			with open(configuration_filepath, 'wt', encoding='utf8') as outfile:
 				outfile.write('\n'.join([
 					'[network]',
 					'ubuntuCore = 22.04',
@@ -296,22 +296,22 @@ class ConfigurationManagerTest(unittest.TestCase):
 				]))
 
 			# Act:
-			patches = load_shoestring_patches_from_file(shoestring_filepath, only_sections)
+			patches = load_configuration_patches_from_file(configuration_filepath, only_sections)
 
 			# Assert:
 			self.assertEqual(expected_patches, patches)
 
-	def test_cannot_load_shoestring_patches_from_file_does_not_exist(self):
+	def test_cannot_load_configuration_patches_from_file_does_not_exist(self):
 		# Arrange:
 		with tempfile.TemporaryDirectory() as temp_directory:
-			shoestring_filepath = Path(temp_directory) / 'shoestring_not_found.ini'
+			configuration_filepath = Path(temp_directory) / 'configuration_not_found.ini'
 
 			# Act + Assert:
 			with self.assertRaises(FileNotFoundError):
-				load_shoestring_patches_from_file(shoestring_filepath, [])
+				load_configuration_patches_from_file(configuration_filepath, [])
 
-	def test_can_load_shoestring_patches_from_file_well_formed(self):
-		self._assert__can_load_shoestring_patches_from_file([
+	def test_can_load_configuration_patches_from_file_well_formed(self):
+		self._assert__can_load_configuration_patches_from_file([
 			('network', 'ubuntuCore', '22.04'),
 			('network', 'fedora', '36'),
 			('network', 'debian', '11.4'),
@@ -320,15 +320,15 @@ class ConfigurationManagerTest(unittest.TestCase):
 			('node', 'nodeCommonName', 'test 127.0.0.1')
 		])
 
-	def test_can_load_shoestring_patches_from_file_include_one_section(self):
-		self._assert__can_load_shoestring_patches_from_file([
+	def test_can_load_configuration_patches_from_file_include_one_section(self):
+		self._assert__can_load_configuration_patches_from_file([
 			('images', 'rest', 'symbolplatform/symbol-rest:2.4.4')
 		],
 			['images']
 		)
 
-	def test_can_load_shoestring_patches_from_file_include_two_sections(self):
-		self._assert__can_load_shoestring_patches_from_file([
+	def test_can_load_configuration_patches_from_file_include_two_sections(self):
+		self._assert__can_load_configuration_patches_from_file([
 			('images', 'rest', 'symbolplatform/symbol-rest:2.4.4'),
 			('node', 'caCommonName', 'CA test'),
 			('node', 'nodeCommonName', 'test 127.0.0.1')
@@ -336,8 +336,8 @@ class ConfigurationManagerTest(unittest.TestCase):
 			['images', 'node']
 		)
 
-	def test_cannot_load_shoestring_patches_from_file_when_include_section_not_found(self):
-		self._assert_cannot_load_shoestring_patches_from_file([
+	def test_cannot_load_configuration_patches_from_file_when_include_section_not_found(self):
+		self._assert_cannot_load_configuration_patches_from_file([
 			'[node]',
 			'ubuntuCore = 22.04',
 			'fedora = 36',
@@ -349,8 +349,8 @@ class ConfigurationManagerTest(unittest.TestCase):
 			['images']
 		)
 
-	def test_cannot_load_shoestring_patches_from_file_malformed_ini(self):
-		self._assert_cannot_load_shoestring_patches_from_file([
+	def test_cannot_load_configuration_patches_from_file_malformed_ini(self):
+		self._assert_cannot_load_configuration_patches_from_file([
 			'ubuntuCore = 22.04',
 			'fedora = 36',
 			'debian = 11.4',
@@ -359,8 +359,8 @@ class ConfigurationManagerTest(unittest.TestCase):
 			'boost = 80'
 		])
 
-	def test_cannot_load_shoestring_patches_from_file_malformed_section_header(self):
-		self._assert_cannot_load_shoestring_patches_from_file([
+	def test_cannot_load_configuration_patches_from_file_malformed_section_header(self):
+		self._assert_cannot_load_configuration_patches_from_file([
 			'[]',
 			'ubuntuCore = 22.04',
 			'fedora = 36',

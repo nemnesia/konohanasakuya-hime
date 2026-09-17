@@ -16,7 +16,7 @@ ImportsConfiguration = namedtuple('ImportsConfiguration', ['harvester', 'voter',
 NodeConfiguration = namedtuple('NodeConfiguration', [
 	'features', 'user_id', 'group_id', 'ca_password', 'api_https', 'full_api', 'ca_common_name', 'node_common_name'
 ])
-ShoestringConfiguration = namedtuple('ShoestringConfiguration', ['network', 'images', 'services', 'transaction', 'imports', 'node'])
+SakuyaConfiguration = namedtuple('SakuyaConfiguration', ['network', 'images', 'services', 'transaction', 'imports', 'node'])
 
 
 def parse_network_configuration(config):
@@ -82,14 +82,14 @@ def parse_node_configuration(config):
 	return NodeConfiguration(features, user_id, group_id, ca_password, api_https, full_api, ca_common_name, node_common_name)
 
 
-def parse_shoestring_configuration(filename):
-	"""Parses a shoestring configuration file."""
+def parse_sakuya_configuration(filename):
+	"""Parses a Sakuya configuration file."""
 
 	parser = configparser.ConfigParser()
 	with open(filename, 'rt', encoding='utf8') as infile:
 		parser.read_file(infile)
 
-	return ShoestringConfiguration(
+	return SakuyaConfiguration(
 		parse_network_configuration(parser['network']),
 		parse_images_configuration(parser['images']),
 		parse_services_configuration(parser['services']),

@@ -4,8 +4,8 @@ from prompt_toolkit.utils import get_cwidth
 from prompt_toolkit.widgets import Box, Shadow
 
 from sakuya.wizard.MultibyteButton import MultibyteButton as Button
+from sakuya.wizard.SakuyaOperation import SakuyaOperation
 from sakuya.wizard.Screen import Screen
-from sakuya.wizard.ShoestringOperation import ShoestringOperation
 
 
 class ButtonWithOperation(Button):
@@ -34,11 +34,11 @@ class WelcomeSettings:
 
 def create(_screens):
 	values = [
-		(ShoestringOperation.SETUP, _('wizard-welcome-setup')),
-		(ShoestringOperation.UPGRADE, _('wizard-welcome-upgrade')),
-		(ShoestringOperation.RESET_DATA, _('wizard-welcome-reset-data')),
-		(ShoestringOperation.RENEW_CERTIFICATES, _('wizard-welcome-renew-certificates')),
-		(ShoestringOperation.RENEW_VOTING_KEYS, _('wizard-welcome-renew-voting-keys'))
+		(SakuyaOperation.SETUP, _('wizard-welcome-setup')),
+		(SakuyaOperation.UPGRADE, _('wizard-welcome-upgrade')),
+		(SakuyaOperation.RESET_DATA, _('wizard-welcome-reset-data')),
+		(SakuyaOperation.RENEW_CERTIFICATES, _('wizard-welcome-renew-certificates')),
+		(SakuyaOperation.RENEW_VOTING_KEYS, _('wizard-welcome-renew-voting-keys'))
 	]
 
 	max_label = max(get_cwidth(label) for (_, label) in values)

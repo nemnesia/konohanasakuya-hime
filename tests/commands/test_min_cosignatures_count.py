@@ -10,9 +10,9 @@ from sakuya.__main__ import main
 from sakuya.internal.ConfigurationManager import ConfigurationManager
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.PemUtils import read_public_key_from_private_key_pem_file
-from sakuya.internal.ShoestringConfiguration import NodeConfiguration, ShoestringConfiguration
+from sakuya.internal.SakuyaConfiguration import NodeConfiguration, SakuyaConfiguration
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 from ..test.LogTestUtils import assert_message_is_logged
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 
@@ -30,7 +30,7 @@ async def server(aiohttp_client):
 
 
 def _create_configuration():
-	return ShoestringConfiguration(*(5 * [None]), NodeConfiguration(NodeFeatures.PEER, None, None, None, False, None, None))
+	return SakuyaConfiguration(*(5 * [None]), NodeConfiguration(NodeFeatures.PEER, None, None, None, False, None, None))
 
 
 def _load_ca_address(ca_pem_filepath):
@@ -47,7 +47,7 @@ async def _run_test(server, caplog, additional_flags, expected_config_value):   
 		ca_address = _load_ca_address(ca_pem_filepath)
 		server.mock.multisig_account_addresses.append(ca_address)
 
-		config_filepath = prepare_shoestring_configuration(output_directory, NodeFeatures.PEER, server.make_url(''))
+		config_filepath = prepare_sakuya_configuration(output_directory, NodeFeatures.PEER, server.make_url(''))
 
 		# Act:
 		await main([

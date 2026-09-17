@@ -14,7 +14,7 @@ from sakuya.healthagents.voting_keys import should_run, validate
 from sakuya.internal.ConfigurationManager import ConfigurationManager
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import NodeConfiguration, ServicesConfiguration, ShoestringConfiguration
+from sakuya.internal.SakuyaConfiguration import NodeConfiguration, SakuyaConfiguration, ServicesConfiguration
 from sakuya.internal.VoterConfigurator import inspect_voting_key_files
 
 from ..test.LogTestUtils import LogLevel, assert_all_messages_are_logged, assert_max_log_level
@@ -102,7 +102,7 @@ async def _dispatch_validate(directories, server):  # pylint: disable=redefined-
 	context = SimpleNamespace(
 		config_manager=ConfigurationManager(directories.resources),
 		directories=directories,
-		config=ShoestringConfiguration(
+		config=SakuyaConfiguration(
 			Network('testnet', 0x98, datetime.fromtimestamp(1615853185, timezone.utc), Hash256.zero()),
 			None,
 			ServicesConfiguration(server.make_url('')),

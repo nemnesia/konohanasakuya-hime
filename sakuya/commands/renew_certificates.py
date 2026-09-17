@@ -8,11 +8,11 @@ from sakuya.internal.CertificateFactory import CertificateFactory
 from sakuya.internal.NodeKeyUtils import write_node_key_file
 from sakuya.internal.OpensslExecutor import OpensslExecutor
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 
 async def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 	directories = Preparer.DirectoryLocator(None, Path(args.directory).absolute())
 
 	ca_key_path = Path(args.ca_key_path).absolute()
@@ -54,5 +54,4 @@ def add_arguments(parser):
 	parser.add_argument('--ca-key-path', help=_('argument-help-ca-key-path'))
 	parser.add_argument('--renew-ca', help=_('argument-help-renew-certificates-renew-ca'), action='store_true')
 	parser.add_argument('--renew-node-key', help=_('argument-help-renew-certificates-renew-node-key'), action='store_true')
-	parser.add_argument('--force', help=_('argument-help-renew-certificates-force'), action='store_true')
 	parser.set_defaults(func=run_main)

@@ -16,7 +16,7 @@ from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.PackageResolver import download_and_extract_package as real_download_and_extract_package
 
 from ..test.CertificateTestUtils import assert_certificate_properties
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 from ..test.FileSystemTestUtils import assert_expected_files_and_permissions
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 from ..test.TestPackager import prepare_testnet_package
@@ -174,7 +174,7 @@ async def _assert_can_prepare_node(
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			ca_password = 'abcd' if CaMode.WITH_PASSWORD == ca_mode else ''
-			prepare_shoestring_configuration(
+			prepare_sakuya_configuration(
 				package_directory,
 				node_features,
 				server.make_url(''),
@@ -279,7 +279,7 @@ async def test_can_prepare_node_with_relative_output_directory(server):  # pylin
 	# Arrange:
 	with tempfile.TemporaryDirectory(dir=os.getcwd()) as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_shoestring_configuration(
+			prepare_sakuya_configuration(
 				package_directory,
 				NodeFeatures.PEER,
 				server.make_url(''),
@@ -320,7 +320,7 @@ async def _assert_can_prepare_with_hostname(server, hostname, node_features, api
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_shoestring_configuration(package_directory, node_features, server.make_url(''), api_https=api_https)
+			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=api_https)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
 			user_overrides_filepath = Path(package_directory) / 'overrides.properties'
@@ -354,7 +354,7 @@ async def test_can_apply_custom_rest_overrides(server):  # pylint: disable=redef
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			_prepare_overrides(package_directory)
-			prepare_shoestring_configuration(package_directory, NodeFeatures.API, server.make_url(''))
+			prepare_sakuya_configuration(package_directory, NodeFeatures.API, server.make_url(''))
 			prepare_testnet_package(package_directory, 'resources.zip')
 
 			rest_overrides_filepath = Path(package_directory) / 'metadata.json'
@@ -419,7 +419,7 @@ async def _assert_cannot_prepare_with_hostname(
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_shoestring_configuration(package_directory, node_features, server.make_url(''), api_https=api_https)
+			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=api_https)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
 			user_overrides_filepath = Path(package_directory) / 'overrides.properties'
@@ -474,7 +474,7 @@ async def test_cannot_rerun_setup_when_directory_exists(server):  # pylint: disa
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_shoestring_configuration(package_directory, NodeFeatures.PEER, server.make_url(''), api_https=False)
+			prepare_sakuya_configuration(package_directory, NodeFeatures.PEER, server.make_url(''), api_https=False)
 			_prepare_overrides(package_directory)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
@@ -508,7 +508,7 @@ async def _assert_can_regenerate_links(server, node_features):  # pylint: disabl
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_shoestring_configuration(package_directory, node_features, server.make_url(''), api_https=False)
+			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=False)
 			_prepare_overrides(package_directory)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
@@ -616,7 +616,8 @@ async def test_initial_setup_rejects_symbolic_link_ca_key(tmp_path):
 			command='setup'))
 
 
-async def test_initial_setup_removes_published_ca_key_when_commit_fails(monkeypatch, tmp_path):
+@pytest.mark.parametrize('failure', [OSError, KeyboardInterrupt, SystemExit])
+async def test_initial_setup_removes_published_ca_key_when_commit_fails(monkeypatch, tmp_path, failure):
 	output_directory = tmp_path / 'output'
 	output_directory.mkdir()
 	ca_key_path = tmp_path / 'keys' / 'ca.key.pem'
@@ -627,9 +628,9 @@ async def test_initial_setup_removes_published_ca_key_when_commit_fails(monkeypa
 		args.ca_key_path.write_text('generated', encoding='utf8')
 
 	monkeypatch.setattr(setup_command, '_run_setup', fake_run_setup)
-	monkeypatch.setattr(setup_command, 'replace_paths', lambda *_args: (_ for _ in ()).throw(OSError('commit failed')))
+	monkeypatch.setattr(setup_command, 'replace_paths', lambda *_args: (_ for _ in ()).throw(failure('commit failed')))
 
-	with pytest.raises(OSError, match='commit failed'):
+	with pytest.raises(failure, match='commit failed'):
 		await setup_command._run_initial_setup_atomically(SimpleNamespace(
 			directory=output_directory,
 			ca_key_path=ca_key_path,
@@ -677,7 +678,7 @@ async def test_run_setup_rejects_existing_resources_on_initial_setup(monkeypatch
 		def __exit__(self, *_args):
 			return False
 
-	monkeypatch.setattr(setup_command, 'parse_shoestring_configuration', lambda _path: SimpleNamespace())
+	monkeypatch.setattr(setup_command, 'parse_sakuya_configuration', lambda _path: SimpleNamespace())
 	monkeypatch.setattr(setup_command, 'Preparer', FakePreparer)
 
 	with pytest.raises(SystemExit) as ex_info:

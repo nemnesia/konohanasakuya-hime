@@ -46,7 +46,7 @@ def test_prepare_staged_directories_creates_full_api_and_https_directories(tmp_p
 
 async def test_upgrade_requires_existing_node_configuration(monkeypatch, tmp_path):
 	config = SimpleNamespace(node=SimpleNamespace(features=NodeFeatures.PEER))
-	monkeypatch.setattr(upgrade_command, 'parse_shoestring_configuration', lambda _path: config)
+	monkeypatch.setattr(upgrade_command, 'parse_sakuya_configuration', lambda _path: config)
 
 	with pytest.raises(RuntimeError, match='node configuration directory does not exist'):
 		await upgrade_command.run_main(SimpleNamespace(config='config.ini', directory=tmp_path))

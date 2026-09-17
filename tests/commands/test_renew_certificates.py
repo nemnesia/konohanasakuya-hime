@@ -9,10 +9,10 @@ from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 from sakuya.__main__ import main
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 from ..test.CertificateTestUtils import assert_certificate_properties, create_openssl_executor
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 
 # pylint: disable=invalid-name
 
@@ -20,7 +20,7 @@ from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
 # region node certificate renewal only
 
 def _create_configuration(output_directory, ca_password, ca_common_name, node_common_name, filename):
-	return prepare_shoestring_configuration(
+	return prepare_sakuya_configuration(
 		output_directory,
 		NodeFeatures.PEER,
 		ca_password=ca_password,
@@ -41,19 +41,18 @@ def _assert_node_full_certificate(ca_certificate_filepath, node_certificate_file
 	assert node_full_crt_data == node_crt_data + ca_crt_data
 
 
-async def _assert_can_renew_node_certificate(ca_password=None, retain_key=False, use_relative_path=False, force=False):
+async def _assert_can_renew_node_certificate(ca_password=None, retain_key=False, use_relative_path=False):
 	# pylint: disable=too-many-locals
 
 	# Arrange:
-	if use_relative_path and not force:
+	if use_relative_path:
 		# Set the temp directory to cwd so that temp and relative paths are resolved to the same filesystem.
-		# If install path and temp are on different filesystem device then --force has to be used.
 		tempfile.tempdir = os.getcwd()
 
 	with tempfile.TemporaryDirectory() as output_directory:
 		config_filepath_1 = _create_configuration(output_directory, ca_password, 'ORIGINAL CA CN', 'ORIGINAL NODE CN', '1.shoestring.ini')
 		config_filepath_2 = _create_configuration(output_directory, ca_password, 'ORIGINAL CA CN', 'NEW NODE CN', '2.shoestring.ini')
-		preparer = Preparer(output_directory, parse_shoestring_configuration(config_filepath_1))
+		preparer = Preparer(output_directory, parse_sakuya_configuration(config_filepath_1))
 
 		# - generate CA private key pem file
 		ca_private_key = PrivateKey.random()
@@ -89,7 +88,6 @@ async def _assert_can_renew_node_certificate(ca_password=None, retain_key=False,
 			'--config', str(config_filepath_2),
 			'--ca-key-path', str(ca_key_path),
 			*(['--renew-node-key'] if not retain_key else []),
-			*(['--force'] if force else [])
 		])
 
 		# Assert: node certificate is regenerated (subject changed)
@@ -127,13 +125,6 @@ async def test_can_renew_node_certificate_with_relative_path():
 	await _assert_can_renew_node_certificate(use_relative_path=True)
 
 
-async def test_can_renew_node_certificate_with_force():
-	await _assert_can_renew_node_certificate(force=True)
-
-
-async def test_can_renew_node_certificate_with_relative_path_and_force():
-	await _assert_can_renew_node_certificate(use_relative_path=True, force=True)
-
 # endregion
 
 
@@ -146,7 +137,7 @@ async def _assert_can_renew_ca_and_node_certificates(ca_password=None, use_relat
 	with tempfile.TemporaryDirectory() as output_directory:
 		config_filepath_1 = _create_configuration(output_directory, ca_password, 'ORIGINAL CA CN', 'ORIGINAL NODE CN', '1.shoestring.ini')
 		config_filepath_2 = _create_configuration(output_directory, ca_password, 'NEW CA CN', 'NEW NODE CN', '2.shoestring.ini')
-		preparer = Preparer(output_directory, parse_shoestring_configuration(config_filepath_1))
+		preparer = Preparer(output_directory, parse_sakuya_configuration(config_filepath_1))
 
 		with tempfile.TemporaryDirectory(dir=os.getcwd() if use_relative_path else None) as ca_directory:
 			# - generate CA private key pem file
@@ -246,7 +237,7 @@ async def test_cannot_renew_ca_and_node_certificates_when_ca_key_path_does_not_e
 	with tempfile.TemporaryDirectory() as output_directory:
 		config_filepath_1 = _create_configuration(output_directory, None, 'ORIGINAL CA CN', 'ORIGINAL NODE CN', '1.shoestring.ini')
 		config_filepath_2 = _create_configuration(output_directory, None, 'NEW CA CN', 'NEW NODE CN', '2.shoestring.ini')
-		preparer = Preparer(output_directory, parse_shoestring_configuration(config_filepath_1))
+		preparer = Preparer(output_directory, parse_sakuya_configuration(config_filepath_1))
 
 		# - generate CA private key pem file
 		ca_private_key = PrivateKey.random()

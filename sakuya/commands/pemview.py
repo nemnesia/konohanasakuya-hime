@@ -3,10 +3,9 @@ from pathlib import Path
 
 from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 from symbolchain.symbol.KeyPair import KeyPair
-from symbolchain.symbol.Network import Network
 from zenlog import log
 
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 
 def run_main(args):
@@ -27,7 +26,7 @@ def run_main(args):
 	log.info(_('pemview-loaded-pem-file').format(filepath=filepath))
 
 	key_pair = KeyPair(private_key)
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 	network = config.network
 	address = network.public_key_to_address(key_pair.public_key)
 

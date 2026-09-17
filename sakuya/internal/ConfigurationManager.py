@@ -91,7 +91,7 @@ def load_patches_from_file(filename):
 	return patches
 
 
-def load_shoestring_patches_from_file(filename, only_sections=None):
+def load_configuration_patches_from_file(filename, only_sections=None):
 	"""Loads patch information from ini file."""
 
 	parser = configparser.ConfigParser()

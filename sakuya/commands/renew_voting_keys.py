@@ -15,7 +15,7 @@ from sakuya.internal.NodewatchClient import get_current_finalization_epoch
 from sakuya.internal.PeerDownloader import load_api_endpoints
 from sakuya.internal.PemUtils import read_public_key_from_public_key_pem_file
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 from sakuya.internal.TransactionSerializer import write_transaction_to_file
 from sakuya.internal.VoterConfigurator import VoterConfigurator, inspect_voting_key_files
 
@@ -135,7 +135,7 @@ async def _resolve_pending(config, directories, transaction_path, pending_direct
 
 
 async def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 
 	if NodeFeatures.VOTER not in config.node.features:
 		log.error(_('renew-voting-keys-not-voting'))

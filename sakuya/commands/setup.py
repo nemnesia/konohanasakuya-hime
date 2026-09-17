@@ -17,7 +17,7 @@ from sakuya.internal.PackageResolver import download_and_extract_package, resolv
 from sakuya.internal.PeerDownloader import download_peers, find_api_node
 from sakuya.internal.PemUtils import read_public_key_from_public_key_pem_file
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 from sakuya.internal.TransactionSerializer import write_transaction_to_file
 from sakuya.internal.VoterConfigurator import inspect_voting_key_files
 
@@ -130,13 +130,15 @@ async def _run_initial_setup_atomically(args):
 		await _run_setup(staged_args)
 		if ca_key_was_generated and ca_key_path.parent != output_directory:
 			shutil.copy2(staged_args.ca_key_path, ca_key_path)
-			ca_key_path.chmod(0o400)
 			ca_key_published = True
+			ca_key_path.chmod(0o400)
 		elif ca_key_was_generated:
 			managed_paths += (ca_key_path.name,)
 		replace_paths(staged_directory, output_directory, managed_paths)
 		ca_key_path.chmod(0o400)
-	except Exception:
+	# The generated CA key is published in the same critical section as the
+	# staged node files.  Clean it up for every interruption or failure.
+	except BaseException:
 		if ca_key_published:
 			ca_key_path.unlink(missing_ok=True)
 		raise
@@ -145,7 +147,7 @@ async def _run_initial_setup_atomically(args):
 
 
 async def _run_setup(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 	is_initial_setup = 'setup' == getattr(args, 'command', 'setup')
 
 	if is_initial_setup and args.output_transaction_only:

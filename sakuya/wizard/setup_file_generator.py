@@ -1,10 +1,9 @@
 import logging
 import shutil
 from collections import namedtuple
-from pathlib import Path
 
 from sakuya.commands.init import run_main as run_init
-from sakuya.internal.ConfigurationManager import ConfigurationManager, load_shoestring_patches_from_file
+from sakuya.internal.ConfigurationManager import ConfigurationManager, load_configuration_patches_from_file
 from sakuya.internal.NodeFeatures import NodeFeatures
 
 InitArgs = namedtuple('InitArgs', ['package', 'config'])
@@ -67,15 +66,15 @@ def prepare_overrides_file(screens, output_filename):
 		]))
 
 
-async def prepare_shoestring_config(network_type, config_filepath):
-	"""Run shoestring init command."""
+async def prepare_sakuya_config(network_type, config_filepath):
+	"""Run Sakuya init command."""
 
 	with DisableLogger():
 		await run_init(InitArgs(network_type, config_filepath))
 
 
-async def prepare_shoestring_files(screens, directory):
-	"""Prepares shoestring configuration files based on screens."""
+async def prepare_sakuya_files(screens, directory):
+	"""Prepares Sakuya configuration files based on screens."""
 
 	network_type = screens.get('network-type').current_value
 	node_type = screens.get('node-type').current_value
@@ -85,7 +84,7 @@ async def prepare_shoestring_files(screens, directory):
 	node_settings = screens.get('node-settings')
 
 	config_filepath = directory / 'config.ini'
-	await prepare_shoestring_config(network_type, config_filepath)
+	await prepare_sakuya_config(network_type, config_filepath)
 
 	node_features = NodeFeatures.PEER
 	if node_type in ['dual', 'light']:
@@ -125,10 +124,10 @@ async def prepare_shoestring_files(screens, directory):
 	ConfigurationManager(config_filepath.parent).patch(config_filepath.name, replacements)
 
 
-def patch_shoestring_config(shoestring_filepath, package_config_filepath):
-	"""Patches shoestring configuration files."""
+def patch_sakuya_config(sakuya_filepath, package_config_filepath):
+	"""Patches Sakuya configuration files."""
 
-	config_patches = load_shoestring_patches_from_file(shoestring_filepath, ['transaction', 'imports', 'node'])
+	config_patches = load_configuration_patches_from_file(sakuya_filepath, ['transaction', 'imports', 'node'])
 	new_config_manager = ConfigurationManager(package_config_filepath.parent)
 	new_config_manager.patch(package_config_filepath.name, config_patches)
-	shutil.copy(package_config_filepath, shoestring_filepath)
+	shutil.copy(package_config_filepath, sakuya_filepath)

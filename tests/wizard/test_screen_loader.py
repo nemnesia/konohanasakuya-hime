@@ -1,7 +1,7 @@
 
+from sakuya.wizard.SakuyaOperation import SakuyaOperation
 from sakuya.wizard.screen_loader import load_screens, lookup_screens_list_for_operation
 from sakuya.wizard.ScreenContainer import ScreenContainer
-from sakuya.wizard.ShoestringOperation import ShoestringOperation
 
 ALL_SCREEN_IDS = [
 	'welcome', 'root-check',
@@ -43,23 +43,23 @@ def _assert_operation_screens(operation, expected_screen_list):
 
 def test_can_lookup_screens_list_for_operation_setup():
 	_assert_operation_screens(
-		ShoestringOperation.SETUP,
+		SakuyaOperation.SETUP,
 		['welcome', 'root-check', 'obligatory', 'network-type', 'node-type',
 			'harvesting', 'voting', 'node-settings', 'certificates', 'end-screen']
 	)
 
 
 def test_can_lookup_screens_list_for_operation_upgrade():
-	_assert_operation_screens(ShoestringOperation.UPGRADE, ['welcome', 'obligatory', 'end-screen'])
+	_assert_operation_screens(SakuyaOperation.UPGRADE, ['welcome', 'obligatory', 'end-screen'])
 
 
 def test_can_lookup_screens_list_for_operation_reset_data():
-	_assert_operation_screens(ShoestringOperation.RESET_DATA, ['welcome', 'obligatory', 'end-screen'])
+	_assert_operation_screens(SakuyaOperation.RESET_DATA, ['welcome', 'obligatory', 'end-screen'])
 
 
 def test_can_lookup_screens_list_for_operation_renew_certificates():
-	_assert_operation_screens(ShoestringOperation.RENEW_CERTIFICATES, ['welcome', 'obligatory', 'end-screen'])
+	_assert_operation_screens(SakuyaOperation.RENEW_CERTIFICATES, ['welcome', 'obligatory', 'end-screen'])
 
 
 def test_can_lookup_screens_list_for_operation_renew_voting_keys():
-	_assert_operation_screens(ShoestringOperation.RENEW_VOTING_KEYS, ['welcome', 'obligatory', 'end-screen'])
+	_assert_operation_screens(SakuyaOperation.RENEW_VOTING_KEYS, ['welcome', 'obligatory', 'end-screen'])

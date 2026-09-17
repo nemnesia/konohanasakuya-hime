@@ -3,8 +3,8 @@ from collections import namedtuple
 from prompt_toolkit.widgets import Label
 
 from sakuya.wizard.buttons import create_next_clicked_handler, create_operation_button_handler, create_prev_clicked_handler
+from sakuya.wizard.SakuyaOperation import SakuyaOperation
 from sakuya.wizard.ScreenContainer import ScreenContainer
-from sakuya.wizard.ShoestringOperation import ShoestringOperation
 from sakuya.wizard.TitleBar import TitleBar
 
 ChildScreen = namedtuple('ChildScreen', ['screen_id', 'accessor', 'should_show'], defaults=[None, None, lambda: True])
@@ -30,7 +30,7 @@ class StartScreen:
 		self.accessor = self
 		self.should_show = lambda: True
 
-		self.operation = ShoestringOperation.RESET_DATA
+		self.operation = SakuyaOperation.RESET_DATA
 		self.selected_buttons = []
 
 	def select(self, button):
@@ -249,7 +249,7 @@ class OperationButtonTestContext:
 
 def test_can_select_operation_requiring_main_public_key():
 	# Arrange:
-	context = OperationButtonTestContext(ShoestringOperation.SETUP)
+	context = OperationButtonTestContext(SakuyaOperation.SETUP)
 	handler = create_operation_button_handler(context.screens, context.button, context.next)
 
 	# Act:
@@ -269,7 +269,7 @@ def test_can_select_operation_requiring_main_public_key():
 
 def test_can_select_operation_not_requiring_main_public_key():
 	# Arrange:
-	context = OperationButtonTestContext(ShoestringOperation.UPGRADE)
+	context = OperationButtonTestContext(SakuyaOperation.UPGRADE)
 	handler = create_operation_button_handler(context.screens, context.button, context.next)
 
 	context.screens.next()

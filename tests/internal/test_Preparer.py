@@ -16,12 +16,7 @@ from symbollightapi.connector.SymbolConnector import LinkedPublicKeys, VotingPub
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.OpensslExecutor import OpensslExecutor
 from sakuya.internal.Preparer import API_EXTENSIONS, HARVESTER_EXTENSIONS, PEER_EXTENSIONS, Preparer
-from sakuya.internal.ShoestringConfiguration import (
-	ImportsConfiguration,
-	NodeConfiguration,
-	ShoestringConfiguration,
-	TransactionConfiguration
-)
+from sakuya.internal.SakuyaConfiguration import ImportsConfiguration, NodeConfiguration, SakuyaConfiguration, TransactionConfiguration
 
 from ..test.TestPackager import prepare_testnet_package
 from ..test.TransactionTestUtils import AggregateDescriptor, LinkDescriptor, assert_aggregate_transaction, assert_link_transaction
@@ -34,7 +29,7 @@ class PreparerTest(unittest.TestCase):
 
 	@staticmethod
 	def _create_configuration(node_features, api_https=True, light_api=False, imports_config=None):
-		return ShoestringConfiguration(
+		return SakuyaConfiguration(
 			'testnet',
 			None,
 			None,

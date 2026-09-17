@@ -11,7 +11,7 @@ from symbolchain.symbol.Network import NetworkTimestamp
 from sakuya.__main__ import main
 from sakuya.internal.NodeFeatures import NodeFeatures
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 
 
 def _assert_hash_lock_transaction(transaction, expected_signer_public_key, expected_hash):
@@ -51,8 +51,8 @@ async def _assert_can_sign_transaction(transaction_descriptor_factory, check_has
 			# Sanity:
 			assert not facade.verify_transaction(transaction, transaction.signature)
 
-		# - prepare shoestring configuration
-		config_filepath = prepare_shoestring_configuration(output_directory, NodeFeatures.PEER, ca_password=ca_password)
+		# - prepare Sakuya configuration
+		config_filepath = prepare_sakuya_configuration(output_directory, NodeFeatures.PEER, ca_password=ca_password)
 
 		# Act:
 		await main([

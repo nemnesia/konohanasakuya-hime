@@ -8,7 +8,7 @@ from sakuya.internal.ConfigurationManager import ConfigurationManager
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.PackageResolver import download_and_extract_package as real_download_and_extract_package
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 from ..test.FileSystemTestUtils import assert_expected_files_and_permissions
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 from ..test.TestPackager import prepare_testnet_package
@@ -164,7 +164,7 @@ async def _assert_can_upgrade_node(
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_shoestring_configuration(package_directory, node_features, server.make_url(''), api_https=api_https, light_api=light_api)
+			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=api_https, light_api=light_api)
 			_prepare_overrides(package_directory, 'name from setup')
 			prepare_testnet_package(package_directory, 'resources.zip')
 

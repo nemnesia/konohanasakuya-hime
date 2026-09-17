@@ -11,7 +11,7 @@ from symbollightapi.model.PacketHeader import PacketHeader, PacketType
 from sakuya.healthagents.peer_api import should_run, validate
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
+from sakuya.internal.SakuyaConfiguration import ImportsConfiguration, NodeConfiguration, SakuyaConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 
@@ -20,7 +20,7 @@ from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_i
 
 def _create_configuration():
 	node_config = NodeConfiguration(NodeFeatures.PEER, None, None, None, None, None, 'CA CN', 'NODE CN')
-	return ShoestringConfiguration('testnet', *(3 * [None]), ImportsConfiguration(None, None, None), node_config)
+	return SakuyaConfiguration('testnet', *(3 * [None]), ImportsConfiguration(None, None, None), node_config)
 
 
 @pytest.fixture

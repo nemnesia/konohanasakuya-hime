@@ -68,3 +68,30 @@ def test_replace_paths_removes_installed_directory_during_rollback(monkeypatch, 
 
 	assert (output / 'one').is_dir()
 	assert 'old-two' == (output / 'two').read_text(encoding='utf8')
+
+
+@pytest.mark.parametrize('failure', [OSError, KeyboardInterrupt, SystemExit])
+def test_replace_paths_rolls_back_before_cleanup_for_base_exceptions(monkeypatch, tmp_path, failure):
+	staged = tmp_path / 'staged'
+	output = tmp_path / 'output'
+	staged.mkdir()
+	output.mkdir()
+	(output / 'config').write_text('original', encoding='utf8')
+	(staged / 'config').write_text('replacement', encoding='utf8')
+
+	original_replace = AtomicFileSystem.os.replace
+	replace_count = 0
+
+	def fail_during_install(source, target):
+		nonlocal replace_count
+		replace_count += 1
+		if 2 == replace_count:
+			raise failure('simulated interruption')
+		return original_replace(source, target)
+
+	monkeypatch.setattr(AtomicFileSystem.os, 'replace', fail_during_install)
+	with pytest.raises(failure, match='simulated interruption'):
+		AtomicFileSystem.replace_paths(staged, output, ('config',))
+
+	assert 'original' == (output / 'config').read_text(encoding='utf8')
+	assert not list(output.glob('.sakuya-backup-*'))

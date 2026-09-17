@@ -9,9 +9,9 @@ from sakuya.commands import health
 from sakuya.commands.health import HealthAgentContext
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
+from sakuya.internal.SakuyaConfiguration import ImportsConfiguration, NodeConfiguration, SakuyaConfiguration
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 from ..test.LogTestUtils import assert_all_messages_are_logged
 
 # region HealthAgentContext
@@ -34,7 +34,7 @@ def _write_resources(directories, host, port, rest_port):
 
 
 def _create_configuration(api_https):
-	return ShoestringConfiguration(
+	return SakuyaConfiguration(
 		*(4 * [None]),
 		ImportsConfiguration(None, None, None),
 		NodeConfiguration(NodeFeatures.PEER, None, None, None, api_https, False, 'CA', 'NODE'))
@@ -103,7 +103,7 @@ async def test_can_run_health_command(caplog):
 				preparer.generate_certificates(Path(output_directory) / 'ca.key.pem', require_ca=False)
 				_write_resources(preparer.directories, 'symbol.fyi', 1111, 2345)
 
-				config_filepath = prepare_shoestring_configuration(package_directory, NodeFeatures.PEER, '', api_https=False)
+				config_filepath = prepare_sakuya_configuration(package_directory, NodeFeatures.PEER, '', api_https=False)
 
 				# Act:
 				with pytest.raises(RuntimeError, match='one or more health checks failed'):
@@ -133,7 +133,7 @@ async def test_health_runs_all_agents_after_one_agent_raises(monkeypatch, tmp_pa
 		raise RuntimeError('secret must not be logged')
 
 	module.validate = validate
-	monkeypatch.setattr(health, 'parse_shoestring_configuration', lambda _path: config)
+	monkeypatch.setattr(health, 'parse_sakuya_configuration', lambda _path: config)
 	monkeypatch.setattr(health.Preparer, 'DirectoryLocator', lambda _env, _directory: directories)
 	monkeypatch.setattr(health.importlib, 'import_module', lambda _name: module)
 

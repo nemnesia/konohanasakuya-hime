@@ -1,7 +1,7 @@
 from collections import namedtuple
 
+from sakuya.wizard.SakuyaOperation import SakuyaOperation
 from sakuya.wizard.screens.welcome import create
-from sakuya.wizard.ShoestringOperation import ShoestringOperation
 
 Button = namedtuple('Button', ('text', 'operation'))
 
@@ -21,17 +21,17 @@ def test_can_select_button():
 	screen = create(None)
 
 	# Act:
-	screen.accessor.select(Button('upgrade', ShoestringOperation.UPGRADE))
+	screen.accessor.select(Button('upgrade', SakuyaOperation.UPGRADE))
 
 	# Assert:
-	assert ShoestringOperation.UPGRADE == screen.accessor.operation
+	assert SakuyaOperation.UPGRADE == screen.accessor.operation
 	assert 'upgrade' == screen.accessor.operation_label
 
 
 def test_can_generate_diagnostic_accessor_representation():
 	# Arrange:
 	screen = create(None)
-	screen.accessor.select(Button('upgrade', ShoestringOperation.UPGRADE))
+	screen.accessor.select(Button('upgrade', SakuyaOperation.UPGRADE))
 
 	# Act + Assert:
 	assert '(command=\'upgrade\')' == repr(screen.accessor)

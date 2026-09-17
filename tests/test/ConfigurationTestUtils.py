@@ -2,8 +2,8 @@ import configparser
 from pathlib import Path
 
 
-def prepare_shoestring_configuration(directory, node_features, services_nodewatch='', **node_kwargs):
-	"""Prepares a shoestring configuration file in the specified directory."""
+def prepare_sakuya_configuration(directory, node_features, services_nodewatch='', **node_kwargs):
+	"""Prepares a Sakuya configuration using the upstream-compatible format."""
 
 	parser = configparser.ConfigParser()
 	parser.optionxform = str

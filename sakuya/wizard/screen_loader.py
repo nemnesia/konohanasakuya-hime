@@ -1,7 +1,7 @@
 import importlib
 from collections import namedtuple
 
-from sakuya.wizard.ShoestringOperation import ShoestringOperation
+from sakuya.wizard.SakuyaOperation import SakuyaOperation
 
 ScreenGroup = namedtuple('ScreenGroup', ['group_name', 'screen_names'])
 
@@ -33,13 +33,13 @@ def lookup_screens_list_for_operation(operation):
 	"""Looks up the required screens for the specified operation."""
 
 	operation_screens = {
-		ShoestringOperation.SETUP:
+		SakuyaOperation.SETUP:
 			['welcome', 'root-check', 'obligatory', 'network-type', 'node-type',
 				'harvesting', 'voting', 'node-settings', 'certificates', 'end-screen'],
-		ShoestringOperation.UPGRADE: ['welcome', 'obligatory', 'end-screen'],
-		ShoestringOperation.RESET_DATA: ['welcome', 'obligatory', 'end-screen'],
-		ShoestringOperation.RENEW_CERTIFICATES: ['welcome', 'obligatory', 'end-screen'],
-		ShoestringOperation.RENEW_VOTING_KEYS: ['welcome', 'obligatory', 'end-screen'],
+		SakuyaOperation.UPGRADE: ['welcome', 'obligatory', 'end-screen'],
+		SakuyaOperation.RESET_DATA: ['welcome', 'obligatory', 'end-screen'],
+		SakuyaOperation.RENEW_CERTIFICATES: ['welcome', 'obligatory', 'end-screen'],
+		SakuyaOperation.RENEW_VOTING_KEYS: ['welcome', 'obligatory', 'end-screen'],
 	}
 
 	return operation_screens.get(operation)

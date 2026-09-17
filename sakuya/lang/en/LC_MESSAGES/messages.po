@@ -15,16 +15,16 @@ msgid "argument-help-announce-transaction-transaction"
 msgstr "file containing serialized transaction to send"
 
 #: sakuya/commands/min_cosignatures_count.py:35
-#: sakuya/commands/renew_certificates.py:54 sakuya/commands/setup.py:223
+#: sakuya/commands/renew_certificates.py:54 sakuya/commands/setup.py:225
 #: sakuya/commands/signer.py:93
 msgid "argument-help-ca-key-path"
 msgstr "path to main private key PEM file"
 
 #: sakuya/commands/announce_transaction.py:81 sakuya/commands/health.py:83
 #: sakuya/commands/init.py:70 sakuya/commands/min_cosignatures_count.py:34
-#: sakuya/commands/pemview.py:42 sakuya/commands/renew_certificates.py:53
+#: sakuya/commands/pemview.py:41 sakuya/commands/renew_certificates.py:53
 #: sakuya/commands/renew_voting_keys.py:218 sakuya/commands/reset_data.py:112
-#: sakuya/commands/setup.py:218 sakuya/commands/signer.py:92
+#: sakuya/commands/setup.py:220 sakuya/commands/signer.py:92
 msgid "argument-help-config"
 msgstr "path to Sakuya configuration file"
 
@@ -54,21 +54,17 @@ msgstr "input private key file (optional)"
 msgid "argument-help-pemtool-output"
 msgstr "output PEM key file"
 
-#: sakuya/commands/pemview.py:44
+#: sakuya/commands/pemview.py:43
 msgid "argument-help-pemview-ask-pass"
 msgstr "show password prompt for accessing a password protected PEM"
 
-#: sakuya/commands/pemview.py:43
+#: sakuya/commands/pemview.py:42
 msgid "argument-help-pemview-input"
 msgstr "input PEM file"
 
-#: sakuya/commands/pemview.py:45
+#: sakuya/commands/pemview.py:44
 msgid "argument-help-pemview-show-private"
 msgstr "output private key to console too"
-
-#: sakuya/commands/renew_certificates.py:57
-msgid "argument-help-renew-certificates-force"
-msgstr "force overwrite of certificates"
 
 #: sakuya/commands/renew_certificates.py:55
 msgid "argument-help-renew-certificates-renew-ca"
@@ -82,11 +78,11 @@ msgstr "renew node key"
 msgid "argument-help-reset-data-purge-harvesters"
 msgstr "purge harvesters.dat file"
 
-#: sakuya/commands/setup.py:224
+#: sakuya/commands/setup.py:226
 msgid "argument-help-setup-output-transaction-only"
 msgstr "only output linking transaction from a previous setup"
 
-#: sakuya/commands/setup.py:219
+#: sakuya/commands/setup.py:221
 msgid "argument-help-setup-overrides"
 msgstr "path to custom user settings"
 
@@ -96,7 +92,7 @@ msgstr ""
 "Network configuration package. Possible values: (name | file:///filename "
 "| http(s)://uri) (default: mainnet)"
 
-#: sakuya/commands/setup.py:220
+#: sakuya/commands/setup.py:222
 msgid "argument-help-setup-rest-overrides"
 msgstr "path to custom user REST settings (this is only valid for API roles)"
 
@@ -347,27 +343,27 @@ msgstr "Provided passwords do not match"
 msgid "pemtool-saved-pem-file"
 msgstr "saved {filepath}"
 
-#: sakuya/commands/pemview.py:18
+#: sakuya/commands/pemview.py:17
 msgid "pemview-error-input-file-does-not-exist"
 msgstr "input file ({filepath}) does not exist"
 
-#: sakuya/commands/pemview.py:15
+#: sakuya/commands/pemview.py:14
 msgid "pemview-error-input-file-unexpected-suffix"
 msgstr "input file ({filepath}) does not have .pem extension"
 
-#: sakuya/commands/pemview.py:27
+#: sakuya/commands/pemview.py:26
 msgid "pemview-loaded-pem-file"
 msgstr "loaded {filepath}"
 
-#: sakuya/commands/pemview.py:34
+#: sakuya/commands/pemview.py:33
 msgid "pemview-show-address"
 msgstr "    address: {address}"
 
-#: sakuya/commands/pemview.py:38
+#: sakuya/commands/pemview.py:37
 msgid "pemview-show-private-key"
 msgstr "private key: {private_key}"
 
-#: sakuya/commands/pemview.py:35
+#: sakuya/commands/pemview.py:34
 msgid "pemview-show-public-key"
 msgstr " public key: {public_key}"
 
@@ -397,13 +393,13 @@ msgstr ""
 "no transaction has been generated because account is already properly "
 "configured"
 
-#: sakuya/commands/setup.py:116 sakuya/commands/setup.py:163
+#: sakuya/commands/setup.py:116 sakuya/commands/setup.py:165
 msgid "setup-resources-directory-exists"
 msgstr ""
 "setup failed because resources directory {directory} already exists, did "
 "you intend to run upgrade?"
 
-#: sakuya/commands/setup.py:152
+#: sakuya/commands/setup.py:154
 msgid "setup-status-output-transaction-only"
 msgstr "generating linking transaction from previous setup..."
 

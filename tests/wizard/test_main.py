@@ -90,7 +90,7 @@ async def test_wizard_main_dispatches_selected_operation(monkeypatch):
 	async def dispatch(*_args):
 		dispatched.append(True)
 
-	monkeypatch.setattr(wizard_main, 'dispatch_shoestring_command', dispatch)
+	monkeypatch.setattr(wizard_main, 'dispatch_sakuya_command', dispatch)
 	await wizard_main.main()
 
 	assert [True] == dispatched

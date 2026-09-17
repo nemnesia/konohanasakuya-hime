@@ -32,7 +32,9 @@ def replace_paths(staged_root, output_root, relative_paths):
 			target.parent.mkdir(parents=True, exist_ok=True)
 			os.replace(source, target)
 			installed.append(target)
-	except Exception:
+	# The replacement is a transaction boundary.  KeyboardInterrupt and
+	# SystemExit must restore the previous state before the backup is removed.
+	except BaseException:
 		for target in reversed(installed):
 			if target.is_dir() and not target.is_symlink():
 				shutil.rmtree(target)

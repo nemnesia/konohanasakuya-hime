@@ -8,7 +8,7 @@ from symbolchain.CryptoTypes import Hash256
 
 from sakuya.__main__ import main
 from sakuya.commands import init as init_command
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 from ..test.TestPackager import prepare_testnet_package
 
@@ -36,7 +36,7 @@ async def test_can_download_configuration_file_template():
 			# Assert:
 			assert config_filepath.exists()
 
-			config = parse_shoestring_configuration(config_filepath)
+			config = parse_sakuya_configuration(config_filepath)
 			assert Hash256('49D6E1CE276A85B70EAFE52349AACCA389302E7A9754BCF1221E79494FC665A4') == config.network.generation_hash_seed
 
 			# - user and group ids are updated
@@ -68,7 +68,8 @@ async def test_init_rejects_symbolic_link_output():
 					config=config_filepath))
 
 
-async def test_init_restores_existing_files_when_commit_fails(monkeypatch):
+@pytest.mark.parametrize('failure', [OSError, KeyboardInterrupt, SystemExit])
+async def test_init_restores_existing_files_when_commit_fails(monkeypatch, failure):
 	with tempfile.TemporaryDirectory() as package_directory:
 		prepare_testnet_package(package_directory, 'resources.zip')
 		with tempfile.TemporaryDirectory() as output_directory:
@@ -85,11 +86,11 @@ async def test_init_restores_existing_files_when_commit_fails(monkeypatch):
 				nonlocal replace_count
 				replace_count += 1
 				if 2 == replace_count:
-					raise OSError('simulated commit failure')
+					raise failure('simulated commit failure')
 				return original_replace(source, target)
 
 			monkeypatch.setattr(init_command.os, 'replace', fail_on_second_replace)
-			with pytest.raises(OSError, match='simulated commit failure'):
+			with pytest.raises(failure, match='simulated commit failure'):
 				await init_command.run_main(SimpleNamespace(
 					package=f'file://{Path(package_directory) / "resources.zip"}',
 					config=config_filepath))

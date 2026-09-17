@@ -94,7 +94,8 @@ def test_copy_votes_backup_rejects_symbolic_link_epoch(tmp_path):
 
 
 @pytest.mark.asyncio
-async def test_reset_data_restores_directories_when_recreation_fails(monkeypatch, tmp_path):
+@pytest.mark.parametrize('failure', [OSError, KeyboardInterrupt, SystemExit])
+async def test_reset_data_restores_directories_when_recreation_fails(monkeypatch, tmp_path, failure):
 	managed_root = tmp_path / 'sakuya'
 	data = managed_root / 'data'
 	logs = managed_root / 'logs'
@@ -102,13 +103,13 @@ async def test_reset_data_restores_directories_when_recreation_fails(monkeypatch
 	logs.mkdir()
 	(data / 'keep').write_text('data', encoding='utf8')
 	(logs / 'keep').write_text('logs', encoding='utf8')
-	monkeypatch.setattr(reset_data, 'parse_shoestring_configuration', lambda _config: SimpleNamespace(node=SimpleNamespace(full_api=False)))
+	monkeypatch.setattr(reset_data, 'parse_sakuya_configuration', lambda _config: SimpleNamespace(node=SimpleNamespace(full_api=False)))
 
 	def fail_copy(*_args):
-		raise OSError('recreation failed')
+		raise failure('recreation failed')
 
 	monkeypatch.setattr(reset_data, '_copy_file_if_exists', fail_copy)
-	with pytest.raises(OSError, match='recreation failed'):
+	with pytest.raises(failure, match='recreation failed'):
 		await reset_data.run_main(SimpleNamespace(
 			config='config.ini', directory=tmp_path, purge_harvesters=False))
 

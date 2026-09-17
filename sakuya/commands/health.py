@@ -6,7 +6,7 @@ from zenlog import log
 
 from sakuya.internal.ConfigurationManager import ConfigurationManager
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 
 class HealthAgentContext:
@@ -60,7 +60,7 @@ class HealthAgentContext:
 
 
 async def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 	context = HealthAgentContext(Preparer.DirectoryLocator(None, Path(args.directory)), config)
 
 	for agent_name in ('peer_certificate', 'peer_api', 'voting_keys', 'harvesting_keys', 'rest_https_certificate', 'rest_api', 'websockets'):

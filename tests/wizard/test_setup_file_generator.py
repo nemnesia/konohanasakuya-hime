@@ -2,13 +2,13 @@ import tempfile
 from collections import namedtuple
 from pathlib import Path
 
-from sakuya.internal.ConfigurationManager import ConfigurationManager, load_shoestring_patches_from_file
+from sakuya.internal.ConfigurationManager import ConfigurationManager, load_configuration_patches_from_file
 from sakuya.internal.NodeFeatures import NodeFeatures
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 from sakuya.wizard.setup_file_generator import (
-	patch_shoestring_config,
+	patch_sakuya_config,
 	prepare_overrides_file,
-	prepare_shoestring_files,
+	prepare_sakuya_files,
 	try_prepare_rest_overrides_file
 )
 
@@ -138,7 +138,7 @@ def test_can_prepare_overrides_file_when_harvesting_disabled():
 # endregion
 
 
-# region prepare_shoestring_files
+# region prepare_sakuya_files
 
 def _lookup_harvester_private_keys(properties_filepath):
 	return ConfigurationManager(properties_filepath.parent).lookup(properties_filepath.name, [
@@ -147,7 +147,7 @@ def _lookup_harvester_private_keys(properties_filepath):
 	])
 
 
-async def _assert_can_prepare_shoestring_files(expected_node_features, node_type, **kwargs):
+async def _assert_can_prepare_sakuya_files(expected_node_features, node_type, **kwargs):
 	# Arrange:
 	with tempfile.TemporaryDirectory() as package_directory:
 		prepare_testnet_package(package_directory, 'resources.zip')
@@ -158,7 +158,7 @@ async def _assert_can_prepare_shoestring_files(expected_node_features, node_type
 			is_auto_harvest_enabled = kwargs.get('is_auto_harvest_enabled', True)
 
 			# Act:
-			await prepare_shoestring_files({
+			await prepare_sakuya_files({
 				'network-type': SingleValueScreen(f'file://{Path(package_directory) / "resources.zip"}'),
 				'node-type': SingleValueScreen(node_type),
 				'certificates': CertificatesScreen('my ca common name', 'my node common name'),
@@ -177,7 +177,7 @@ async def _assert_can_prepare_shoestring_files(expected_node_features, node_type
 			}, Path(output_directory))
 
 			# Assert:
-			config = parse_shoestring_configuration(Path(output_directory) / 'config.ini')
+			config = parse_sakuya_configuration(Path(output_directory) / 'config.ini')
 			assert kwargs.get('expected_api_https', False) == config.node.api_https
 			assert 'my ca common name' == config.node.ca_common_name
 			assert 'my node common name' == config.node.node_common_name
@@ -200,55 +200,55 @@ async def _assert_can_prepare_shoestring_files(expected_node_features, node_type
 			assert kwargs.get('harvester_vrf_private_key') == private_keys[1]
 
 
-async def test_can_prepare_shoestring_files_peer():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.PEER, 'peer')
+async def test_can_prepare_sakuya_files_peer():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.PEER, 'peer')
 
 
-async def test_can_prepare_shoestring_files_api_with_https():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.API, 'dual', api_https=True, expected_api_https=True)
+async def test_can_prepare_sakuya_files_api_with_https():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.API, 'dual', api_https=True, expected_api_https=True)
 
 
-async def test_can_prepare_shoestring_files_api_without_https():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.API, 'dual')
+async def test_can_prepare_sakuya_files_api_without_https():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.API, 'dual')
 
 
-async def test_can_prepare_shoestring_files_light_api_with_https():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.API, 'light', api_https=True, expected_api_https=True)
+async def test_can_prepare_sakuya_files_light_api_with_https():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.API, 'light', api_https=True, expected_api_https=True)
 
 
-async def test_can_prepare_shoestring_files_light_api_without_https():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.API, 'light')
+async def test_can_prepare_sakuya_files_light_api_without_https():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.API, 'light')
 
 
-async def test_can_prepare_shoestring_files_harvester_new():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.HARVESTER, 'peer', is_harvesting_active=True)
+async def test_can_prepare_sakuya_files_harvester_new():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.HARVESTER, 'peer', is_harvesting_active=True)
 
 
-async def test_can_prepare_shoestring_files_harvester_imported():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.HARVESTER, 'peer', **{
+async def test_can_prepare_sakuya_files_harvester_imported():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.HARVESTER, 'peer', **{
 		'is_harvesting_active': True,
 		'harvester_signing_private_key': '605CAA1C6D03133FCE6C1D2482EDDB9C928F4A05BE1CA501A277AEA16C30628E',
 		'harvester_vrf_private_key': '09160DF296FE41F6215F59768B7C1B17D2B6D09335670CC6494B348C7B3A1427',
 	})
 
 
-async def test_can_prepare_shoestring_files_harvester_auto_harvest_disabled():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.HARVESTER, 'peer', is_harvesting_active=True, is_auto_harvest_enabled=False)
+async def test_can_prepare_sakuya_files_harvester_auto_harvest_disabled():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.HARVESTER, 'peer', is_harvesting_active=True, is_auto_harvest_enabled=False)
 
 
-async def test_can_prepare_shoestring_files_voter():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.VOTER, 'peer', is_voting_active=True)
+async def test_can_prepare_sakuya_files_voter():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.VOTER, 'peer', is_voting_active=True)
 
 
-async def test_can_prepare_shoestring_files_full():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER, 'dual', **{
+async def test_can_prepare_sakuya_files_full():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER, 'dual', **{
 		'is_harvesting_active': True,
 		'is_voting_active': True
 	})
 
 
-async def test_can_prepare_shoestring_files_light():
-	await _assert_can_prepare_shoestring_files(NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER, 'light', **{
+async def test_can_prepare_sakuya_files_light():
+	await _assert_can_prepare_sakuya_files(NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER, 'light', **{
 		'is_harvesting_active': True,
 		'is_voting_active': True
 	})
@@ -256,19 +256,19 @@ async def test_can_prepare_shoestring_files_light():
 # endregion
 
 
-# region patch_shoestring_config
+# region patch_sakuya_config
 
 def write_text_file(filepath, text):
 	with open(filepath, 'wt', encoding='utf8') as outfile:
 		outfile.write(text)
 
 
-async def _assert_can_patch_shoestring_file(new_content, expected_patches):
+async def _assert_can_patch_sakuya_file(new_content, expected_patches):
 	# Arrange:
 	with tempfile.TemporaryDirectory() as temp_directory:
-		shoestring_path = Path(temp_directory)
-		shoestring_filepath = shoestring_path / 'shoe.ini'
-		write_text_file(shoestring_filepath, '\n'.join([
+		sakuya_path = Path(temp_directory)
+		sakuya_filepath = sakuya_path / 'configuration.ini'
+		write_text_file(sakuya_filepath, '\n'.join([
 			'[network]',
 			'ubuntuCore = 22.04',
 			'',
@@ -285,22 +285,22 @@ async def _assert_can_patch_shoestring_file(new_content, expected_patches):
 			'caCommonName = CA test',
 			'nodeCommonName = test 127.0.0.1'
 		]))
-		new_shoestring_filepath = shoestring_path / 'shoe_new.ini'
-		write_text_file(new_shoestring_filepath, new_content)
+		new_sakuya_filepath = sakuya_path / 'configuration_new.ini'
+		write_text_file(new_sakuya_filepath, new_content)
 
 		# Act:
-		patch_shoestring_config(shoestring_filepath, new_shoestring_filepath)
+		patch_sakuya_config(sakuya_filepath, new_sakuya_filepath)
 
 		# Assert:
-		patches = load_shoestring_patches_from_file(shoestring_filepath)
+		patches = load_configuration_patches_from_file(sakuya_filepath)
 
 		# patches is a superset of expected_patches
 		for expected_patch in expected_patches:
 			assert expected_patch in patches
 
 
-async def test_can_patch_shoestring_file():
-	await _assert_can_patch_shoestring_file('\n'.join([
+async def test_can_patch_sakuya_file():
+	await _assert_can_patch_sakuya_file('\n'.join([
 		'[network]',
 		'ubuntuCore = 22.04',
 		'',
@@ -321,8 +321,8 @@ async def test_can_patch_shoestring_file():
 	])
 
 
-async def test_can_patch_shoestring_file_overwrite():
-	await _assert_can_patch_shoestring_file('\n'.join([
+async def test_can_patch_sakuya_file_overwrite():
+	await _assert_can_patch_sakuya_file('\n'.join([
 		'[network]',
 		'ubuntuCore = 22.04',
 		'',
@@ -343,8 +343,8 @@ async def test_can_patch_shoestring_file_overwrite():
 	])
 
 
-async def test_can_patch_shoestring_file_remove_old_property():
-	await _assert_can_patch_shoestring_file('\n'.join([
+async def test_can_patch_sakuya_file_remove_old_property():
+	await _assert_can_patch_sakuya_file('\n'.join([
 		'[network]',
 		'ubuntuCore = 22.04',
 		'',
@@ -363,8 +363,8 @@ async def test_can_patch_shoestring_file_remove_old_property():
 	])
 
 
-async def test_can_patch_shoestring_file_new_property():
-	await _assert_can_patch_shoestring_file('\n'.join([
+async def test_can_patch_sakuya_file_new_property():
+	await _assert_can_patch_sakuya_file('\n'.join([
 		'[network]',
 		'ubuntuCore = 22.04',
 		'',

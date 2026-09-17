@@ -12,7 +12,7 @@ from symbolchain.symbol.Network import Network
 from sakuya.__main__ import main
 from sakuya.internal.NodeFeatures import NodeFeatures
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 from ..test.LogTestUtils import assert_all_messages_are_logged
 
 
@@ -31,7 +31,7 @@ def _write_private_key_pem_file(directory, name, password=None):
 # region basic operation - success (unencrypted)
 
 def _prepare_network_configuration(directory, network):
-	config_filepath = prepare_shoestring_configuration(directory, NodeFeatures.PEER, filename='config.ini')
+	config_filepath = prepare_sakuya_configuration(directory, NodeFeatures.PEER, filename='config.ini')
 	if network.name == 'testnet':
 		return config_filepath
 

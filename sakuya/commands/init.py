@@ -54,7 +54,7 @@ async def run_main(args):
 			for staged, target in targets:
 				log.info(_('general-copying-file').format(source_path=staged, destination_path=target))
 				os.replace(staged, target)
-		except Exception:
+		except BaseException:
 			for _staged, target in targets:
 				if target.exists() and not any(existing_target == target for _backup, existing_target in backups):
 					target.unlink()

@@ -1,5 +1,5 @@
+from .SakuyaOperation import requires_ca_key_path
 from .screen_loader import lookup_screens_list_for_operation
-from .ShoestringOperation import requires_ca_key_path
 
 
 def create_next_clicked_handler(screens, activate_screen, title_bar, next_button, exit_handler):
@@ -54,7 +54,7 @@ def create_prev_clicked_handler(screens, activate_screen, title_bar, next_button
 
 
 def create_operation_button_handler(screens, button, next_clicked):
-	"""Selects an shoestring operation."""
+	"""Selects a Sakuya operation."""
 
 	def handler():
 		allowed_screens_list = lookup_screens_list_for_operation(button.operation)

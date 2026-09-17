@@ -6,7 +6,7 @@ from symbolchain.symbol.KeyPair import KeyPair
 from zenlog import log
 
 from ..internal.PemUtils import read_private_key_from_private_key_pem_file
-from ..internal.ShoestringConfiguration import parse_shoestring_configuration
+from ..internal.SakuyaConfiguration import parse_sakuya_configuration
 from ..internal.TransactionSerializer import write_transaction_to_file
 
 
@@ -48,7 +48,7 @@ def _sign_transaction(facade, key_pair, transaction):
 
 
 def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 	facade = SymbolFacade(config.network)
 
 	transaction = _load_transaction(args.filename)

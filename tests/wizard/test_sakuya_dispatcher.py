@@ -2,9 +2,9 @@ import tempfile
 from collections import namedtuple
 from pathlib import Path
 
-from sakuya.internal.ConfigurationManager import load_shoestring_patches_from_file
-from sakuya.wizard.shoestring_dispatcher import dispatch_shoestring_command
-from sakuya.wizard.ShoestringOperation import ShoestringOperation
+from sakuya.internal.ConfigurationManager import load_configuration_patches_from_file
+from sakuya.wizard.sakuya_dispatcher import dispatch_sakuya_command
+from sakuya.wizard.SakuyaOperation import SakuyaOperation
 
 from ..test.TestPackager import prepare_testnet_package
 
@@ -41,7 +41,7 @@ def _create_setup_screens(
 		'harvesting': ToggleScreen(False),
 		'voting': ToggleScreen(False),
 		'certificates': CertificatesScreen('ca', 'peer'),
-		'welcome': WelcomeScreen(ShoestringOperation.SETUP)
+		'welcome': WelcomeScreen(SakuyaOperation.SETUP)
 	}
 
 
@@ -56,7 +56,7 @@ async def test_can_dispatch_setup_command():
 
 		with tempfile.TemporaryDirectory() as output_directory:
 			# Act:
-			await dispatch_shoestring_command(
+			await dispatch_sakuya_command(
 				_create_setup_screens(package_directory, output_directory, 'peer', None),
 				_create_executor(dispatched_args))
 
@@ -73,12 +73,12 @@ async def test_can_dispatch_setup_command():
 				'--rest-overrides', 'rest_overrides.json'
 			] == dispatched_args
 
-			# - shoestring configuration files were created
-			shoestring_directory = Path(output_directory)
-			assert shoestring_directory.exists()
-			assert (shoestring_directory / 'config.ini').exists()
-			assert (shoestring_directory / 'overrides.ini').exists()
-			assert (shoestring_directory / 'rest_overrides.json').exists()
+			# - Sakuya configuration files were created
+			sakuya_directory = Path(output_directory)
+			assert sakuya_directory.exists()
+			assert (sakuya_directory / 'config.ini').exists()
+			assert (sakuya_directory / 'overrides.ini').exists()
+			assert (sakuya_directory / 'rest_overrides.json').exists()
 
 
 async def test_can_dispatch_setup_command_with_custom_rest_overrides():
@@ -89,7 +89,7 @@ async def test_can_dispatch_setup_command_with_custom_rest_overrides():
 
 		with tempfile.TemporaryDirectory() as output_directory:
 			# Act:
-			await dispatch_shoestring_command(
+			await dispatch_sakuya_command(
 				_create_setup_screens(package_directory, output_directory, 'dual', '{"animal": "wolf"}'),
 				_create_executor(dispatched_args))
 
@@ -106,15 +106,15 @@ async def test_can_dispatch_setup_command_with_custom_rest_overrides():
 				'--rest-overrides', 'rest_overrides.json'
 			] == dispatched_args
 
-			# - shoestring configuration files were created
-			shoestring_directory = Path(output_directory)
-			assert shoestring_directory.exists()
-			assert (shoestring_directory / 'config.ini').exists()
-			assert (shoestring_directory / 'overrides.ini').exists()
-			assert (shoestring_directory / 'rest_overrides.json').exists()
+			# - Sakuya configuration files were created
+			sakuya_directory = Path(output_directory)
+			assert sakuya_directory.exists()
+			assert (sakuya_directory / 'config.ini').exists()
+			assert (sakuya_directory / 'overrides.ini').exists()
+			assert (sakuya_directory / 'rest_overrides.json').exists()
 
 
-def _prepare_shoestring_file(output_filename):
+def _prepare_sakuya_file(output_filename):
 	with open(output_filename, 'wt', encoding='utf8') as outfile:
 		outfile.write('\n'.join([
 			'[network]',
@@ -144,26 +144,26 @@ async def test_can_dispatch_upgrade_command():
 	]
 	dispatched_args = []
 	with tempfile.TemporaryDirectory() as package_directory:
-		shoestring_directory = Path(package_directory)
-		shoestring_filepath = shoestring_directory / 'config.ini'
-		_prepare_shoestring_file(shoestring_filepath)
+		sakuya_directory = Path(package_directory)
+		sakuya_filepath = sakuya_directory / 'config.ini'
+		_prepare_sakuya_file(sakuya_filepath)
 
 		# Act:
-		await dispatch_shoestring_command({
+		await dispatch_sakuya_command({
 			'obligatory': ObligatoryScreen(package_directory, str(Path(package_directory) / 'ca.pem')),
 			'network-type': SingleValueScreen('sai'),
-			'welcome': WelcomeScreen(ShoestringOperation.UPGRADE)
+			'welcome': WelcomeScreen(SakuyaOperation.UPGRADE)
 		}, _create_executor(dispatched_args))
 
 		# Assert:
 		assert [
 			'--directory', package_directory,
 			'upgrade',
-			'--config', f'{shoestring_directory}/config.ini',
-			'--overrides', f'{shoestring_directory}/overrides.ini',
+			'--config', f'{sakuya_directory}/config.ini',
+			'--overrides', f'{sakuya_directory}/overrides.ini',
 		] == dispatched_args
 
 		# node_patches is a superset of expected_keys
-		node_patches = load_shoestring_patches_from_file(shoestring_filepath, ['node'])
+		node_patches = load_configuration_patches_from_file(sakuya_filepath, ['node'])
 		for key in expected_keys:
 			assert key in node_patches

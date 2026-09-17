@@ -14,15 +14,15 @@ from prompt_toolkit.widgets import Label
 from prompt_toolkit.widgets.toolbars import ValidationToolbar
 from zenlog import log
 
-from sakuya.__main__ import main as shoestring_main
+from sakuya.__main__ import main as sakuya_main
 from sakuya.wizard.screens.modal import create as create_message_box_float
 from sakuya.wizard.screens.modal import show as show_message_box
 
 from . import keybindings, navigation, styles
 from .buttons import create_next_clicked_handler, create_operation_button_handler, create_prev_clicked_handler
+from .sakuya_dispatcher import dispatch_sakuya_command
 from .screen_loader import load_screens
 from .ScreenContainer import ScreenContainer
-from .shoestring_dispatcher import dispatch_shoestring_command
 from .TitleBar import TitleBar
 
 
@@ -101,7 +101,7 @@ async def main():  # pylint: disable=too-many-locals
 	if result or navbar.next.text != _('wizard-button-finish'):
 		return
 
-	await dispatch_shoestring_command(screens, shoestring_main)
+	await dispatch_sakuya_command(screens, sakuya_main)
 
 	log.info(_('wizard-main-done'))
 

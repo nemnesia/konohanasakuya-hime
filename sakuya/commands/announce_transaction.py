@@ -7,7 +7,7 @@ from symbollightapi.connector.SymbolConnector import SymbolConnector
 from zenlog import log
 
 from sakuya.internal.NodeDownloader import detect_api_endpoints
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 RETRY_INTERVAL_SECONDS = 1
 
@@ -52,7 +52,7 @@ async def _wait_for_terminal_status(connector, transaction_hash, timeout_seconds
 
 
 async def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 
 	api_endpoint = (await detect_api_endpoints(config.services.nodewatch, 1))[0]
 

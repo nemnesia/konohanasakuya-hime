@@ -6,7 +6,7 @@ from aiohttp import web
 
 from sakuya.healthagents.rest_api import should_run, validate
 from sakuya.internal.NodeFeatures import NodeFeatures
-from sakuya.internal.ShoestringConfiguration import NodeConfiguration
+from sakuya.internal.SakuyaConfiguration import NodeConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 

@@ -10,7 +10,7 @@ from sakuya.internal.CertificateFactory import CertificateFactory
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.OpensslExecutor import OpensslExecutor
 from sakuya.internal.Preparer import Preparer
-from sakuya.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
+from sakuya.internal.SakuyaConfiguration import ImportsConfiguration, NodeConfiguration, SakuyaConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 
@@ -35,7 +35,7 @@ def _create_executor():
 
 def _create_configuration():
 	node_config = NodeConfiguration(NodeFeatures.PEER, None, None, None, None, None, 'CA CN', 'NODE CN')
-	return ShoestringConfiguration('testnet', *(3 * [None]), ImportsConfiguration(None, None, None), node_config)
+	return SakuyaConfiguration('testnet', *(3 * [None]), ImportsConfiguration(None, None, None), node_config)
 
 
 async def _dispatch_validate(directories):

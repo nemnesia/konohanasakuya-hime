@@ -20,7 +20,7 @@ from sakuya.internal.PeerDownloader import download_peers
 from sakuya.internal.PemUtils import read_public_key_from_public_key_pem_file
 from sakuya.internal.VoterConfigurator import inspect_voting_key_files
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 from ..test.LogTestUtils import assert_message_is_logged
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 from ..test.TestPackager import prepare_testnet_package
@@ -117,7 +117,7 @@ async def test_renew_voting_keys_fails_when_node_is_not_voter(server, caplog):  
 		with tempfile.TemporaryDirectory() as package_directory:
 			node_features = NodeFeatures.PEER | NodeFeatures.API | NodeFeatures.HARVESTER
 			await _prepare_output_directory(Path(package_directory), Path(output_directory), node_features, server.make_url(''))
-			config_filepath = prepare_shoestring_configuration(package_directory, node_features)
+			config_filepath = prepare_sakuya_configuration(package_directory, node_features)
 
 			# Act:
 			await main([
@@ -141,7 +141,7 @@ async def test_can_renew_voting_keys_when_none_are_present(server, caplog):  # p
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			await _prepare_output_directory(Path(package_directory), Path(output_directory), NodeFeatures.VOTER, server.make_url(''))
-			config_filepath = prepare_shoestring_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
+			config_filepath = prepare_sakuya_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
 
 			# Act:
 			await main([
@@ -179,7 +179,7 @@ async def test_can_renew_voting_keys_when_some_are_present_and_active(server):  
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			await _prepare_output_directory(Path(package_directory), Path(output_directory), NodeFeatures.VOTER, server.make_url(''))
-			config_filepath = prepare_shoestring_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
+			config_filepath = prepare_sakuya_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
 
 			voting_keys_directory = Path(output_directory) / 'sakuya' / 'keys' / 'voting'
 			_write_voting_keys_file(voting_keys_directory, 1, 2800, 2899)
@@ -223,7 +223,7 @@ async def test_can_renew_voting_keys_when_some_are_present_and_inactive(server):
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			await _prepare_output_directory(Path(package_directory), Path(output_directory), NodeFeatures.VOTER, server.make_url(''))
-			config_filepath = prepare_shoestring_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
+			config_filepath = prepare_sakuya_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
 
 			voting_keys_directory = Path(output_directory) / 'sakuya' / 'keys' / 'voting'
 			expired_root_voting_public_key_1 = _write_voting_keys_file(voting_keys_directory, 1, 2600, 2699)
@@ -271,7 +271,7 @@ async def test_cannot_renew_voting_keys_when_max_keys_are_active(server, caplog)
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			await _prepare_output_directory(Path(package_directory), Path(output_directory), NodeFeatures.VOTER, server.make_url(''))
-			config_filepath = prepare_shoestring_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
+			config_filepath = prepare_sakuya_configuration(package_directory, NodeFeatures.VOTER, server.make_url(''))
 
 			voting_keys_directory = Path(output_directory) / 'sakuya' / 'keys' / 'voting'
 			key_1 = _write_voting_keys_file(voting_keys_directory, 1, 2800, 2825)  # last epoch matches current epoch
@@ -480,7 +480,7 @@ async def test_renew_voting_keys_custom_network_unlinks_expired_local_key(monkey
 	config_manager = SimpleNamespace(lookup=lambda _filename, _keys: ['3'])
 	directories = SimpleNamespace(
 		resources=resources, voting_keys=voting_keys, certificates=certificates, output_directory=output_directory)
-	monkeypatch.setattr(renew_voting_keys, 'parse_shoestring_configuration', lambda _path: config)
+	monkeypatch.setattr(renew_voting_keys, 'parse_sakuya_configuration', lambda _path: config)
 	monkeypatch.setattr(renew_voting_keys.Preparer, 'DirectoryLocator', lambda _env, _root: directories)
 	monkeypatch.setattr(renew_voting_keys, 'ConfigurationManager', lambda _resources: config_manager)
 	monkeypatch.setattr(renew_voting_keys, 'get_current_finalization_epoch', lambda *_args: _async_value(10))
@@ -537,7 +537,7 @@ async def test_renew_voting_keys_rejects_symbolic_link_paths(monkeypatch, tmp_pa
 	external.mkdir()
 	(voting_directory / 'pending').symlink_to(external, target_is_directory=True)
 	config = _run_main_config()
-	monkeypatch.setattr(renew_voting_keys, 'parse_shoestring_configuration', lambda _path: config)
+	monkeypatch.setattr(renew_voting_keys, 'parse_sakuya_configuration', lambda _path: config)
 	with pytest.raises(RuntimeError, match='must not be symbolic links'):
 		await renew_voting_keys.run_main(SimpleNamespace(config='config.ini', directory=tmp_path))
 
@@ -546,7 +546,7 @@ async def test_renew_voting_keys_resolves_existing_pending_directory(monkeypatch
 	voting_directory = _prepare_run_main_directories(tmp_path)
 	(voting_directory / 'pending').mkdir()
 	config = _run_main_config()
-	monkeypatch.setattr(renew_voting_keys, 'parse_shoestring_configuration', lambda _path: config)
+	monkeypatch.setattr(renew_voting_keys, 'parse_sakuya_configuration', lambda _path: config)
 	monkeypatch.setattr(renew_voting_keys, 'ConfigurationManager', lambda _resources: SimpleNamespace())
 	called = []
 
@@ -562,7 +562,7 @@ async def test_renew_voting_keys_rejects_existing_pending_transaction(monkeypatc
 	_prepare_run_main_directories(tmp_path)
 	(tmp_path / 'renew_voting_keys_transaction.dat').write_bytes(b'transaction')
 	config = _run_main_config()
-	monkeypatch.setattr(renew_voting_keys, 'parse_shoestring_configuration', lambda _path: config)
+	monkeypatch.setattr(renew_voting_keys, 'parse_sakuya_configuration', lambda _path: config)
 	monkeypatch.setattr(renew_voting_keys, 'ConfigurationManager', lambda _resources: SimpleNamespace())
 	monkeypatch.setattr(renew_voting_keys, '_read_transaction', lambda _path: 'transaction')
 	monkeypatch.setattr(renew_voting_keys.SymbolFacade, 'hash_transaction', lambda _self, _transaction: 'hash')

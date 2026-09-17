@@ -12,7 +12,7 @@ from sakuya.__main__ import main
 from sakuya.commands import announce_transaction
 from sakuya.internal.NodeFeatures import NodeFeatures
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 
 # region server fixture
@@ -30,8 +30,8 @@ async def server(aiohttp_client):
 async def _run_test(server, expected_url_path, transaction_descriptor_factory):  # pylint: disable=redefined-outer-name
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
-		# - prepare shoestring configuration
-		config_filepath = prepare_shoestring_configuration(output_directory, NodeFeatures.PEER, server.make_url(''))
+		# - prepare Sakuya configuration
+		config_filepath = prepare_sakuya_configuration(output_directory, NodeFeatures.PEER, server.make_url(''))
 
 		# - generate and write out (unsigned) transaction
 		facade = SymbolFacade('testnet')

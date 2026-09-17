@@ -4,7 +4,7 @@ from pathlib import Path
 from sakuya.__main__ import main
 from sakuya.internal.NodeFeatures import NodeFeatures
 
-from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
 
 
 def _create_directories_with_placeholders(directory, subdirectory_names):
@@ -27,7 +27,7 @@ async def _assert_reset_data(node_features, expected_recreated_subdirectories, l
 	# Arrange:
 	subdirectory_names = ('data', 'logs', 'dbdata', 'keys', 'unknown')
 	with tempfile.TemporaryDirectory() as output_directory:
-		config_filepath = prepare_shoestring_configuration(output_directory, node_features, light_api=light_api)
+		config_filepath = prepare_sakuya_configuration(output_directory, node_features, light_api=light_api)
 
 		# - create some directories each with a placeholder file
 		_create_directories_with_placeholders(output_directory, subdirectory_names)
@@ -106,7 +106,7 @@ async def _assert_reset_data_with_harvester_state(additional_command_args, expec
 	# Arrange:
 	subdirectory_names = DEFAULT_SUBDIRECTORIES_FOR_STATE_TESTS
 	with tempfile.TemporaryDirectory() as output_directory:
-		config_filepath = prepare_shoestring_configuration(output_directory, NodeFeatures.HARVESTER)
+		config_filepath = prepare_sakuya_configuration(output_directory, NodeFeatures.HARVESTER)
 
 		# - create some directories each with a placeholder file
 		_create_directories_with_placeholders(output_directory, subdirectory_names)
@@ -144,7 +144,7 @@ async def _assert_reset_data_with_voter_state(votes_backup_epochs, expected_data
 	# Arrange:
 	subdirectory_names = [*DEFAULT_SUBDIRECTORIES_FOR_STATE_TESTS, 'data/votes_backup']
 	with tempfile.TemporaryDirectory() as output_directory:
-		config_filepath = prepare_shoestring_configuration(output_directory, NodeFeatures.VOTER)
+		config_filepath = prepare_sakuya_configuration(output_directory, NodeFeatures.VOTER)
 
 		# - create some directories each with a placeholder file
 		_create_directories_with_placeholders(output_directory, subdirectory_names)

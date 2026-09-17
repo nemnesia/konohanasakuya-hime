@@ -6,19 +6,19 @@ from pathlib import Path
 from symbolchain.CryptoTypes import Hash256
 
 from sakuya.internal.NodeFeatures import NodeFeatures
-from sakuya.internal.ShoestringConfiguration import (
+from sakuya.internal.SakuyaConfiguration import (
 	parse_images_configuration,
 	parse_imports_configuration,
 	parse_network_configuration,
 	parse_node_configuration,
+	parse_sakuya_configuration,
 	parse_services_configuration,
-	parse_shoestring_configuration,
 	parse_transaction_configuration
 )
 
 
 # pylint: disable=too-many-public-methods
-class ShoestringConfigurationTest(unittest.TestCase):
+class SakuyaConfigurationTest(unittest.TestCase):
 	# region configuration templates
 
 	GENERATION_HASH_SEED = Hash256('EA35CFA79B68B2EB2F9EC8041399C1869663F3FC06ED93AEB2EFF8075B21C39B')
@@ -320,7 +320,7 @@ class ShoestringConfigurationTest(unittest.TestCase):
 
 	# endregion
 
-	# region parse_shoestring_configuration
+	# region parse_sakuya_configuration
 
 	@staticmethod
 	def _write_section(outfile, header, pairs):
@@ -328,7 +328,7 @@ class ShoestringConfigurationTest(unittest.TestCase):
 		for key, value in pairs.items():
 			outfile.write(f'{key} = {value}\n')
 
-	def test_can_parse_shoestring_configuration(self):
+	def test_can_parse_sakuya_configuration(self):
 		# Arrange:
 		with tempfile.TemporaryDirectory() as temp_directory:
 			configuration_file = Path(temp_directory) / 'foo.properties'
@@ -342,7 +342,7 @@ class ShoestringConfigurationTest(unittest.TestCase):
 				self._write_section(outfile, '\n[node]', self.VALID_NODE_CONFIGURATION)
 
 			# Act:
-			config = parse_shoestring_configuration(configuration_file)
+			config = parse_sakuya_configuration(configuration_file)
 
 			# Assert:
 			self.assertEqual('foo', config.network.name)
@@ -375,7 +375,7 @@ class ShoestringConfigurationTest(unittest.TestCase):
 			self.assertEqual('my CA name', config.node.ca_common_name)
 			self.assertEqual('my Node name', config.node.node_common_name)
 
-	def test_cannot_parse_shoestring_configuration_incomplete(self):
+	def test_cannot_parse_sakuya_configuration_incomplete(self):
 		# Arrange:
 		for section_id in range(4):
 			with tempfile.TemporaryDirectory() as temp_directory:
@@ -396,15 +396,15 @@ class ShoestringConfigurationTest(unittest.TestCase):
 
 				# Act + Assert:
 				with self.assertRaises(KeyError):
-					parse_shoestring_configuration(configuration_file)
+					parse_sakuya_configuration(configuration_file)
 
-	def test_cannot_parse_shoestring_configuration_file_not_found(self):
+	def test_cannot_parse_sakuya_configuration_file_not_found(self):
 		# Arrange:
 		with tempfile.TemporaryDirectory() as temp_directory:
 			configuration_file = Path(temp_directory) / 'file_not_found.properties'
 
 			# Act + Assert:
 			with self.assertRaises(FileNotFoundError):
-				parse_shoestring_configuration(configuration_file)
+				parse_sakuya_configuration(configuration_file)
 
 	# endregion

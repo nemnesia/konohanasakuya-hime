@@ -7,11 +7,11 @@ from sakuya.internal.ConfigurationManager import ConfigurationManager
 from sakuya.internal.MultisigAnalyzer import calculate_min_cosignatures_count
 from sakuya.internal.NodeDownloader import detect_api_endpoints
 from sakuya.internal.PemUtils import read_public_key_from_private_key_pem_file
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 
 async def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 
 	api_endpoint = (await detect_api_endpoints(config.services.nodewatch, 1))[0]
 

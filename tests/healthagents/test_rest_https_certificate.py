@@ -9,7 +9,7 @@ from aiohttp import web
 from sakuya.healthagents import rest_https_certificate
 from sakuya.healthagents.rest_https_certificate import should_run, validate
 from sakuya.internal.OpensslExecutor import OpensslExecutor
-from sakuya.internal.ShoestringConfiguration import NodeConfiguration
+from sakuya.internal.SakuyaConfiguration import NodeConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 

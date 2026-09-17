@@ -5,7 +5,7 @@ from pathlib import Path
 
 from zenlog import log
 
-from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 
 
 def _raise_walk_error(error):
@@ -64,7 +64,7 @@ def _copy_votes_backup(data_directory, backup_directory):
 
 
 async def run_main(args):
-	config = parse_shoestring_configuration(args.config)
+	config = parse_sakuya_configuration(args.config)
 	root = Path(args.directory).absolute()
 	data_directory = _validate_target(root, 'data')
 	logs_directory = _validate_target(root, 'logs')
@@ -97,7 +97,7 @@ async def run_main(args):
 
 		for target in targets:
 			log.info(_('reset-data-recreating-directory').format(directory=target))
-	except Exception:
+	except BaseException:
 		for _backup, target in reversed(moved_targets):
 			if target.exists() or target.is_symlink():
 				shutil.rmtree(target)
