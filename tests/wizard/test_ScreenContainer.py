@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from shoestring.wizard.ScreenContainer import ScreenContainer
+from sakuya.wizard.ScreenContainer import ScreenContainer
 
 ChildScreen = namedtuple('ChildScreen', ['screen_id', 'accessor', 'should_show'], defaults=[None, None, lambda: True])
 

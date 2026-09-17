@@ -3,9 +3,9 @@ from prompt_toolkit.layout.containers import HSplit, Window, WindowAlign
 from prompt_toolkit.utils import get_cwidth
 from prompt_toolkit.widgets import Box, Shadow
 
-from shoestring.wizard.MultibyteButton import MultibyteButton as Button
-from shoestring.wizard.Screen import Screen
-from shoestring.wizard.ShoestringOperation import ShoestringOperation
+from sakuya.wizard.MultibyteButton import MultibyteButton as Button
+from sakuya.wizard.Screen import Screen
+from sakuya.wizard.ShoestringOperation import ShoestringOperation
 
 
 class ButtonWithOperation(Button):
@@ -35,7 +35,6 @@ class WelcomeSettings:
 def create(_screens):
 	values = [
 		(ShoestringOperation.SETUP, _('wizard-welcome-setup')),
-		(ShoestringOperation.IMPORT_BOOTSTRAP, _('wizard-welcome-import-bootstrap')),
 		(ShoestringOperation.UPGRADE, _('wizard-welcome-upgrade')),
 		(ShoestringOperation.RESET_DATA, _('wizard-welcome-reset-data')),
 		(ShoestringOperation.RENEW_CERTIFICATES, _('wizard-welcome-renew-certificates')),

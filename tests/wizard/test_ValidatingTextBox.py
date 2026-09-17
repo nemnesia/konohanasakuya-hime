@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from shoestring.wizard.ValidatingTextBox import (
+from sakuya.wizard.ValidatingTextBox import (
 	ValidatingTextBox,
 	is_directory_path,
 	is_file_path,

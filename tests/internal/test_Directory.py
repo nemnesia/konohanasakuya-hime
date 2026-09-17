@@ -3,12 +3,13 @@ from pathlib import Path
 
 import pytest
 
-from shoestring.__main__ import parse_args
-from shoestring.internal.Directory import resolve_directory
+from sakuya.__main__ import parse_args
+from sakuya.internal.Directory import resolve_directory
 
 
 def _parse_args(args):
-	gettext.install('messages')
+	lang_directory = Path(__file__).resolve().parents[2] / 'sakuya' / 'lang'
+	gettext.translation('messages', localedir=lang_directory, languages=('en',)).install()
 	return parse_args(args)
 
 
@@ -16,7 +17,7 @@ def test_explicit_directory_has_priority(monkeypatch, tmp_path):
 	environment_directory = tmp_path / 'environment'
 	current_directory = tmp_path / 'current'
 	command_directory = tmp_path / 'command'
-	monkeypatch.setenv('SHOESTRING_HOME', str(environment_directory))
+	monkeypatch.setenv('SAKUYA_HOME', str(environment_directory))
 	current_directory.mkdir()
 	monkeypatch.chdir(current_directory)
 
@@ -25,7 +26,7 @@ def test_explicit_directory_has_priority(monkeypatch, tmp_path):
 
 def test_environment_directory_is_used_when_option_is_omitted(monkeypatch, tmp_path):
 	environment_directory = tmp_path / 'environment'
-	monkeypatch.setenv('SHOESTRING_HOME', str(environment_directory))
+	monkeypatch.setenv('SAKUYA_HOME', str(environment_directory))
 
 	assert environment_directory == resolve_directory()
 	args = _parse_args(['health', '--config', 'config.ini'])
@@ -34,7 +35,7 @@ def test_environment_directory_is_used_when_option_is_omitted(monkeypatch, tmp_p
 
 
 def test_current_directory_is_used_when_option_and_environment_are_omitted(monkeypatch, tmp_path):
-	monkeypatch.delenv('SHOESTRING_HOME', raising=False)
+	monkeypatch.delenv('SAKUYA_HOME', raising=False)
 	monkeypatch.chdir(tmp_path)
 
 	assert Path.cwd() == resolve_directory()
@@ -46,7 +47,7 @@ def test_current_directory_is_used_when_option_and_environment_are_omitted(monke
 def test_cli_directory_option_has_priority_over_environment(monkeypatch, tmp_path):
 	environment_directory = tmp_path / 'environment'
 	command_directory = tmp_path / 'command'
-	monkeypatch.setenv('SHOESTRING_HOME', str(environment_directory))
+	monkeypatch.setenv('SAKUYA_HOME', str(environment_directory))
 
 	args = _parse_args(['--directory', str(command_directory), 'health', '--config', 'config.ini'])
 

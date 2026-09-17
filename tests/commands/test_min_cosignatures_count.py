@@ -6,11 +6,11 @@ from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 from symbolchain.symbol.Network import Network
 
-from shoestring.__main__ import main
-from shoestring.internal.ConfigurationManager import ConfigurationManager
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.PemUtils import read_public_key_from_private_key_pem_file
-from shoestring.internal.ShoestringConfiguration import NodeConfiguration, ShoestringConfiguration
+from sakuya.__main__ import main
+from sakuya.internal.ConfigurationManager import ConfigurationManager
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.PemUtils import read_public_key_from_private_key_pem_file
+from sakuya.internal.ShoestringConfiguration import NodeConfiguration, ShoestringConfiguration
 
 from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
 from ..test.LogTestUtils import assert_message_is_logged

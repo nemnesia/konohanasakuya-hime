@@ -1,15 +1,17 @@
 import tempfile
 from pathlib import Path
 
-from shoestring.__main__ import main
-from shoestring.internal.NodeFeatures import NodeFeatures
+from sakuya.__main__ import main
+from sakuya.internal.NodeFeatures import NodeFeatures
 
 from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
 
 
 def _create_directories_with_placeholders(directory, subdirectory_names):
+	managed_directory = Path(directory) / 'sakuya'
+	managed_directory.mkdir(exist_ok=True)
 	for name in subdirectory_names:
-		subdirectory = Path(directory) / name
+		subdirectory = managed_directory / name
 		subdirectory.mkdir()
 
 		with open(subdirectory / 'placeholder.dat', 'wb') as _:
@@ -38,17 +40,18 @@ async def _assert_reset_data(node_features, expected_recreated_subdirectories, l
 		])
 
 		# Assert: all folders should be present and folders not recreated should still have placeholder files
-		expected_files = [*subdirectory_names, 'sai.shoestring.ini']
+		expected_files = ['sai.shoestring.ini', 'sakuya']
+		expected_files.extend(f'sakuya/{name}' for name in subdirectory_names)
 		for name in subdirectory_names:
 			if name not in expected_recreated_subdirectories:
-				expected_files.append(f'{name}/placeholder.dat')
+				expected_files.append(f'sakuya/{name}/placeholder.dat')
 
 		files = sorted(str(path.relative_to(output_directory)) for path in Path(output_directory).glob('**/*'))
 		assert sorted(expected_files) == files
 
 		# - recreated folders should have correct permissions
 		for name in expected_recreated_subdirectories:
-			assert 0o700 == (Path(output_directory) / name).stat().st_mode & 0o777
+			assert 0o700 == (Path(output_directory) / 'sakuya' / name).stat().st_mode & 0o777
 
 
 async def test_can_reset_data_peer_node():
@@ -74,25 +77,28 @@ async def test_can_reset_data_voter_node_without_voter_state():
 
 DEFAULT_SUBDIRECTORIES_FOR_STATE_TESTS = ['data', 'logs', 'dbdata', 'keys', 'unknown']
 DEFAULT_EXPECTED_DATA_FILES_FOR_STATE_TESTS = [
-	'dbdata',
-	'dbdata/placeholder.dat',
-	'keys',
-	'keys/placeholder.dat',
-	'logs',
+	'sakuya/dbdata',
+	'sakuya/dbdata/placeholder.dat',
+	'sakuya/keys',
+	'sakuya/keys/placeholder.dat',
+	'sakuya/logs',
 	'sai.shoestring.ini',
-	'unknown',
-	'unknown/placeholder.dat'
+	'sakuya/unknown',
+	'sakuya/unknown/placeholder.dat'
 ]
 
 
 def _assert_data_files_and_contents(output_directory, expected_data_files, expected_file_contents):
 	# all folders should be present and folders not recreated should still have placeholder files
 	files = sorted(str(path.relative_to(output_directory)) for path in Path(output_directory).glob('**/*'))
-	assert expected_data_files + DEFAULT_EXPECTED_DATA_FILES_FOR_STATE_TESTS == files
+	expected_files = ['sai.shoestring.ini', 'sakuya']
+	expected_files.extend(f'sakuya/{name}' for name in expected_data_files)
+	expected_files.extend(name for name in DEFAULT_EXPECTED_DATA_FILES_FOR_STATE_TESTS if name != 'sai.shoestring.ini')
+	assert sorted(expected_files) == files
 
 	# check file contents
 	for key, value in expected_file_contents.items():
-		with open(Path(output_directory) / key, 'rt', encoding='utf8') as infile:
+		with open(Path(output_directory) / 'sakuya' / key, 'rt', encoding='utf8') as infile:
 			assert value == infile.read()
 
 
@@ -106,7 +112,7 @@ async def _assert_reset_data_with_harvester_state(additional_command_args, expec
 		_create_directories_with_placeholders(output_directory, subdirectory_names)
 
 		# - prepare harvesters.dat
-		with open(Path(output_directory) / 'data' / 'harvesters.dat', 'wt', encoding='utf8') as outfile:
+		with open(Path(output_directory) / 'sakuya' / 'data' / 'harvesters.dat', 'wt', encoding='utf8') as outfile:
 			outfile.write('sed ut perspiciatis unde omnis')
 
 		# Act:
@@ -144,12 +150,12 @@ async def _assert_reset_data_with_voter_state(votes_backup_epochs, expected_data
 		_create_directories_with_placeholders(output_directory, subdirectory_names)
 
 		# - prepare voting_status.dat
-		with open(Path(output_directory) / 'data' / 'voting_status.dat', 'wt', encoding='utf8') as outfile:
+		with open(Path(output_directory) / 'sakuya' / 'data' / 'voting_status.dat', 'wt', encoding='utf8') as outfile:
 			outfile.write('lorem ipsum dolor sit amet')
 
 		# - prepare votes_backup
 		for epoch in votes_backup_epochs:
-			epoch_directory = Path(output_directory) / 'data' / 'votes_backup' / str(epoch)
+			epoch_directory = Path(output_directory) / 'sakuya' / 'data' / 'votes_backup' / str(epoch)
 			epoch_directory.mkdir()
 
 			with open(epoch_directory / 'foo.txt', 'wt', encoding='utf8') as outfile:

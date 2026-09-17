@@ -1,6 +1,6 @@
 from prompt_toolkit.utils import get_cwidth
 
-from shoestring.wizard.MultibyteButton import MultibyteButton
+from sakuya.wizard.MultibyteButton import MultibyteButton
 
 
 def test_multibyte_button_centering():

@@ -1,3 +1,4 @@
+import configparser
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -8,8 +9,10 @@ from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 from symbolchain.symbol.KeyPair import KeyPair
 from symbolchain.symbol.Network import Network
 
-from shoestring.__main__ import main
+from sakuya.__main__ import main
+from sakuya.internal.NodeFeatures import NodeFeatures
 
+from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
 from ..test.LogTestUtils import assert_all_messages_are_logged
 
 
@@ -27,18 +30,36 @@ def _write_private_key_pem_file(directory, name, password=None):
 
 # region basic operation - success (unencrypted)
 
+def _prepare_network_configuration(directory, network):
+	config_filepath = prepare_shoestring_configuration(directory, NodeFeatures.PEER, filename='config.ini')
+	if network.name == 'testnet':
+		return config_filepath
+
+	parser = configparser.ConfigParser()
+	parser.optionxform = str
+	parser.read(config_filepath)
+	parser['network']['name'] = network.name
+	parser['network']['identifier'] = str(network.identifier)
+	parser['network']['epochAdjustment'] = str(int(network.datetime_converter.epoch.timestamp()))
+	parser['network']['generationHashSeed'] = str(network.generation_hash_seed)
+	with open(config_filepath, 'wt', encoding='utf8') as outfile:
+		parser.write(outfile)
+	return config_filepath
+
+
 async def _assert_can_output_unencrypted_pem(caplog, network, show_private=False):
 	# Arrange:
 	with tempfile.TemporaryDirectory() as temp_directory:
 		# - prepare input pem file
 		private_key = _write_private_key_pem_file(temp_directory, 'test')
 		pem_filepath = Path(temp_directory) / 'test.pem'
+		config_filepath = _prepare_network_configuration(temp_directory, network)
 
 		# Act:
 		await main([
 			'pemview',
 			'--input', str(pem_filepath),
-			'--network', network.name
+			'--config', str(config_filepath)
 		] + (['--show-private'] if show_private else []))
 
 		# Assert:
@@ -78,12 +99,13 @@ async def _assert_can_output_encrypted_pem(caplog, getpass, network, show_privat
 		# - prepare input pem file
 		private_key = _write_private_key_pem_file(temp_directory, 'test', 'foobar')
 		pem_filepath = Path(temp_directory) / 'test.pem'
+		config_filepath = _prepare_network_configuration(temp_directory, network)
 
 		# Act:
 		await main([
 			'pemview',
 			'--input', str(pem_filepath),
-			'--network', network.name,
+			'--config', str(config_filepath),
 			'--ask-pass'
 		] + (['--show-private'] if show_private else []))
 
@@ -130,7 +152,7 @@ async def test_cannot_output_pem_with_invalid_extension():
 			await main([
 				'pemview',
 				'--input', str(pem_filepath),
-				'--network', 'mainnet',
+				'--config', str(Path(temp_directory) / 'missing.ini'),
 			])
 
 
@@ -144,7 +166,7 @@ async def test_cannot_output_pem_that_does_not_exist():
 			await main([
 				'pemview',
 				'--input', str(pem_filepath),
-				'--network', 'mainnet',
+				'--config', str(Path(temp_directory) / 'missing.ini'),
 			])
 
 # endregion

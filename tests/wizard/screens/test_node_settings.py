@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from shoestring.wizard.screens.node_settings import create
+from sakuya.wizard.screens.node_settings import create
 
 SingleValueScreen = namedtuple('SingleValueScreen', ['current_value'])
 

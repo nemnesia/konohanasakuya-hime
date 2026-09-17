@@ -6,7 +6,7 @@ from symbolchain.sc import LinkAction, TransactionType
 from symbolchain.symbol.KeyPair import KeyPair
 from symbolchain.symbol.Network import NetworkTimestamp
 
-from shoestring.internal.LinkTransactionBuilder import LinkTransactionBuilder
+from sakuya.internal.LinkTransactionBuilder import LinkTransactionBuilder
 
 from ..test.TransactionTestUtils import AggregateDescriptor, LinkDescriptor, assert_aggregate_transaction, assert_link_transaction
 

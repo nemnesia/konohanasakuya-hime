@@ -2,7 +2,7 @@ from functools import reduce
 
 import pytest
 
-from shoestring.internal.NodeDownloader import NodeDownloader, detect_api_endpoints
+from sakuya.internal.NodeDownloader import NodeDownloader, detect_api_endpoints
 
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 

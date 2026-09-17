@@ -6,10 +6,10 @@ import pytest
 from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 
-from shoestring.__main__ import main
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.Preparer import Preparer
-from shoestring.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.__main__ import main
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.Preparer import Preparer
+from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
 
 from ..test.CertificateTestUtils import assert_certificate_properties, create_openssl_executor
 from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
@@ -88,7 +88,7 @@ async def _assert_can_renew_node_certificate(ca_password=None, retain_key=False,
 			'renew-certificates',
 			'--config', str(config_filepath_2),
 			'--ca-key-path', str(ca_key_path),
-			*(['--retain-node-key'] if retain_key else []),
+			*(['--renew-node-key'] if not retain_key else []),
 			*(['--force'] if force else [])
 		])
 
@@ -207,6 +207,38 @@ async def test_can_renew_ca_and_node_certificates_with_ca_password():
 
 async def test_can_renew_ca_and_node_certificates_with_relative_ca_key_path():
 	await _assert_can_renew_ca_and_node_certificates(use_relative_path=True)
+
+
+async def test_cannot_renew_certificates_with_symbolic_link_ca_key():
+	with tempfile.TemporaryDirectory() as output_directory:
+		config_filepath = _create_configuration(output_directory, None, 'CA CN', 'NODE CN', 'config.ini')
+		ca_key_path = Path(output_directory) / 'ca.key.pem'
+		target = Path(output_directory) / 'real-ca.key.pem'
+		PrivateKeyStorage(output_directory).save('real-ca.key', PrivateKey.random())
+		ca_key_path.symlink_to(target)
+
+		with pytest.raises(RuntimeError, match='must not be a symbolic link'):
+			await main([
+				'--directory', output_directory,
+				'renew-certificates',
+				'--config', str(config_filepath),
+				'--ca-key-path', str(ca_key_path)
+			])
+
+
+async def test_cannot_renew_certificates_when_certificate_directory_is_missing():
+	with tempfile.TemporaryDirectory() as output_directory:
+		config_filepath = _create_configuration(output_directory, None, 'CA CN', 'NODE CN', 'config.ini')
+		ca_key_path = Path(output_directory) / 'ca.key.pem'
+		PrivateKeyStorage(output_directory).save('ca.key', PrivateKey.random())
+
+		with pytest.raises(RuntimeError, match='certificate directory does not exist'):
+			await main([
+				'--directory', output_directory,
+				'renew-certificates',
+				'--config', str(config_filepath),
+				'--ca-key-path', str(ca_key_path)
+			])
 
 
 async def test_cannot_renew_ca_and_node_certificates_when_ca_key_path_does_not_exist():

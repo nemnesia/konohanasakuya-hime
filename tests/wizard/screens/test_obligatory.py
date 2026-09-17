@@ -4,7 +4,7 @@ from pathlib import Path
 from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 
-from shoestring.wizard.screens.obligatory import create
+from sakuya.wizard.screens.obligatory import create
 
 # pylint: disable=invalid-name
 

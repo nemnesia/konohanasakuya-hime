@@ -1,451 +1,138 @@
-# shoestring
+# Sakuya
 
-# Security
+[日本語版 README](README.ja.md)
 
-> [!IMPORTANT]
-> CLI commands will generate unencrypted PEM file by default. The file specified via the argument  `--ca-key-path` is expected to contain the **main** private key. This file itself is NOT needed to run the node and can be removed after the node is properly configured.
->
-> Additionally, the `pemtool` command can produce a encrypted PEM file, which is supported by all CLI commands.
->
-> In order to limit security risk, it is recommended to:
-> 1. Make sure to back up `ca.key.pem`
-> 2. Remove `ca.key.pem` after node setup
-> 3. Use an encrypted PEM file if **main** account is sufficient valuable.
+Sakuya (`konohanasakuya-hime`) prepares and operates Symbol node deployments.
+The PyPI package name is `symbol-sakuya` and the Python module is `sakuya`.
 
-> [!WARNING]
-> `shoestring.wizard` does not currently support encrypted PEM files because there is no password input currently.
+## Security
 
-## PEM files
+The CA private key is a sensitive file. By default it is read from
+`ca.key.pem` in the node root and is written with mode `0400` when Sakuya
+creates it. Keep it backed up securely and do not expose it to containers.
 
-To import existing private key and optionally encrypt it, we recommend using `pemtool` command, described below in [pemtool section](#pemtool).
+`pemtool` can create an encrypted PEM file. The wizard currently does not
+provide a password prompt for encrypted PEM files.
 
-OpenSSL can be used to inspect the contents of a PEM file.
-
-To print the public key only:
-```sh
-openssl pkey -in PEM_FILE.pem -noout -text_pub
-```
-
-To print both the private key and public key:
-```sh
-openssl pkey -in PEM_FILE.pem -noout -text
-```
-
-OpenSSL can also be used to generate completely new key:
-```sh
-openssl genpkey -algorithm ed25519 -out ca.key.pem
-```
-
-To generate new encrypted key:
-```sh
-openssl genpkey -algorithm ed25519 -out ca.key.pem -pass OPTIONS-FOLLOW
-```
-
-For details on openssl `-pass` switch we refer to [openssl passphrase documentation](https://www.openssl.org/docs/manmaster/man1/openssl-passphrase-options.html).
-
-# Tips
-
-If you are setting up a new node from scratch, it is recommended to use `init` and `setup`.
-
-If you are setting up a new node but have existing harvesting and/or voting keys, it is recommended to update the imports section of the shoestring configuration file downloaded by `init` before running `setup`.
-
-If you need to renew voting key files, it is recommended to use `renew-voting-keys`. This command will unregister all expired voting keys and register a new set of voting keys starting at first epoch without a registered voting key.
-
-# CLI Commands
-
-The CLI exposes a common installation directory context for commands that use local node state. The directory is resolved in this order:
-
-1. top-level `--directory`
-2. `SHOESTRING_HOME`
-3. the current working directory
-
-Examples:
+## Installation
 
 ```sh
-shoestring --directory /srv/symbol health --config /path/to/shoestring.ini
-shoestring --directory /srv/symbol upgrade --config /path/to/shoestring.ini
-
-cd /srv/symbol
-shoestring health --config /path/to/shoestring.ini
-shoestring upgrade --config /path/to/shoestring.ini
-
-export SHOESTRING_HOME=/srv/symbol
-shoestring health --config /path/to/shoestring.ini
+python3 -m pip install symbol-sakuya
+python3 -m sakuya --help
 ```
 
-`--directory` is a top-level option and must appear before the subcommand.
-
-In commands that require `--package` switch, the list of currently supported network aliases are:
- * mainnet
- * sai (current testnet)
-
-As documented below, alternatively full path to package zip file can be provided using `file:///filename` or `http(s)://`.
-
-## Setup Commands
-
-### init
-
-Extracts a template shoestring configuration file from a package that the user can then customize.
-
-```
-init [--package PACKAGE] config
-
-  config             path to shoestring configuration file
-  --package PACKAGE  Network configuration package. Possible values: (name | file:///filename | http(s)://uri) (default: mainnet)
-```
-
-### min-cosignatures-count
-
-Automatically detects the minimum cosignatures required for an account and optionally updates the shoestring configuration file.
-
-```
-min-cosignatures-count --config CONFIG --ca-key-path CA_KEY_PATH [--update]
-
-  --config CONFIG           path to shoestring configuration file
-  --ca-key-path CA_KEY_PATH path to main private key PEM file
-  --update                  update the shoestring configuration file
-```
-
-### import-bootstrap
-
-Imports settings from a symbol-bootstrap installation.
-
-
-```
-import-bootstrap --config CONFIG --bootstrap BOOTSTRAP [--include-node-key]
-
-  --config CONFIG       path to shoestring configuration file
-  --bootstrap BOOTSTRAP path to bootstrap target directory
-  --include-node-key    include node key
-```
-
-### import-harvesters
-
-Imports harvesters from an existing harvesters.dat file.
-
-
-```
-import-harvesters --config CONFIG --in-harvesters IN_HARVESTERS --in-pem IN_PEM [--out-harvesters OUT_HARVESTERS] [--out-pem OUT_PEM]
-
-  --config CONFIG                 path to shoestring configuration file
-  --in-harvesters IN_HARVESTERS   input harvesters.dat file that is encrypted with in-pem
-  --in-pem IN_PEM                 PEM file that can be used to decrypt in-harvesters
-  --out-harvesters OUT_HARVESTERS output harvesters.dat file that will be encrypted with out-pem
-  --out-pem OUT_PEM               PEM file that can be used to encrypt out-harvesters
-```
-
-### pemtool
-
-Generates a main private key PEM file that can be used by shoestring.
-
-```
-pemtool --output OUTPUT [--input INPUT] [--ask-pass] [--force]
-
-  --output OUTPUT  output PEM key file
-  --input INPUT    input private key file (optional)
-  --ask-pass       encrypt PEM with a password (password prompt will be shown)
-  --force          overwrite output file if it already exists
-```
-
-### pemview
-
-Outputs information about a private key PEM file.
-
-```
-pemview --input INPUT --network NETWORK [--ask-pass] [--show-private]
-
-options:
-  --input INPUT      input PEM file
-  --network NETWORK  Symbol network name to use for generating address
-  --ask-pass         show password prompt for accessing a password protected PEM
-  --show-private     output private key to console too
-```
-
-### setup
-
-Sets up a Symbol node from scratch
-
-```
-setup \
-    --config CONFIG \
-    [--package PACKAGE] \
-    [--overrides OVERRIDES] \
-    [--rest-overrides REST_OVERRIDES] \
-    [--security {default,paranoid,insecure}] \
-    --ca-key-path CA_KEY_PATH
-
-  --config CONFIG                       path to shoestring configuration file
-  --package PACKAGE                     Network configuration package. Possible values: (name | file:///filename | http(s)://uri) (default: mainnet)
-  --overrides OVERRIDES                 path to custom user settings
-  --rest-overrides REST_OVERRIDES       path to custom user REST settings (this is only valid for API roles)
-  --security                            security mode (default: default)
-  --ca-key-path CA_KEY_PATH             path to main private key PEM file
-```
-
-Please note that only security mode "default" is supported at this time.
-
-This command will generate a transaction that will need to be sent to the network using `announce-transaction` to update the network state.
-
-## Operational Commands
-
-### signer
-
-Signs a transaction that can then be announced to the network
-
-```
-signer --config CONFIG --ca-key-path CA_KEY_PATH [--save] filename
-
-  filename                  transaction binary payload
-  --config CONFIG           path to shoestring configuration file
-  --ca-key-path CA_KEY_PATH path to main private key PEM file
-  --save                    save signed payload into same file as input
-```
-
-### announce-transaction
-
-Announces a transaction to the network.
-
-```
-announce-transaction --config CONFIG --transaction TRANSACTION
-
-  --config CONFIG           path to shoestring configuration file
-  --transaction TRANSACTION file containing serialized transaction to send
-```
-
-### health
-
-Checks the health of the local Symbol node.
-
-
-```
-health [-h] --config CONFIG
-
-  --config CONFIG       path to shoestring configuration file
-```
-
-## Upgrade Commands
-
-### upgrade
-
-Upgrades a node to the latest client version.
-
-```
-upgrade \
-    --config CONFIG \
-    [--package PACKAGE] \
-    [--overrides OVERRIDES] \
-    [--rest-overrides REST_OVERRIDES]
-
-  --config CONFIG                       path to shoestring configuration file
-  --package PACKAGE                     Network configuration package. Possible values: (name | file:///filename | http(s)://uri) (default: mainnet)
-  --overrides OVERRIDES                 path to custom user settings
-  --rest-overrides REST_OVERRIDES       path to custom user REST settings (this is only valid for API roles)
-```
-
-### renew-certificates
-
-Renews peer certificates.
-
-```
-renew-certificates --config CONFIG --ca-key-path CA_KEY_PATH [--renew-ca] [--retain-node-key]
-
-  --config CONFIG           path to shoestring configuration file
-  --ca-key-path CA_KEY_PATH path to main private key PEM file
-  --renew-ca                renews CA certificate too
-  --retain-node-key         retain node key
-  --force                   force overwrite of certificates
-```
-
-When `--renew-ca` is set, both CA and node certificates will be regenerated. Otherwise, only node certificate will be.
-
-### renew-voting-keys
-
-Renews voting keys.
-
-```
-renew-voting-keys --config CONFIG
-
-  --config CONFIG           path to shoestring configuration file
-```
-
-This command will generate a transaction that will need to be sent to the network using `announce-transaction` to update the network state.
-
-### reset-data
-
-Resets blockchain state to allow a resync from scratch.
-
-```
-reset-data --config CONFIG [--purge-harvesters]
-
-  --config CONFIG           path to shoestring configuration file
-  --purge-harvesters        purge harvesters.dat file
-```
-
-When `--purge-harvesters` is set, delegates discovered using old keys will be discarded.
-
-
-## Files
-
-### Shoestring Configuration INI
-
-INI file used by shoestring to customize a Symbol node deployment.
-It is composed of five sections: `network`, `images`, `services`, `transaction`, `imports`, `node`.
-
-#### network
-
-Describes properties of network that deployed node should connect with.
-These should match values in `config-network.properties` Symbol configuration file.
-If `init` command is used, these values shouldn't be modified
-
-```
-name                  Network name
-identifier            Network numeric identifier
-epochAdjustment       Network epoch adjustment
-generationHashSeed    Network generation hash seed
-```
-
-#### images
-
-Describes Symbol docker images to use.
-If `init` command is used, these values shouldn't be modified
-```
-client  Catapult client docker image
-rest    REST docker image
-```
-
-#### services
-
-Describes network services to use during deployment.
-If `init` command is used, these values shouldn't be modified
-
-```
-nodewatch  URL to nodewatch service.
-```
-
-#### transactions
-
-Describes properties of generated transactions.
-If `init` command is used, most of these values _generally_ shouldn't be modified.
-`min-cosignatures-count` command can be used to automatically update `minCosignaturesCount` setting.
-
-General properties:
-```
-feeMultiplier             Min fee multiplier of generated transactions
-timeoutHours              Timeout of generated transactions (in hours)
-minCosignaturesCount      Minimum number of cosignatures generated transactions will require
-```
-
-When `signer` command is signing an aggregate bonded transaction, it will additionally generate a hash lock transaction
-using the following properties:
-```
-hashLockDuration          Hash lock duration in blocks
-currencyMosaicId          Network currency mosaid id
-lockedFundsPerAggregate   Locked funds per aggregate
-```
-
-#### imports
-
-Describes keys to import.
-These need to be manually set if there are harvesting and/or voting keys that need to be imported.
-
-```
-harvester Path to a config-harvesting.properties Symbol configuration file containing harvesting keys to import
-voter     Path to a directory containing private_key_tree*.day files to import
-```
-
-#### node
-
-Describes settings to customize a node.
-
-`features` supports the following:
-* `PEER` - Peer support
-* `API` - REST support
-* `HARVESTER` - Node will be configured to harvest and accept delegated harvesters
-* `VOTER` - Node will be configured to vote
-
-`caPassword` supports all available openssl passphrase options: https://www.openssl.org/docs/man3.0/man1/openssl-passphrase-options.html.
-
-```
-features       One or more node features to deploy (| delimited)
-userId         User id of node used to set process and file permissons
-groupId        Group id of node used to set process and file permissons
-caPassword     Password of CA (main) PEM private key file (if applicable)
-apiHttps       Set to enable HTTPS REST (only applicable when features include API)
-
-caCommonName   Common name of generated CA certificates
-nodeCommonName Common name of generated Node certificates
-```
-
-### Overrides
-
-INI file that is used to customize advanced Symbol settings.
-
-Sections should have the format `[<config-short-name>.<config-section>]`.
-Section contents will then be applied to the appropriate Symbol configuration file.
-
-For example, in order to set two custom settings:
-1. `connectTimeout` - located in the `config-node.properties` file in section `node`
-1. `maxUnlockedAccounts` - located in the `config-harvesting.properties` file in section `harvesting`
-
-The following snippet will suffice:
-
-```ini
-[node.node]
-
-connectTimeout = 5s
-
-[harvesting.harvesting]
-
-maxUnlockedAccounts = 2
-```
-
-Notice that these custom settings are applied *BEFORE* shoestring updates the Symbol configuration files.
-In cases of conflicts, the shoestring changes will take precedence.
-
-### REST Overrides
-
-JSON file that is ingested and used to update the contents of rest.json.
-This file is optional and only used for deployments including API role.
-
-# Running
-
-## Prerequisites:
+For a source checkout:
 
 ```sh
-apt-get install python3 python3-pip openssl
+PYTHONPATH=. python3 -m sakuya --help
 ```
 
-## Installing and running prepared package:
+## Directory layout
+
+The node root is selected in this order: top-level `--directory`,
+`SAKUYA_HOME`, then the current directory.
+
+User-managed files are kept in the root:
+
+```text
+config.ini
+overrides.ini
+rest_overrides.json
+ca.key.pem
+docker-compose.yaml
+docker-compose-recovery.yaml
+```
+
+Generated node files are kept below `sakuya/`, including `node-config`,
+`keys`, `data`, `logs`, `seed`, and API support files. Transaction files are
+written in the root.
+
+## Initial setup
+
+Create the network configuration and the default override files:
 
 ```sh
-python3 -m pip install symbol-shoestring
-python3 -m shoestring --help
+python3 -m sakuya --directory /srv/symbol init
 ```
 
-## (Alternative) Running from github clone:
+The package can be selected with `--package`. `mainnet` is the default;
+`testnet`, `sai`, a local `file://` URI, or an HTTP(S) URI can be supplied.
+For a private or custom network, the source is saved in the `[package]`
+section of `config.ini`.
+
+Edit `config.ini` and, if needed, `overrides.ini` and
+`rest_overrides.json`, then run:
 
 ```sh
-cd symbol-product-directory/tools/shoestring
-
-python3 -m pip install -r requirements.txt
-PYTHONPATH=. python3 -m shoestring --help
+python3 -m sakuya --directory /srv/symbol setup
 ```
 
-# Troubleshooting
+`setup` and `upgrade` resolve the package from `config.ini`; they do not take
+a package option. Setup generation is staged and published only after it
+completes successfully. The generated linking transaction is written to the
+root and can be signed and announced separately.
 
-## Server or Broker failed to start due to lock files
-
-The docker-compose-recovery.yaml file is used to recover your node when there is a `server.lock` or `broker.lock` 
-present in the `data` folder after stopping your node.
+To generate only the setup transaction:
 
 ```sh
-docker compose -f docker-compose-recovery.yaml up --abort-on-container-exit
+python3 -m sakuya --directory /srv/symbol setup --output-transaction-only
 ```
 
-## Need to resync your node
+## Commands
 
-If recovery failed, get the latest copy for the mainnet node data for linux OS:
-dual: https://catapultmainnetdata.s3.us-west-2.amazonaws.com/weekly/catapult_dual_data.tar.gz
-peer: https://catapultmainnetdata.s3.us-west-2.amazonaws.com/weekly/catapult_peer_data.tar.gz
+The available commands are:
 
-Note: keep a copy of your node's `harvesters.dat` from the data.
+```text
+init
+setup
+upgrade
+signer
+announce-transaction
+health
+min-cosignatures-count
+pemtool
+pemview
+renew-certificates
+renew-voting-keys
+reset-data
+```
+
+All commands that use node configuration default to `config.ini` in the node
+root. `setup` also defaults to `overrides.ini`, `rest_overrides.json`, and
+`ca.key.pem` in that root.
+
+`announce-transaction` takes the transaction file as a positional argument:
+
+```sh
+python3 -m sakuya --directory /srv/symbol announce-transaction transaction.dat
+```
+
+The command waits for a confirmed or failed transaction state until the
+configured transaction timeout expires.
+
+`renew-certificates` reuses the current CA and node key by default. Use
+`--renew-ca` or `--renew-node-key` explicitly to replace them. Certificate
+publication is atomic.
+
+`renew-voting-keys` checks the account's on-chain voting-key links before
+creating a transaction. Local voting-key files are not removed before the
+external transaction state is confirmed.
+
+`reset-data` only operates on managed directories below `sakuya/` and keeps
+the voting status file, and `harvesters.dat` unless `--purge-harvesters` is
+specified. The reset is rolled back if rebuilding the directories fails.
+
+## Wizard
+
+The interactive wizard is available as:
+
+```sh
+python3 -m sakuya.wizard
+```
+
+It remains available for setup and operational commands. Upgrade uses the
+existing `config.ini`; it does not reconfigure the network.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

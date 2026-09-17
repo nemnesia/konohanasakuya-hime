@@ -6,7 +6,7 @@ import pytest
 from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 
-from shoestring.__main__ import main
+from sakuya.__main__ import main
 
 
 def _write_private_key_file(filepath):
@@ -177,6 +177,19 @@ async def test_existing_pem_file_is_not_overwritten_without_force_flag():
 		private_key_from_pem = private_key_storage.load('output')
 
 		assert private_key_input == private_key_from_pem
+
+
+async def test_symlink_output_is_rejected():
+	with tempfile.TemporaryDirectory() as temp_directory:
+		input_filepath = Path(temp_directory) / 'input.txt'
+		_write_private_key_file(input_filepath)
+		target = Path(temp_directory) / 'target.pem'
+		target.write_text('do not replace', encoding='utf8')
+		output = Path(temp_directory) / 'output.pem'
+		output.symlink_to(target)
+
+		with pytest.raises(RuntimeError, match='already exists'):
+			await main(['pemtool', '--output', str(output), '--input', str(input_filepath)])
 
 
 async def test_existing_pem_file_is_overwritten_with_force_flag():

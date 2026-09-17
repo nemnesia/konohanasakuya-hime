@@ -36,7 +36,11 @@ class OpensslExecutor:
 					sys.stdout.flush()
 
 			if 0 != process.returncode:
-				formatted_command_line = ' '.join(command_line)
+				redacted_command_line = command_line.copy()
+				for index, argument in enumerate(redacted_command_line[:-1]):
+					if argument in ('-passin', '-passout'):
+						redacted_command_line[index + 1] = '<redacted>'
+				formatted_command_line = ' '.join(redacted_command_line)
 				raise RuntimeError(f'{formatted_command_line} exited with {process.returncode}, stdout:\n{stdout_lines}')
 
 		return all_lines

@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from shoestring.internal.ConfigurationManager import ConfigurationManager
-from shoestring.internal.NodewatchClient import NodewatchClient, get_current_finalization_epoch
+from sakuya.internal.ConfigurationManager import ConfigurationManager
+from sakuya.internal.NodewatchClient import NodewatchClient, get_current_finalization_epoch
 
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 

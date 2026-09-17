@@ -3,9 +3,9 @@ from prompt_toolkit.layout.containers import ConditionalContainer, HSplit, VSpli
 from prompt_toolkit.validation import ThreadedValidator, Validator
 from prompt_toolkit.widgets import CheckboxList, Label, TextArea
 
-from shoestring.wizard.Screen import ScreenDialog
-from shoestring.wizard.styles import to_enabled_string
-from shoestring.wizard.ValidatingTextBox import ValidatingTextBox, is_hostname, is_ip_address, is_json
+from sakuya.wizard.Screen import ScreenDialog
+from sakuya.wizard.styles import to_enabled_string
+from sakuya.wizard.ValidatingTextBox import ValidatingTextBox, is_hostname, is_ip_address, is_json
 
 
 class NodeSettings:

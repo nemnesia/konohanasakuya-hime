@@ -8,8 +8,8 @@ from symbolchain.sc import NetworkType, TransactionFactory, TransactionType
 from symbolchain.symbol.KeyPair import KeyPair
 from symbolchain.symbol.Network import NetworkTimestamp
 
-from shoestring.__main__ import main
-from shoestring.internal.NodeFeatures import NodeFeatures
+from sakuya.__main__ import main
+from sakuya.internal.NodeFeatures import NodeFeatures
 
 from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
 

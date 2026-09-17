@@ -1,12 +1,12 @@
 import json
-from collections import namedtuple
+from types import SimpleNamespace
 
 import pytest
 from aiohttp import web
 
-from shoestring.healthagents.rest_api import should_run, validate
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.ShoestringConfiguration import NodeConfiguration
+from sakuya.healthagents.rest_api import should_run, validate
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.ShoestringConfiguration import NodeConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 
@@ -77,8 +77,7 @@ def test_should_run_for_light_node():
 
 async def _dispatch_validate(port):
 	# Arrange:
-	HealthAgentContext = namedtuple('HealthAgentContext', ['rest_endpoint'])
-	context = HealthAgentContext(f'http://localhost:{port}')
+	context = SimpleNamespace(rest_endpoint=f'http://localhost:{port}', failed=False)
 
 	# Act:
 	await validate(context)

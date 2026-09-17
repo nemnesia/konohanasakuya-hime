@@ -2,7 +2,7 @@ from symbollightapi.connector.SymbolConnector import SymbolConnector
 from symbollightapi.model.Exceptions import NodeException
 from zenlog import log
 
-from shoestring.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.NodeFeatures import NodeFeatures
 
 NAME = 'REST API'
 
@@ -20,3 +20,4 @@ async def validate(context):
 		log.info(_('health-rest-api-success').format(height=chain_statistics.height))
 	except NodeException:
 		log.error(_('health-rest-api-error').format(endpoint=endpoint))
+		context.failed = True

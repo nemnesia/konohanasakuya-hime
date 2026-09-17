@@ -1,4 +1,4 @@
-from shoestring.wizard.styles import initialize, to_enabled_string
+from sakuya.wizard.styles import initialize, to_enabled_string
 
 # pylint: disable=invalid-name
 

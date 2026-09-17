@@ -3,7 +3,7 @@ from prompt_toolkit.application.current import set_app
 from prompt_toolkit.layout.containers import FloatContainer, HSplit
 from prompt_toolkit.layout.layout import Layout
 
-from shoestring.wizard.screens.modal import create, show
+from sakuya.wizard.screens.modal import create, show
 
 
 def test_can_create_modal():

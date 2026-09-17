@@ -6,9 +6,12 @@ from zipfile import ZipFile
 import pytest
 from aiohttp import web
 
-from shoestring.internal.PackageResolver import download_and_extract_package, resolve_package
+from sakuya.internal import PackageResolver
+from sakuya.internal.PackageResolver import download_and_extract_package, resolve_package, resolve_package_identifier
 
 from ..test.TestPackager import prepare_testnet_package
+
+TEST_DIGEST = f"sha3-512:{'a' * 128}"
 
 # region server fixture
 
@@ -23,29 +26,33 @@ async def server(aiohttp_client):
 			return await self._process(request, [
 				{
 					'tag_name': 'client/catapult/4',
-					'assets': [{'name': 'alpha-444', 'browser_download_url': 'www.symbol.com/a444.zip', 'tag': 'a'}]
+					'assets': [{'name': 'alpha-444', 'browser_download_url': 'www.symbol.com/a444.zip', 'digest': TEST_DIGEST, 'tag': 'a'}]
 				},
 				{
 					'tag_name': 'client/catapult/x',
 				},
 				{
 					'tag_name': 'client/catapult/3',
-					'assets': [{'name': 'alpha-333', 'browser_download_url': 'www.symbol.com/a333.zip', 'tag': 'b'}]
+					'assets': [{'name': 'alpha-333', 'browser_download_url': 'www.symbol.com/a333.zip', 'digest': TEST_DIGEST, 'tag': 'b'}]
 				},
 				{
 					'tag_name': 'sdk/javascript/2',
-					'assets': [{'name': 'beta-222', 'browser_download_url': 'www.symbol.com/b222.zip', 'tag': 'c'}]
+					'assets': [{'name': 'beta-222', 'browser_download_url': 'www.symbol.com/b222.zip', 'digest': TEST_DIGEST, 'tag': 'c'}]
 				},
 				{
 					'tag_name': 'client/catapult/1',
 					'assets': [
-						{'name': 'gamma-112', 'browser_download_url': 'www.symbol.com/g112.zip', 'tag': 'd'},
-						{'name': 'gamma-115', 'browser_download_url': 'www.symbol.com/g115.zip', 'tag': 'e'}
+						{'name': 'gamma-112', 'browser_download_url': 'www.symbol.com/g112.zip', 'digest': TEST_DIGEST, 'tag': 'd'},
+						{'name': 'gamma-115', 'browser_download_url': 'www.symbol.com/g115.zip', 'digest': TEST_DIGEST, 'tag': 'e'}
 					]
 				},
 				{
 					'tag_name': 'client/catapult/v1.0.3.9',
-					'assets': [{'name': 'latest', 'browser_download_url': 'www.symbol.com/latest.zip', 'tag': 'client/catapult/v1.0.3.9'}]
+					'assets': [{
+						'name': 'latest',
+						'browser_download_url': 'www.symbol.com/latest.zip',
+						'digest': TEST_DIGEST,
+						'tag': 'client/catapult/v1.0.3.9'}]
 				}
 			])
 
@@ -85,7 +92,8 @@ async def test_mainnet_resolution_returns_first_release_with_matching_asset(serv
 	# Assert: client/catapult/4 is the first release that has an asset starting with "alpha" (partial match)
 	await _assert_mainnet_resolution_success(server, 'alpha', {
 		'name': 'configuration-package.zip',
-		'url': 'www.symbol.com/a444.zip'
+		'url': 'www.symbol.com/a444.zip',
+		'hash': TEST_DIGEST
 	})
 
 
@@ -93,7 +101,8 @@ async def test_mainnet_resolution_returns_first_release_with_exact_matching_asse
 	# Assert: client/catapult/3 is the first release that has an asset starting with "alpha-333" (exact match)
 	await _assert_mainnet_resolution_success(server, 'alpha-333', {
 		'name': 'configuration-package.zip',
-		'url': 'www.symbol.com/a333.zip'
+		'url': 'www.symbol.com/a333.zip',
+		'hash': TEST_DIGEST
 	})
 
 
@@ -101,7 +110,8 @@ async def test_mainnet_resolution_returns_first_matching_asset_within_first_rele
 	# Assert: client/catapult/1 has two matching assets but the first is returned
 	await _assert_mainnet_resolution_success(server, 'gamma-112', {
 		'name': 'configuration-package.zip',
-		'url': 'www.symbol.com/g112.zip'
+		'url': 'www.symbol.com/g112.zip',
+		'hash': TEST_DIGEST
 	})
 
 
@@ -109,10 +119,7 @@ async def test_mainnet_resolution_returns_official_hash_when_available(server): 
 	await _assert_mainnet_resolution_success(server, 'latest', {
 		'name': 'configuration-package.zip',
 		'url': 'www.symbol.com/latest.zip',
-		'hash': (
-			'895AB5284768278BEBBEB8F40D3F15D20F78B464E705BA9AFCA444248F3C4EF2'
-			'335DEC40A5CCABFE18E6E9BBB9EA36EC495F10A77CBEDE6F30A29DEB621F97F2'
-		)
+		'hash': TEST_DIGEST
 	})
 
 
@@ -155,6 +162,39 @@ async def test_testnet_resolution_can_resolve_custom_testnet(server):  # pylint:
 		'name': 'configuration-package.zip',
 		'url': 'https://foo.zip'
 	} == download_descriptor
+
+
+async def test_mainnet_resolution_fails_when_digest_is_missing(server, monkeypatch):  # pylint: disable=redefined-outer-name
+	async def get_releases(_uri):
+		return [{'tag_name': 'client/catapult/1', 'assets': [{'name': 'missing-digest', 'browser_download_url': 'https://example.com/a.zip'}]}]
+
+	monkeypatch.setattr(PackageResolver, '_get_releases', get_releases)
+	with pytest.raises(RuntimeError, match='usable digest'):
+		await resolve_package('mainnet', releases_uri='unused', asset_prefix='missing-digest')
+
+
+async def test_package_source_must_be_a_valid_uri():
+	with pytest.raises(RuntimeError, match='package source'):
+		await resolve_package('relative.zip')
+
+
+def test_package_source_is_required_for_custom_network(tmp_path):
+	config_filepath = tmp_path / 'config.ini'
+	config_filepath.write_text('[network]\nname = private\n', encoding='utf8')
+	with pytest.raises(RuntimeError, match='package source is required'):
+		resolve_package_identifier(config_filepath, 'private')
+
+
+def test_package_identifier_is_fixed_for_mainnet_and_testnet(tmp_path):
+	config_filepath = tmp_path / 'config.ini'
+	assert 'mainnet' == resolve_package_identifier(config_filepath, 'mainnet')
+	assert 'testnet' == resolve_package_identifier(config_filepath, 'testnet')
+
+
+def test_package_source_is_loaded_for_custom_network(tmp_path):
+	config_filepath = tmp_path / 'config.ini'
+	config_filepath.write_text('[package]\nsource = https://example.com/package.zip\n', encoding='utf8')
+	assert 'https://example.com/package.zip' == resolve_package_identifier(config_filepath, 'private')
 
 # endregion
 
@@ -267,6 +307,17 @@ async def test_cannot_find_seed_directory_multiple_levels_down():
 	# Act + Assert:
 	with pytest.raises(RuntimeError):
 		await _assert_can_download_and_extract_local_package_using_file_protocol(add_files_to_archive)
+
+
+async def test_cannot_extract_package_with_unsafe_path(tmp_path):
+	source_filepath = tmp_path / 'unsafe.zip'
+	with ZipFile(source_filepath, 'w') as archive:
+		archive.writestr('../outside.txt', 'unsafe')
+
+	output_directory = tmp_path / 'output'
+	output_directory.mkdir()
+	with pytest.raises(RuntimeError, match='unsafe path'):
+		await download_and_extract_package(f'file://{source_filepath}', output_directory)
 
 
 # endregion

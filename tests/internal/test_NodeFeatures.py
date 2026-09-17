@@ -1,6 +1,6 @@
 import unittest
 
-from shoestring.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.NodeFeatures import NodeFeatures
 
 
 class NodeFeaturesTest(unittest.TestCase):

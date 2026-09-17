@@ -13,8 +13,8 @@ services:
         soft: 65536
         hard: 65536
     volumes:
-      - ./dbdata:/dbdata:rw
-      - ./dbdata:/data:rw
+      - ./sakuya/dbdata:/dbdata:rw
+      - ./sakuya/dbdata:/data:rw
 
   initiate:
     image: '{{ mongo_image }}'
@@ -25,11 +25,11 @@ services:
         soft: 65536
         hard: 65536
     volumes:
-      - ./startup:/startup:ro
-      - ./mongo:/mongo:ro
-      - ./dbdata:/dbdata:rw
-      - ./dbdata:/data:rw
-      - ./data:/real_data
+      - ./sakuya/startup:/startup:ro
+      - ./sakuya/mongo:/mongo:ro
+      - ./sakuya/dbdata:/dbdata:rw
+      - ./sakuya/dbdata:/data:rw
+      - ./sakuya/data:/real_data
     depends_on:
       - db
 
@@ -58,13 +58,13 @@ services:
         soft: 65536
         hard: 65536
     volumes:
-      - ./startup:/startup:ro
-      - ./userconfig:/userconfig:ro
-      - ./seed:/seed:ro
-      - ./keys/cert:/certificates:ro
-      - ./data:/data
-      - ./logs:/logs
-      - ./keys/voting:/votingkeys
+      - ./sakuya/startup:/startup:ro
+      - ./sakuya/node-config:/userconfig:ro
+      - ./sakuya/seed:/seed:ro
+      - ./sakuya/keys/cert:/certificates:ro
+      - ./sakuya/data:/data
+      - ./sakuya/logs:/logs
+      - ./sakuya/keys/voting:/votingkeys
 
 {%- if not recovery %}
   broker:
@@ -83,11 +83,11 @@ services:
         soft: 65536
         hard: 65536
     volumes:
-      - ./startup:/startup:ro
-      - ./userconfig:/userconfig:ro
-      - ./keys/cert:/certificates:ro
-      - ./data:/data
-      - ./logs:/logs
+      - ./sakuya/startup:/startup:ro
+      - ./sakuya/node-config:/userconfig:ro
+      - ./sakuya/keys/cert:/certificates:ro
+      - ./sakuya/data:/data
+      - ./sakuya/logs:/logs
 
   rest-api:
     image: '{{ catapult_rest_image }}'
@@ -102,12 +102,12 @@ services:
       - 3000:3000
 {%- endif %}
     volumes:
-      - ./startup:/startup:ro
-      - ./userconfig:/userconfig:ro
-      - ./keys/cert:/certificates:ro
-      - ./data:/data
-      - ./logs:/logs
-      - ./rest-cache:/symbol-workdir
+      - ./sakuya/startup:/startup:ro
+      - ./sakuya/node-config:/userconfig:ro
+      - ./sakuya/keys/cert:/certificates:ro
+      - ./sakuya/data:/data
+      - ./sakuya/logs:/logs
+      - ./sakuya/rest-cache:/symbol-workdir
     networks:
       default:
         ipv4_address: 172.20.0.25
@@ -126,8 +126,8 @@ services:
       - STAGE=production
       - FORCE_RENEW=false
     volumes:
-      - ./https-proxy:/var/lib/https-portal
-      - ./https-proxy/nginx.conf.erb:/var/lib/nginx-conf/{{ domainname }}.conf.erb:ro
+      - ./sakuya/https-proxy:/var/lib/https-portal
+      - ./sakuya/https-proxy/nginx.conf.erb:/var/lib/nginx-conf/{{ domainname }}.conf.erb:ro
 {% endif %}
 {% endif %}
 networks:

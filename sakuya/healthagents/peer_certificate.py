@@ -4,7 +4,7 @@ from email.utils import parsedate_to_datetime
 
 from zenlog import log
 
-from shoestring.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.OpensslExecutor import OpensslExecutor
 
 NAME = 'peer certificate'
 CERT_RENEW_DAYS_WARNING = 30
@@ -30,15 +30,19 @@ def _process_end_certificate_date(current_datetime, name, certificate_datetime):
 	days_remaining = (certificate_datetime - current_datetime).days
 	if certificate_datetime < current_datetime:
 		log.error(_('health-peer-certificate-expired').format(name=name, days_expired=-days_remaining))
+		return False
 	elif (certificate_datetime - current_datetime).days < CERT_RENEW_DAYS_WARNING:
 		log.warning(_('health-peer-certificate-near-expiry').format(name=name, days_remaining=days_remaining))
 	else:
 		log.info(_('health-peer-certificate-not-near-expiry').format(name=name, days_remaining=days_remaining))
+	return True
 
 
 def _process_start_certificate_date(current_datetime, name, certificate_datetime):
 	if current_datetime < certificate_datetime:
 		log.error(_('health-peer-certificate-future-start').format(name=name, start_date=certificate_datetime.strftime('%y-%m-%d')))
+		return False
+	return True
 
 
 def _load_binary_file_data(filename):
@@ -50,10 +54,10 @@ def _check_certificate_lifetime(openssl_executor, crt_path, name):
 	current_date = datetime.now(timezone.utc)
 
 	end_date = _openssl_get_certificate_date(openssl_executor, crt_path, 'end')
-	_process_end_certificate_date(current_date, name, end_date)
+	is_valid = _process_end_certificate_date(current_date, name, end_date)
 
 	start_date = _openssl_get_certificate_date(openssl_executor, crt_path, 'start')
-	_process_start_certificate_date(current_date, name, start_date)
+	return _process_start_certificate_date(current_date, name, start_date) and is_valid
 
 
 def _verify_certificate(openssl_executor, ca_crt_path, crt_path, name):
@@ -61,6 +65,8 @@ def _verify_certificate(openssl_executor, ca_crt_path, crt_path, name):
 		openssl_executor.dispatch(['verify', '-CAfile', ca_crt_path, crt_path])
 	except RuntimeError:
 		log.error(_('health-peer-certificate-not-verifiable').format(name=name))
+		return False
+	return True
 
 
 async def validate(context):
@@ -70,6 +76,7 @@ async def validate(context):
 	if expected_package_files != package_files:
 		missing_files = ', '.join(sorted(set(expected_package_files) - set(package_files)))
 		log.error(_('health-peer-certificate-missing-files').format(missing_files=missing_files))
+		context.failed = True
 		return
 
 	# verify that node.full == node.crt + ca.crt
@@ -81,13 +88,18 @@ async def validate(context):
 
 	if node_full_crt_data != node_crt_data + ca_crt_data:
 		log.error(_('health-peer-certificate-corrupt-full-certificate'))
+		context.failed = True
 		return
 
 	# check certificate lifetime
 	openssl_executor = OpensslExecutor(os.environ.get('OPENSSL_EXECUTABLE', 'openssl'))
-	_check_certificate_lifetime(openssl_executor, ca_crt_path, 'ca')
-	_check_certificate_lifetime(openssl_executor, node_crt_path, 'node')
+	if not _check_certificate_lifetime(openssl_executor, ca_crt_path, 'ca'):
+		context.failed = True
+	if not _check_certificate_lifetime(openssl_executor, node_crt_path, 'node'):
+		context.failed = True
 
 	# verify certificates
-	_verify_certificate(openssl_executor, ca_crt_path, ca_crt_path, 'ca')
-	_verify_certificate(openssl_executor, ca_crt_path, node_crt_path, 'node')
+	if not _verify_certificate(openssl_executor, ca_crt_path, ca_crt_path, 'ca'):
+		context.failed = True
+	if not _verify_certificate(openssl_executor, ca_crt_path, node_crt_path, 'node'):
+		context.failed = True

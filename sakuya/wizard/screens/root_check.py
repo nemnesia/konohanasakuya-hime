@@ -5,7 +5,7 @@ from prompt_toolkit.layout import FormattedTextControl
 from prompt_toolkit.layout.containers import HSplit, Window, WindowAlign
 from prompt_toolkit.widgets import Box, Shadow, TextArea
 
-from shoestring.wizard.Screen import Screen
+from sakuya.wizard.Screen import Screen
 
 
 def is_running_as_root(screens):

@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from aiohttp import web
 
-from shoestring.internal.FileDownloader import download_file
+from sakuya.internal.FileDownloader import _matches_hash, _redact_uri, download_file
 
 SHA3_HASH_ABC = (
 	'B751850B1A57168A5693CD924B6B096E08F621827444F70D884F5D0240D2712E'
@@ -160,5 +160,19 @@ async def test_can_download_overwrite_existing_file_with_wrong_hash(server):  # 
 		# Assert: HTTP call was skipped
 		assert [f'{server.make_url("")}/known/file'] == server.mock.urls
 		_assert_downloaded_abc_file(output_directory)
+
+
+def test_matches_hash_supports_sha256_and_rejects_unknown_algorithm():
+	assert 'relative/path' == _redact_uri('relative/path')
+	assert 'https://example.com/path' == _redact_uri('https://user:password@example.com/path?secret=value')
+	assert _matches_hash(b'abc', 'sha256:ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
+	with pytest.raises(RuntimeError, match='unsupported package digest algorithm'):
+		_matches_hash(b'abc', 'md5:900150983cd24fb0d6963f7d28e17f72')
+
+
+async def test_download_fails_when_remote_file_is_unavailable(server):  # pylint: disable=redefined-outer-name
+	with tempfile.TemporaryDirectory() as output_directory:
+		with pytest.raises(RuntimeError, match='could not download file'):
+			await download_file({'name': 'foo.zip', 'url': f'http://user:password@{server.host}:{server.port}/unknown'}, output_directory)
 
 # endregion

@@ -7,8 +7,8 @@ from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 from symbolchain.symbol.KeyPair import KeyPair
 from symbolchain.symbol.Network import Address
 
-from shoestring.internal.ConfigurationManager import ConfigurationManager
-from shoestring.internal.HarvesterConfigurator import HarvesterConfigurator
+from sakuya.internal.ConfigurationManager import ConfigurationManager
+from sakuya.internal.HarvesterConfigurator import HarvesterConfigurator
 
 
 class HarvesterConfiguratorTest(unittest.TestCase):

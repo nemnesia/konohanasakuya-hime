@@ -1,8 +1,8 @@
 from prompt_toolkit.widgets import Label
 
-from shoestring.wizard.screen_loader import load_screens
-from shoestring.wizard.ScreenContainer import ScreenContainer
-from shoestring.wizard.TitleBar import TitleBar
+from sakuya.wizard.screen_loader import load_screens
+from sakuya.wizard.ScreenContainer import ScreenContainer
+from sakuya.wizard.TitleBar import TitleBar
 
 # pylint: disable=invalid-name
 

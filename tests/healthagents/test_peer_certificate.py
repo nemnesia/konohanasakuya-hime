@@ -1,16 +1,16 @@
 import os
 import shutil
 import tempfile
-from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
-from shoestring.healthagents.peer_certificate import should_run, validate
-from shoestring.internal.CertificateFactory import CertificateFactory
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.OpensslExecutor import OpensslExecutor
-from shoestring.internal.Preparer import Preparer
-from shoestring.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
+from sakuya.healthagents.peer_certificate import should_run, validate
+from sakuya.internal.CertificateFactory import CertificateFactory
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.Preparer import Preparer
+from sakuya.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 
@@ -40,8 +40,7 @@ def _create_configuration():
 
 async def _dispatch_validate(directories):
 	# Arrange:
-	HealthAgentContext = namedtuple('HealthAgentContext', ['directories'])
-	context = HealthAgentContext(directories)
+	context = SimpleNamespace(directories=directories, failed=False)
 
 	# Act:
 	await validate(context)

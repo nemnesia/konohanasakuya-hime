@@ -6,8 +6,8 @@ from symbolchain.BufferReader import BufferReader
 from symbolchain.BufferWriter import BufferWriter
 from symbolchain.CryptoTypes import PrivateKey, PublicKey
 
-from shoestring.internal.ConfigurationManager import ConfigurationManager
-from shoestring.internal.VoterConfigurator import VoterConfigurator, inspect_voting_key_files
+from sakuya.internal.ConfigurationManager import ConfigurationManager
+from sakuya.internal.VoterConfigurator import VoterConfigurator, inspect_voting_key_files
 
 
 class VoterConfiguratorTest(unittest.TestCase):

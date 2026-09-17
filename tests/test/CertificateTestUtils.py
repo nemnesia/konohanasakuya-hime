@@ -2,7 +2,7 @@ import datetime
 import os
 import re
 
-from shoestring.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.OpensslExecutor import OpensslExecutor
 
 
 def create_openssl_executor():

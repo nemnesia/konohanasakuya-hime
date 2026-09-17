@@ -3,9 +3,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from shoestring.internal.CertificateFactory import CertificateFactory
-from shoestring.internal.NodeKeyUtils import write_node_key_file
-from shoestring.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.CertificateFactory import CertificateFactory
+from sakuya.internal.NodeKeyUtils import write_node_key_file
+from sakuya.internal.OpensslExecutor import OpensslExecutor
 
 
 class NodeKeyUtilsTest(unittest.TestCase):

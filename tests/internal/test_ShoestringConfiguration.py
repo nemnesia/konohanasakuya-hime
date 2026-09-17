@@ -5,8 +5,8 @@ from pathlib import Path
 
 from symbolchain.CryptoTypes import Hash256
 
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.ShoestringConfiguration import (
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.ShoestringConfiguration import (
 	parse_images_configuration,
 	parse_imports_configuration,
 	parse_network_configuration,

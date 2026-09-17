@@ -10,7 +10,6 @@ class ShoestringOperation(Enum):
 	RESET_DATA = 3
 	RENEW_CERTIFICATES = 4
 	RENEW_VOTING_KEYS = 5
-	IMPORT_BOOTSTRAP = 6
 
 
 def requires_ca_key_path(operation):
@@ -44,22 +43,17 @@ def build_shoestring_command(
 	shoestring_args = [
 		'--directory', str(destination_directory),
 		command_name,
-		'--config', str(Path(shoestring_directory) / 'shoestring.ini')
+		'--config', str(Path(shoestring_directory) / 'config.ini')
 	]
 
 	if requires_ca_key_path(operation):
 		shoestring_args.extend(['--ca-key-path', str(ca_pem_path)])
 
 	if operation in (ShoestringOperation.SETUP, ShoestringOperation.UPGRADE):
-		shoestring_args.extend([
-			'--overrides', str(Path(shoestring_directory) / 'overrides.ini'),
-			'--package', package
-		])
+		shoestring_args.extend(['--overrides', str(Path(shoestring_directory) / 'overrides.ini')])
 
 	if ShoestringOperation.SETUP == operation:
-		shoestring_args.extend(['--security', 'insecure'])
-
-		if has_custom_rest_overrides:
-			shoestring_args.extend(['--rest-overrides', str(Path(shoestring_directory) / 'rest_overrides.json')])
+		# initが常に生成する既定のREST設定もsetupへ明示的に渡す。
+		shoestring_args.extend(['--rest-overrides', str(Path(shoestring_directory) / 'rest_overrides.json')])
 
 	return shoestring_args

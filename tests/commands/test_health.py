@@ -1,11 +1,15 @@
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 
-from shoestring.__main__ import main
-from shoestring.commands.health import HealthAgentContext
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.Preparer import Preparer
-from shoestring.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
+import pytest
+
+from sakuya.__main__ import main
+from sakuya.commands import health
+from sakuya.commands.health import HealthAgentContext
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.Preparer import Preparer
+from sakuya.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
 
 from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
 from ..test.LogTestUtils import assert_all_messages_are_logged
@@ -25,7 +29,7 @@ def _write_resources(directories, host, port, rest_port):
 			f'host = {host}'
 		]))
 
-	with open(directories.userconfig / 'rest.json', 'wt', encoding='utf8') as outfile:
+	with open(directories.node_config / 'rest.json', 'wt', encoding='utf8') as outfile:
 		outfile.write(f'{{"port": {rest_port}}}\n')
 
 
@@ -102,19 +106,38 @@ async def test_can_run_health_command(caplog):
 				config_filepath = prepare_shoestring_configuration(package_directory, NodeFeatures.PEER, '', api_https=False)
 
 				# Act:
-				await main([
-					'--directory', output_directory,
-					'health',
-					'--config', str(config_filepath),
-				])
+				with pytest.raises(RuntimeError, match='one or more health checks failed'):
+					await main([
+						'--directory', output_directory,
+						'health',
+						'--config', str(config_filepath),
+					])
 
 				# Assert:
-				assert_all_messages_are_logged([
-					'running health agent for peer certificate',
-					'ca certificate not near expiry (7299 day(s))',
-					'node certificate not near expiry (374 day(s))',
-					'running health agent for peer API',
-					'cannot access peer API at localhost on port 1111'
-				], caplog)
+			expected_messages = [
+				'running health agent for peer certificate',
+				'ca certificate not near expiry (7299 day(s))',
+				'node certificate not near expiry (374 day(s))',
+				'running health agent for peer API',
+				'cannot access peer API at localhost on port 1111'
+			]
+			assert_all_messages_are_logged(expected_messages, caplog)
+
+
+async def test_health_runs_all_agents_after_one_agent_raises(monkeypatch, tmp_path):
+	config = SimpleNamespace(node=SimpleNamespace(api_https=False))
+	directories = SimpleNamespace(resources=tmp_path, node_config=tmp_path)
+	module = SimpleNamespace(NAME='test-agent', should_run=lambda _node: True)
+
+	async def validate(_context):
+		raise RuntimeError('secret must not be logged')
+
+	module.validate = validate
+	monkeypatch.setattr(health, 'parse_shoestring_configuration', lambda _path: config)
+	monkeypatch.setattr(health.Preparer, 'DirectoryLocator', lambda _env, _directory: directories)
+	monkeypatch.setattr(health.importlib, 'import_module', lambda _name: module)
+
+	with pytest.raises(RuntimeError, match='one or more health checks failed'):
+		await health.run_main(SimpleNamespace(config='config.ini', directory=tmp_path))
 
 # endregion

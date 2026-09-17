@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from shoestring.internal.PeerDownloader import download_peers, find_api_node, load_api_endpoints
+from sakuya.internal.PeerDownloader import download_peers, find_api_node, load_api_endpoints
 
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 

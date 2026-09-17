@@ -1,7 +1,7 @@
 from prompt_toolkit.layout.containers import HSplit, VSplit
 
-from shoestring.wizard.Screen import ScreenDialog
-from shoestring.wizard.ValidatingTextBox import ValidatingTextBox, is_not_empty
+from sakuya.wizard.Screen import ScreenDialog
+from sakuya.wizard.ValidatingTextBox import ValidatingTextBox, is_not_empty
 
 
 class CertSettings:

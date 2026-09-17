@@ -1,7 +1,7 @@
 from prompt_toolkit.utils import get_cwidth
 from prompt_toolkit.widgets import TextArea
 
-from shoestring.wizard.Screen import ScreenDialog
+from sakuya.wizard.Screen import ScreenDialog
 
 
 def create(_screens):

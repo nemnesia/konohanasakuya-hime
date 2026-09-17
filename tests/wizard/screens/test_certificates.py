@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from shoestring.wizard.screens.certificates import create
+from sakuya.wizard.screens.certificates import create
 
 NodeSettingsScreen = namedtuple('NodeSettingsScreen', ['domain_name', 'friendly_name'])
 

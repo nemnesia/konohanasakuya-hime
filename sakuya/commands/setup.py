@@ -1,22 +1,25 @@
 import ipaddress
+import shutil
 import socket
 import sys
+import tempfile
+from argparse import Namespace
 from pathlib import Path
 
 from symbollightapi.connector.SymbolConnector import SymbolConnector
 from zenlog import log
 
-from shoestring.internal.ConfigurationManager import ConfigurationManager, load_patches_from_file
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.NodewatchClient import get_current_finalization_epoch
-from shoestring.internal.PackageResolver import download_and_extract_package
-from shoestring.internal.PeerDownloader import download_peers, find_api_node
-from shoestring.internal.PemUtils import read_public_key_from_public_key_pem_file
-from shoestring.internal.Preparer import Preparer
-from shoestring.internal.ShoestringConfiguration import parse_shoestring_configuration
-from shoestring.internal.TransactionSerializer import write_transaction_to_file
-
-SECURITY_MODES = ('default', 'paranoid', 'insecure')
+from sakuya.internal.AtomicFileSystem import replace_paths
+from sakuya.internal.ConfigurationManager import ConfigurationManager, load_patches_from_file
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.NodewatchClient import get_current_finalization_epoch
+from sakuya.internal.PackageResolver import download_and_extract_package, resolve_package_identifier
+from sakuya.internal.PeerDownloader import download_peers, find_api_node
+from sakuya.internal.PemUtils import read_public_key_from_public_key_pem_file
+from sakuya.internal.Preparer import Preparer
+from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.TransactionSerializer import write_transaction_to_file
+from sakuya.internal.VoterConfigurator import inspect_voting_key_files
 
 
 def _resolve_hostname_and_configure_https(config, preparer):
@@ -64,6 +67,24 @@ async def _prepare_linking_transaction(preparer, api_endpoint):
 
 	account_public_key = read_public_key_from_public_key_pem_file(preparer.directories.certificates / 'ca.pubkey.pem')
 	existing_links = await connector.account_links(account_public_key)
+	if preparer.config.network.name in ('mainnet', 'testnet'):
+		if preparer.harvester_configurator.is_imported:
+			remote_key_mismatch = existing_links.linked_public_key != preparer.harvester_configurator.remote_key_pair.public_key
+			vrf_key_mismatch = existing_links.vrf_public_key != preparer.harvester_configurator.vrf_key_pair.public_key
+			if remote_key_mismatch or vrf_key_mismatch:
+				raise RuntimeError('imported harvesting keys do not match on-chain links')
+
+		if preparer.voter_configurator.is_imported:
+			local_voting_links = {
+				(descriptor.public_key, descriptor.start_epoch, descriptor.end_epoch)
+				for descriptor in inspect_voting_key_files(preparer.directories.voting_keys)
+			}
+			chain_voting_links = {
+				(link.public_key, link.start_epoch, link.end_epoch)
+				for link in existing_links.voting_public_keys
+			}
+			if local_voting_links != chain_voting_links:
+				raise RuntimeError('imported voting keys do not match on-chain links')
 
 	network_time = await connector.network_time()
 	transaction = preparer.prepare_linking_transaction(account_public_key, existing_links, network_time.timestamp)
@@ -75,8 +96,57 @@ async def _prepare_linking_transaction(preparer, api_endpoint):
 
 
 async def run_main(args):
+	if 'setup' == getattr(args, 'command', 'setup'):
+		# transaction-only は既存の出力を読むため、一時出力への初期化を行わない。
+		if args.output_transaction_only:
+			await _run_setup(args)
+			return
+		await _run_initial_setup_atomically(args)
+		return
+
+	await _run_setup(args)
+
+
+async def _run_initial_setup_atomically(args):
+	"""初期セットアップを一時ディレクトリで実行してから公開する。"""
+	output_directory = Path(args.directory).absolute()
+	output_directory.mkdir(parents=True, exist_ok=True)
+	managed_paths = ('sakuya', 'docker-compose.yaml', 'docker-compose-recovery.yaml', 'linking_transaction.dat')
+	if any((output_directory / path).exists() or (output_directory / path).is_symlink() for path in managed_paths):
+		log.error(_('setup-resources-directory-exists').format(directory=output_directory / 'sakuya'))
+		sys.exit(1)
+
+	staged_directory = Path(tempfile.mkdtemp(dir=output_directory.parent, prefix='.sakuya-setup-'))
+	ca_key_path = Path(args.ca_key_path).absolute()
+	if ca_key_path.is_symlink():
+		raise RuntimeError(f'CA key path must not be a symbolic link: {ca_key_path}')
+	ca_key_was_generated = not ca_key_path.exists()
+	ca_key_published = False
+	try:
+		staged_args = Namespace(**vars(args))
+		staged_args.directory = staged_directory
+		if ca_key_was_generated:
+			staged_args.ca_key_path = staged_directory / ca_key_path.name
+		await _run_setup(staged_args)
+		if ca_key_was_generated and ca_key_path.parent != output_directory:
+			shutil.copy2(staged_args.ca_key_path, ca_key_path)
+			ca_key_path.chmod(0o400)
+			ca_key_published = True
+		elif ca_key_was_generated:
+			managed_paths += (ca_key_path.name,)
+		replace_paths(staged_directory, output_directory, managed_paths)
+		ca_key_path.chmod(0o400)
+	except Exception:
+		if ca_key_published:
+			ca_key_path.unlink(missing_ok=True)
+		raise
+	finally:
+		shutil.rmtree(staged_directory, ignore_errors=True)
+
+
+async def _run_setup(args):
 	config = parse_shoestring_configuration(args.config)
-	is_initial_setup = hasattr(args, 'security')
+	is_initial_setup = 'setup' == getattr(args, 'command', 'setup')
 
 	if is_initial_setup and args.output_transaction_only:
 		log.info(_('setup-status-output-transaction-only'))
@@ -102,7 +172,8 @@ async def run_main(args):
 			config.services.nodewatch,
 			preparer.directories.resources,
 			config.node.full_api)
-		await download_and_extract_package(args.package, preparer.directories.temp)
+		package_identifier = resolve_package_identifier(args.config, config.network.name)
+		await download_and_extract_package(package_identifier, preparer.directories.temp)
 
 		# prepare nemesis data and resources
 		if is_initial_setup:
@@ -117,7 +188,7 @@ async def run_main(args):
 			]
 		}
 
-		if args.overrides:
+		if args.overrides and Path(args.overrides).is_file():
 			user_patches = load_patches_from_file(args.overrides)
 
 		preparer.configure_resources(user_patches)
@@ -144,13 +215,11 @@ async def run_main(args):
 
 
 def add_arguments(parser, is_initial_setup=True):
-	parser.add_argument('--config', help=_('argument-help-config'), required=True)
-	parser.add_argument('--package', help=_('argument-help-setup-package'), default='mainnet')
+	parser.add_argument('--config', help=_('argument-help-config'))
 	parser.add_argument('--overrides', help=_('argument-help-setup-overrides'))
 	parser.add_argument('--rest-overrides', help=_('argument-help-setup-rest-overrides'))
 
 	if is_initial_setup:
-		parser.add_argument('--security', help=_('argument-help-setup-security'), choices=SECURITY_MODES, default='default')
-		parser.add_argument('--ca-key-path', help=_('argument-help-ca-key-path'), required=True)
+		parser.add_argument('--ca-key-path', help=_('argument-help-ca-key-path'))
 		parser.add_argument('--output-transaction-only', help=_('argument-help-setup-output-transaction-only'), action='store_true')
 		parser.set_defaults(func=run_main)

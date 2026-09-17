@@ -7,8 +7,8 @@ from symbolchain.facade.SymbolFacade import SymbolFacade
 from symbolchain.sc import TransactionFactory
 from symbolchain.symbol.Network import NetworkTimestamp
 
-from shoestring.internal.LinkTransactionBuilder import LinkTransactionBuilder
-from shoestring.internal.TransactionSerializer import write_transaction_to_file
+from sakuya.internal.LinkTransactionBuilder import LinkTransactionBuilder
+from sakuya.internal.TransactionSerializer import write_transaction_to_file
 
 
 class TransactionSerializerTest(unittest.TestCase):

@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from shoestring.internal.ConfigurationManager import (
+from sakuya.internal.ConfigurationManager import (
 	ConfigurationManager,
 	load_patches_from_file,
 	load_shoestring_patches_from_file,

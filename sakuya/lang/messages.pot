@@ -1,903 +1,803 @@
-#: shoestring/commands/announce_transaction.py:31
-msgid "announce-transaction-announce-successful"
-msgstr ""
-
-#: shoestring/commands/announce_transaction.py:24
+#: sakuya/commands/announce_transaction.py:68
 msgid "announce-transaction-preparing-to-announce"
 msgstr ""
 
-#: shoestring/commands/announce_transaction.py:36
+#: sakuya/commands/announce_transaction.py:82
 msgid "argument-help-announce-transaction-transaction"
 msgstr ""
 
-#: shoestring/commands/min_cosignatures_count.py:35
-#: shoestring/commands/renew_certificates.py:40
-#: shoestring/commands/setup.py:155 shoestring/commands/signer.py:93
+#: sakuya/commands/min_cosignatures_count.py:35
+#: sakuya/commands/renew_certificates.py:54 sakuya/commands/setup.py:223
+#: sakuya/commands/signer.py:93
 msgid "argument-help-ca-key-path"
 msgstr ""
 
-#: shoestring/commands/announce_transaction.py:35
-#: shoestring/commands/health.py:74 shoestring/commands/import_bootstrap.py:49
-#: shoestring/commands/import_harvesters.py:97 shoestring/commands/init.py:29
-#: shoestring/commands/min_cosignatures_count.py:34
-#: shoestring/commands/renew_certificates.py:38
-#: shoestring/commands/renew_voting_keys.py:112
-#: shoestring/commands/reset_data.py:86 shoestring/commands/setup.py:147
-#: shoestring/commands/signer.py:92
+#: sakuya/commands/announce_transaction.py:81 sakuya/commands/health.py:83
+#: sakuya/commands/init.py:70 sakuya/commands/min_cosignatures_count.py:34
+#: sakuya/commands/pemview.py:42 sakuya/commands/renew_certificates.py:53
+#: sakuya/commands/renew_voting_keys.py:218 sakuya/commands/reset_data.py:112
+#: sakuya/commands/setup.py:218 sakuya/commands/signer.py:92
 msgid "argument-help-config"
 msgstr ""
 
-#: shoestring/__main__.py:19
+#: sakuya/__main__.py:21
 msgid "argument-help-directory"
 msgstr ""
 
-#: shoestring/commands/import_bootstrap.py:50
-msgid "argument-help-import-bootstrap-bootstrap"
-msgstr ""
-
-#: shoestring/commands/import_bootstrap.py:51
-msgid "argument-help-import-bootstrap-include-node-key"
-msgstr ""
-
-#: shoestring/commands/import_harvesters.py:98
-msgid "argument-help-import-harvesters-in-harvesters"
-msgstr ""
-
-#: shoestring/commands/import_harvesters.py:99
-msgid "argument-help-import-harvesters-in-pem"
-msgstr ""
-
-#: shoestring/commands/import_harvesters.py:101
-msgid "argument-help-import-harvesters-out-harvesters"
-msgstr ""
-
-#: shoestring/commands/import_harvesters.py:102
-msgid "argument-help-import-harvesters-out-pem"
-msgstr ""
-
-#: shoestring/commands/min_cosignatures_count.py:36
+#: sakuya/commands/min_cosignatures_count.py:36
 msgid "argument-help-min-cosignatures-count-update"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:49
+#: sakuya/commands/pemtool.py:58
 msgid "argument-help-pemtool-ask-pass"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:50
+#: sakuya/commands/pemtool.py:59
 msgid "argument-help-pemtool-force"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:48
+#: sakuya/commands/pemtool.py:57
 msgid "argument-help-pemtool-input"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:47
+#: sakuya/commands/pemtool.py:56
 msgid "argument-help-pemtool-output"
 msgstr ""
 
-#: shoestring/commands/pemview.py:42
+#: sakuya/commands/pemview.py:44
 msgid "argument-help-pemview-ask-pass"
 msgstr ""
 
-#: shoestring/commands/pemview.py:40
+#: sakuya/commands/pemview.py:43
 msgid "argument-help-pemview-input"
 msgstr ""
 
-#: shoestring/commands/pemview.py:41
-msgid "argument-help-pemview-network"
-msgstr ""
-
-#: shoestring/commands/pemview.py:43
+#: sakuya/commands/pemview.py:45
 msgid "argument-help-pemview-show-private"
 msgstr ""
 
-#: shoestring/commands/renew_certificates.py:43
+#: sakuya/commands/renew_certificates.py:57
 msgid "argument-help-renew-certificates-force"
 msgstr ""
 
-#: shoestring/commands/renew_certificates.py:41
+#: sakuya/commands/renew_certificates.py:55
 msgid "argument-help-renew-certificates-renew-ca"
 msgstr ""
 
-#: shoestring/commands/renew_certificates.py:42
-msgid "argument-help-renew-certificates-retain-node-key"
+#: sakuya/commands/renew_certificates.py:56
+msgid "argument-help-renew-certificates-renew-node-key"
 msgstr ""
 
-#: shoestring/commands/reset_data.py:88
+#: sakuya/commands/reset_data.py:113
 msgid "argument-help-reset-data-purge-harvesters"
 msgstr ""
 
-#: shoestring/commands/setup.py:156
+#: sakuya/commands/setup.py:224
 msgid "argument-help-setup-output-transaction-only"
 msgstr ""
 
-#: shoestring/commands/setup.py:150
+#: sakuya/commands/setup.py:219
 msgid "argument-help-setup-overrides"
 msgstr ""
 
-#: shoestring/commands/init.py:28 shoestring/commands/setup.py:148
+#: sakuya/commands/init.py:69
 msgid "argument-help-setup-package"
 msgstr ""
 
-#: shoestring/commands/setup.py:151
+#: sakuya/commands/setup.py:220
 msgid "argument-help-setup-rest-overrides"
 msgstr ""
 
-#: shoestring/commands/setup.py:154
-msgid "argument-help-setup-security"
-msgstr ""
-
-#: shoestring/commands/signer.py:95
+#: sakuya/commands/signer.py:95
 msgid "argument-help-signer-filename"
 msgstr ""
 
-#: shoestring/commands/signer.py:94
+#: sakuya/commands/signer.py:94
 msgid "argument-help-signer-save"
 msgstr ""
 
-#: shoestring/internal/FileDownloader.py:40
+#: sakuya/internal/FileDownloader.py:64
 msgid "file-downloader-already-downloaded"
 msgstr ""
 
-#: shoestring/internal/FileDownloader.py:54
+#: sakuya/internal/FileDownloader.py:78
 msgid "file-downloader-downloaded-with-invalid-hash"
 msgstr ""
 
-#: shoestring/internal/FileDownloader.py:43
+#: sakuya/internal/FileDownloader.py:67
 msgid "file-downloader-exists-with-invalid-hash"
 msgstr ""
 
-#: shoestring/commands/announce_transaction.py:15
-#: shoestring/commands/min_cosignatures_count.py:18
-#: shoestring/commands/renew_voting_keys.py:32 shoestring/commands/setup.py:62
+#: sakuya/commands/announce_transaction.py:59
+#: sakuya/commands/min_cosignatures_count.py:18
+#: sakuya/commands/renew_voting_keys.py:36
+#: sakuya/commands/renew_voting_keys.py:45 sakuya/commands/setup.py:65
 msgid "general-connecting-to-node"
 msgstr ""
 
-#: shoestring/commands/init.py:17 shoestring/commands/reset_data.py:56
-#: shoestring/internal/Preparer.py:193
-#: shoestring/internal/VoterConfigurator.py:55
+#: sakuya/commands/init.py:55 sakuya/internal/Preparer.py:206
+#: sakuya/internal/VoterConfigurator.py:55
 msgid "general-copying-file"
 msgstr ""
 
-#: shoestring/commands/reset_data.py:61 shoestring/internal/Preparer.py:199
+#: sakuya/internal/Preparer.py:212
 msgid "general-copying-tree"
 msgstr ""
 
-#: shoestring/commands/renew_voting_keys.py:46
-#: shoestring/internal/Preparer.py:415
+#: sakuya/commands/renew_voting_keys.py:68 sakuya/internal/Preparer.py:426
 msgid "general-created-aggregate-transaction"
 msgstr ""
 
-#: shoestring/healthagents/peer_api.py:25
+#: sakuya/healthagents/harvesting_keys.py:34
+#: sakuya/healthagents/harvesting_keys.py:41
+msgid "health-harvesting-keys-mismatch"
+msgstr ""
+
+#: sakuya/healthagents/harvesting_keys.py:24
+msgid "health-harvesting-keys-unknown"
+msgstr ""
+
+#: sakuya/healthagents/peer_api.py:25
 msgid "health-peer-api-error"
 msgstr ""
 
-#: shoestring/healthagents/peer_api.py:23
+#: sakuya/healthagents/peer_api.py:23
 msgid "health-peer-api-success"
 msgstr ""
 
-#: shoestring/healthagents/peer_certificate.py:83
+#: sakuya/healthagents/peer_certificate.py:90
 msgid "health-peer-certificate-corrupt-full-certificate"
 msgstr ""
 
-#: shoestring/healthagents/peer_certificate.py:32
+#: sakuya/healthagents/peer_certificate.py:32
 msgid "health-peer-certificate-expired"
 msgstr ""
 
-#: shoestring/healthagents/peer_certificate.py:41
+#: sakuya/healthagents/peer_certificate.py:43
 msgid "health-peer-certificate-future-start"
 msgstr ""
 
-#: shoestring/healthagents/peer_certificate.py:72
+#: sakuya/healthagents/peer_certificate.py:78
 msgid "health-peer-certificate-missing-files"
 msgstr ""
 
-#: shoestring/healthagents/peer_certificate.py:34
+#: sakuya/healthagents/peer_certificate.py:35
 msgid "health-peer-certificate-near-expiry"
 msgstr ""
 
-#: shoestring/healthagents/peer_certificate.py:36
+#: sakuya/healthagents/peer_certificate.py:37
 msgid "health-peer-certificate-not-near-expiry"
 msgstr ""
 
-#: shoestring/healthagents/peer_certificate.py:63
+#: sakuya/healthagents/peer_certificate.py:67
 msgid "health-peer-certificate-not-verifiable"
 msgstr ""
 
-#: shoestring/healthagents/rest_api.py:22
+#: sakuya/healthagents/rest_api.py:22
 msgid "health-rest-api-error"
 msgstr ""
 
-#: shoestring/healthagents/rest_api.py:20
+#: sakuya/healthagents/rest_api.py:20
 msgid "health-rest-api-success"
 msgstr ""
 
-#: shoestring/healthagents/rest_https_certificate.py:96
+#: sakuya/healthagents/rest_https_certificate.py:96
 msgid "health-rest-https-certificate-invalid"
 msgstr ""
 
-#: shoestring/healthagents/rest_https_certificate.py:99
+#: sakuya/healthagents/rest_https_certificate.py:100
 msgid "health-rest-https-certificate-valid"
 msgstr ""
 
-#: shoestring/commands/health.py:69
+#: sakuya/commands/health.py:70
 msgid "health-running-health-agent"
 msgstr ""
 
-#: shoestring/healthagents/voting_keys.py:23
+#: sakuya/healthagents/voting_keys.py:91
 msgid "health-voting-keys-active"
 msgstr ""
 
-#: shoestring/healthagents/voting_keys.py:21
+#: sakuya/healthagents/voting_keys.py:89
 msgid "health-voting-keys-expired"
 msgstr ""
 
-#: shoestring/healthagents/voting_keys.py:26
+#: sakuya/healthagents/voting_keys.py:94
 msgid "health-voting-keys-future"
 msgstr ""
 
-#: shoestring/healthagents/voting_keys.py:32
+#: sakuya/healthagents/voting_keys.py:34 sakuya/healthagents/voting_keys.py:52
+#: sakuya/healthagents/voting_keys.py:58 sakuya/healthagents/voting_keys.py:63
+#: sakuya/healthagents/voting_keys.py:86 sakuya/healthagents/voting_keys.py:100
 msgid "health-voting-keys-not-registered"
 msgstr ""
 
-#: shoestring/healthagents/voting_keys.py:34
+#: sakuya/healthagents/voting_keys.py:103
 msgid "health-voting-keys-registered"
 msgstr ""
 
-#: shoestring/healthagents/websockets.py:21
+#: sakuya/healthagents/websockets.py:21
 msgid "health-websockets-connected"
 msgstr ""
 
-#: shoestring/healthagents/websockets.py:38
+#: sakuya/healthagents/websockets.py:38
 msgid "health-websockets-received-block"
 msgstr ""
 
-#: shoestring/healthagents/websockets.py:40
+#: sakuya/healthagents/websockets.py:40
 msgid "health-websockets-received-wrong-topic"
 msgstr ""
 
-#: shoestring/healthagents/websockets.py:42
+#: sakuya/healthagents/websockets.py:43
 msgid "health-websockets-timed-out"
 msgstr ""
 
-#: shoestring/commands/import_bootstrap.py:23
-msgid "import-bootstrap-importing-harvester"
-msgstr ""
-
-#: shoestring/commands/import_bootstrap.py:37
-msgid "import-bootstrap-importing-node-key"
-msgstr ""
-
-#: shoestring/commands/import_bootstrap.py:41
-msgid "import-bootstrap-importing-node-key-not-found"
-msgstr ""
-
-#: shoestring/commands/import_bootstrap.py:29
-msgid "import-bootstrap-importing-voter"
-msgstr ""
-
-#: shoestring/commands/import_bootstrap.py:18
-msgid "import-bootstrap-invalid-directory"
-msgstr ""
-
-#: shoestring/commands/import_harvesters.py:75
-msgid "import-harvesters-error-in-harvesters-is-equal-to-out-harvesters"
-msgstr ""
-
-#: shoestring/commands/import_harvesters.py:52
-msgid "import-harvesters-list-header"
-msgstr ""
-
-#: shoestring/__main__.py:20
+#: sakuya/__main__.py:24
 msgid "main-announce-transaction-help"
 msgstr ""
 
-#: shoestring/__main__.py:21
+#: sakuya/__main__.py:25
 msgid "main-health-help"
 msgstr ""
 
-#: shoestring/__main__.py:22
-msgid "main-import-bootstrap-help"
-msgstr ""
-
-#: shoestring/__main__.py:23
-msgid "main-import-harvesters-help"
-msgstr ""
-
-#: shoestring/__main__.py:24
+#: sakuya/__main__.py:26
 msgid "main-init-help"
 msgstr ""
 
-#: shoestring/__main__.py:25
+#: sakuya/__main__.py:27
 msgid "main-min-cosignatures-count-help"
 msgstr ""
 
-#: shoestring/__main__.py:26
+#: sakuya/__main__.py:28
 msgid "main-pemtool-help"
 msgstr ""
 
-#: shoestring/__main__.py:27
+#: sakuya/__main__.py:29
 msgid "main-pemview-help"
 msgstr ""
 
-#: shoestring/__main__.py:28
+#: sakuya/__main__.py:30
 msgid "main-renew-certificates-help"
 msgstr ""
 
-#: shoestring/__main__.py:29
+#: sakuya/__main__.py:31
 msgid "main-renew-voting-keys-help"
 msgstr ""
 
-#: shoestring/__main__.py:30
+#: sakuya/__main__.py:32
 msgid "main-reset-data-help"
 msgstr ""
 
-#: shoestring/__main__.py:31
+#: sakuya/__main__.py:33
 msgid "main-setup-help"
 msgstr ""
 
-#: shoestring/__main__.py:32
+#: sakuya/__main__.py:34
 msgid "main-signer-help"
 msgstr ""
 
-#: shoestring/__main__.py:18
+#: sakuya/__main__.py:22
 msgid "main-subcommands-help"
 msgstr ""
 
-#: shoestring/__main__.py:17
+#: sakuya/__main__.py:20
 msgid "main-title"
 msgstr ""
 
-#: shoestring/__main__.py:33
+#: sakuya/__main__.py:35
 msgid "main-upgrade-help"
 msgstr ""
 
-#: shoestring/commands/min_cosignatures_count.py:24
+#: sakuya/commands/min_cosignatures_count.py:24
 msgid "min-cosignatures-count-cosignatures-detected"
 msgstr ""
 
-#: shoestring/internal/NodewatchClient.py:37
+#: sakuya/internal/NodewatchClient.py:37
 msgid "nodewatch-client-detected-epoch"
 msgstr ""
 
-#: shoestring/internal/NodewatchClient.py:33
+#: sakuya/internal/NodewatchClient.py:33
 msgid "nodewatch-client-detected-height"
 msgstr ""
 
-#: shoestring/internal/PeerDownloader.py:79
+#: sakuya/internal/PeerDownloader.py:79
 msgid "peer-downloader-loading-api-endpoints"
 msgstr ""
 
-#: shoestring/internal/PeerDownloader.py:34
+#: sakuya/internal/PeerDownloader.py:34
 msgid "peer-downloader-saved-file"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:12
+#: sakuya/commands/pemtool.py:12
 msgid "pemtool-enter-private-key"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:27
+#: sakuya/commands/pemtool.py:27 sakuya/commands/pemtool.py:29
 msgid "pemtool-error-output-file-already-exists"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:39
+#: sakuya/commands/pemtool.py:46
 msgid "pemtool-error-password-length"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:36
+#: sakuya/commands/pemtool.py:43
 msgid "pemtool-error-password-mismatch"
 msgstr ""
 
-#: shoestring/commands/pemtool.py:43
+#: sakuya/commands/pemtool.py:52
 msgid "pemtool-saved-pem-file"
 msgstr ""
 
-#: shoestring/commands/pemview.py:17
+#: sakuya/commands/pemview.py:18
 msgid "pemview-error-input-file-does-not-exist"
 msgstr ""
 
-#: shoestring/commands/pemview.py:14
+#: sakuya/commands/pemview.py:15
 msgid "pemview-error-input-file-unexpected-suffix"
 msgstr ""
 
-#: shoestring/commands/pemview.py:26
+#: sakuya/commands/pemview.py:27
 msgid "pemview-loaded-pem-file"
 msgstr ""
 
-#: shoestring/commands/pemview.py:32
+#: sakuya/commands/pemview.py:34
 msgid "pemview-show-address"
 msgstr ""
 
-#: shoestring/commands/pemview.py:36
+#: sakuya/commands/pemview.py:38
 msgid "pemview-show-private-key"
 msgstr ""
 
-#: shoestring/commands/pemview.py:33
+#: sakuya/commands/pemview.py:35
 msgid "pemview-show-public-key"
 msgstr ""
 
-#: shoestring/commands/renew_voting_keys.py:89
+#: sakuya/commands/renew_voting_keys.py:194
 msgid "renew-voting-keys-maximum-already-registered"
 msgstr ""
 
-#: shoestring/commands/renew_voting_keys.py:85
+#: sakuya/commands/renew_voting_keys.py:167
 msgid "renew-voting-keys-no-voting-keys-found"
 msgstr ""
 
-#: shoestring/commands/renew_voting_keys.py:72
+#: sakuya/commands/renew_voting_keys.py:141
 msgid "renew-voting-keys-not-voting"
 msgstr ""
 
-#: shoestring/commands/renew_voting_keys.py:58
-msgid "renew-voting-keys-removing-expired-voting-keys"
+#: sakuya/commands/renew_voting_keys.py:134
+msgid "renew-voting-keys-pending"
 msgstr ""
 
-#: shoestring/commands/reset_data.py:10
+#: sakuya/commands/reset_data.py:99
 msgid "reset-data-recreating-directory"
 msgstr ""
 
-#: shoestring/commands/setup.py:74
+#: sakuya/commands/setup.py:95
 msgid "setup-no-state-changes-required"
 msgstr ""
 
-#: shoestring/commands/setup.py:93
+#: sakuya/commands/setup.py:116 sakuya/commands/setup.py:163
 msgid "setup-resources-directory-exists"
 msgstr ""
 
-#: shoestring/commands/setup.py:82
+#: sakuya/commands/setup.py:152
 msgid "setup-status-output-transaction-only"
 msgstr ""
 
-#: shoestring/commands/signer.py:32
+#: sakuya/commands/signer.py:32
 msgid "signer-aggregate-transaction"
 msgstr ""
 
-#: shoestring/commands/signer.py:33
+#: sakuya/commands/signer.py:33
 msgid "signer-inner-transactions"
 msgstr ""
 
-#: shoestring/commands/signer.py:46
+#: sakuya/commands/signer.py:46
 msgid "signer-signed-transaction"
 msgstr ""
 
-#: shoestring/commands/signer.py:26
+#: sakuya/commands/signer.py:26
 msgid "signer-transaction"
 msgstr ""
 
-#: shoestring/internal/TransactionSerializer.py:12
+#: sakuya/internal/TransactionSerializer.py:12
 msgid "transaction-serializer-saved-file"
 msgstr ""
 
-#: shoestring/commands/upgrade.py:16
-msgid "upgrade-purging-directory"
-msgstr ""
-
-#: shoestring/commands/upgrade.py:21
-msgid "upgrade-recreating-directory"
-msgstr ""
-
-#: shoestring/wizard/screens/bootstrap.py:40
-msgid "wizard-bootstrap-node-key"
-msgstr ""
-
-#: shoestring/wizard/screens/bootstrap.py:53
-msgid "wizard-bootstrap-path-error-text"
-msgstr ""
-
-#: shoestring/wizard/screens/bootstrap.py:51
-msgid "wizard-bootstrap-path-label"
-msgstr ""
-
-#: shoestring/wizard/screens/bootstrap.py:66
-msgid "wizard-bootstrap-title"
-msgstr ""
-
-#: shoestring/wizard/screens/bootstrap.py:28
-msgid "wizard-bootstrap-token-bootstrap-path"
-msgstr ""
-
-#: shoestring/wizard/screens/bootstrap.py:27
-msgid "wizard-bootstrap-token-include-node-key"
-msgstr ""
-
-#: shoestring/wizard/__main__.py:99 shoestring/wizard/buttons.py:29
+#: sakuya/wizard/__main__.py:101 sakuya/wizard/buttons.py:29
 msgid "wizard-button-finish"
 msgstr ""
 
-#: shoestring/wizard/buttons.py:51 shoestring/wizard/navigation.py:54
+#: sakuya/wizard/buttons.py:51 sakuya/wizard/navigation.py:54
 msgid "wizard-button-next"
 msgstr ""
 
-#: shoestring/wizard/navigation.py:53
+#: sakuya/wizard/navigation.py:53
 msgid "wizard-button-prev"
 msgstr ""
 
-#: shoestring/wizard/screens/root_check.py:16
+#: sakuya/wizard/screens/root_check.py:16
 msgid "wizard-button-quit"
 msgstr ""
 
-#: shoestring/wizard/screens/certificates.py:34
+#: sakuya/wizard/screens/certificates.py:34
 msgid "wizard-certificates-ca-cert-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/certificates.py:32
+#: sakuya/wizard/screens/certificates.py:32
 msgid "wizard-certificates-ca-cert-label"
 msgstr ""
 
-#: shoestring/wizard/screens/certificates.py:38
+#: sakuya/wizard/screens/certificates.py:38
 msgid "wizard-certificates-peer-cert-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/certificates.py:36
+#: sakuya/wizard/screens/certificates.py:36
 msgid "wizard-certificates-peer-cert-label"
 msgstr ""
 
-#: shoestring/wizard/screens/certificates.py:50
+#: sakuya/wizard/screens/certificates.py:50
 msgid "wizard-certificates-title"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:85
+#: sakuya/wizard/screens/obligatory.py:79
 msgid "wizard-dialog-message-generation-text"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:84
+#: sakuya/wizard/screens/obligatory.py:78
 msgid "wizard-dialog-message-generation-title"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:101
+#: sakuya/wizard/screens/obligatory.py:95
 msgid "wizard-dialog-message-import-text"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:100
+#: sakuya/wizard/screens/obligatory.py:94
 msgid "wizard-dialog-message-import-title"
 msgstr ""
 
-#: shoestring/wizard/screens/end_screen.py:20
+#: sakuya/wizard/screens/end_screen.py:20
 msgid "wizard-end-title"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:108
+#: sakuya/wizard/screens/harvesting.py:108
 msgid "wizard-harvesting-active"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:112
+#: sakuya/wizard/screens/harvesting.py:112
 msgid "wizard-harvesting-auto-harvest"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:147
+#: sakuya/wizard/screens/harvesting.py:147
 msgid "wizard-harvesting-beneficiary-address-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:145
+#: sakuya/wizard/screens/harvesting.py:145
 msgid "wizard-harvesting-beneficiary-address-label"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:129
+#: sakuya/wizard/screens/harvesting.py:129
 msgid "wizard-harvesting-delegate"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:116
+#: sakuya/wizard/screens/harvesting.py:116
 msgid "wizard-harvesting-generate-keys"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:135
+#: sakuya/wizard/screens/harvesting.py:135
 msgid "wizard-harvesting-max-unlocked-accounts-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:133
+#: sakuya/wizard/screens/harvesting.py:133
 msgid "wizard-harvesting-max-unlocked-accounts-label"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:141
+#: sakuya/wizard/screens/harvesting.py:141
 msgid "wizard-harvesting-min-fee-multiplier-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:139
+#: sakuya/wizard/screens/harvesting.py:139
 msgid "wizard-harvesting-min-fee-multiplier-label"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:122
+#: sakuya/wizard/screens/harvesting.py:122
 msgid "wizard-harvesting-signing-key-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:120
+#: sakuya/wizard/screens/harvesting.py:120
 msgid "wizard-harvesting-signing-key-label"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:169
+#: sakuya/wizard/screens/harvesting.py:169
 msgid "wizard-harvesting-title"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:79
+#: sakuya/wizard/screens/harvesting.py:79
 msgid "wizard-harvesting-token-active"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:82
+#: sakuya/wizard/screens/harvesting.py:82
 msgid "wizard-harvesting-token-auto-harvest"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:87
+#: sakuya/wizard/screens/harvesting.py:87
 msgid "wizard-harvesting-token-beneficiary-address"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:84
+#: sakuya/wizard/screens/harvesting.py:84
 msgid "wizard-harvesting-token-delegate"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:83
+#: sakuya/wizard/screens/harvesting.py:83
 msgid "wizard-harvesting-token-generate-keys"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:85
+#: sakuya/wizard/screens/harvesting.py:85
 msgid "wizard-harvesting-token-max-unlocked-accounts"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:86
+#: sakuya/wizard/screens/harvesting.py:86
 msgid "wizard-harvesting-token-min-fee-multiplier"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:126
+#: sakuya/wizard/screens/harvesting.py:126
 msgid "wizard-harvesting-vrf-key-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/harvesting.py:124
+#: sakuya/wizard/screens/harvesting.py:124
 msgid "wizard-harvesting-vrf-key-label"
 msgstr ""
 
-#: shoestring/wizard/__main__.py:104
+#: sakuya/wizard/__main__.py:106
 msgid "wizard-main-done"
 msgstr ""
 
-#: shoestring/wizard/TitleBar.py:26
+#: sakuya/wizard/TitleBar.py:26
 msgid "wizard-main-initial-title"
 msgstr ""
 
-#: shoestring/wizard/screens/modal.py:26
+#: sakuya/wizard/screens/modal.py:26
 msgid "wizard-modal-button-ok"
 msgstr ""
 
-#: shoestring/wizard/screens/network_type.py:25
+#: sakuya/wizard/screens/network_type.py:25
 msgid "wizard-network-type-mainnet"
 msgstr ""
 
-#: shoestring/wizard/screens/network_type.py:26
+#: sakuya/wizard/screens/network_type.py:26
 msgid "wizard-network-type-testnet"
 msgstr ""
 
-#: shoestring/wizard/screens/network_type.py:32
+#: sakuya/wizard/screens/network_type.py:32
 msgid "wizard-network-type-title"
 msgstr ""
 
-#: shoestring/wizard/screens/network_type.py:16
+#: sakuya/wizard/screens/network_type.py:16
 msgid "wizard-network-type-token"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:90
+#: sakuya/wizard/screens/node_settings.py:90
 msgid "wizard-node-settings-friendly-name-label"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:54
+#: sakuya/wizard/screens/node_settings.py:54
 msgid "wizard-node-settings-https"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:67
+#: sakuya/wizard/screens/node_settings.py:67
 msgid "wizard-node-settings-ip-or-domain-name-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:66
+#: sakuya/wizard/screens/node_settings.py:66
 msgid "wizard-node-settings-ip-or-domain-name-label"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:73
+#: sakuya/wizard/screens/node_settings.py:73
 msgid "wizard-node-settings-metadata-info-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:71
+#: sakuya/wizard/screens/node_settings.py:71
 msgid "wizard-node-settings-metadata-info-label"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:78
+#: sakuya/wizard/screens/node_settings.py:78
 msgid "wizard-node-settings-title"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:38
+#: sakuya/wizard/screens/node_settings.py:38
 msgid "wizard-node-settings-token-domain-name"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:39
+#: sakuya/wizard/screens/node_settings.py:39
 msgid "wizard-node-settings-token-friendly-name"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:37
+#: sakuya/wizard/screens/node_settings.py:37
 msgid "wizard-node-settings-token-https"
 msgstr ""
 
-#: shoestring/wizard/screens/node_settings.py:40
+#: sakuya/wizard/screens/node_settings.py:40
 msgid "wizard-node-settings-token-metadata"
 msgstr ""
 
-#: shoestring/wizard/screens/node_type.py:25
+#: sakuya/wizard/screens/node_type.py:25
 msgid "wizard-node-type-dual"
 msgstr ""
 
-#: shoestring/wizard/screens/node_type.py:27
+#: sakuya/wizard/screens/node_type.py:27
 msgid "wizard-node-type-light"
 msgstr ""
 
-#: shoestring/wizard/screens/node_type.py:26
+#: sakuya/wizard/screens/node_type.py:26
 msgid "wizard-node-type-peer"
 msgstr ""
 
-#: shoestring/wizard/screens/node_type.py:34
+#: sakuya/wizard/screens/node_type.py:34
 msgid "wizard-node-type-title"
 msgstr ""
 
-#: shoestring/wizard/screens/node_type.py:16
+#: sakuya/wizard/screens/node_type.py:16
 msgid "wizard-node-type-token"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:122
-#: shoestring/wizard/screens/obligatory.py:130
+#: sakuya/wizard/screens/obligatory.py:116
+#: sakuya/wizard/screens/obligatory.py:124
 msgid "wizard-obligatory-ca-pem-path-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:123
-#: shoestring/wizard/screens/obligatory.py:124
+#: sakuya/wizard/screens/obligatory.py:117
+#: sakuya/wizard/screens/obligatory.py:118
 msgid "wizard-obligatory-ca-pem-path-error-text-not-exist"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:128
+#: sakuya/wizard/screens/obligatory.py:122
 msgid "wizard-obligatory-ca-pem-path-label"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:109
+#: sakuya/wizard/screens/obligatory.py:103
 msgid "wizard-obligatory-destination-directory-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:107
+#: sakuya/wizard/screens/obligatory.py:101
 msgid "wizard-obligatory-destination-directory-label"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:142
+#: sakuya/wizard/screens/obligatory.py:136
 msgid "wizard-obligatory-generate-button"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:141
+#: sakuya/wizard/screens/obligatory.py:135
 msgid "wizard-obligatory-import-button"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:113
+#: sakuya/wizard/screens/obligatory.py:107
 msgid "wizard-obligatory-priv-ca"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:115
+#: sakuya/wizard/screens/obligatory.py:109
 msgid "wizard-obligatory-priv-generate-new"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:114
+#: sakuya/wizard/screens/obligatory.py:108
 msgid "wizard-obligatory-priv-import-hex"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:146
+#: sakuya/wizard/screens/obligatory.py:140
 msgid "wizard-obligatory-private-key-ca-pem-path-description"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:157
+#: sakuya/wizard/screens/obligatory.py:151
 msgid "wizard-obligatory-private-key-generate-description"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:149
+#: sakuya/wizard/screens/obligatory.py:143
 msgid "wizard-obligatory-private-key-hex-description"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:136
+#: sakuya/wizard/screens/obligatory.py:130
 msgid "wizard-obligatory-private-key-hex-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:134
+#: sakuya/wizard/screens/obligatory.py:128
 msgid "wizard-obligatory-private-key-hex-label"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:177
+#: sakuya/wizard/screens/obligatory.py:171
 msgid "wizard-obligatory-title"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:43
+#: sakuya/wizard/screens/obligatory.py:37
 msgid "wizard-obligatory-token-ca-pem-path"
 msgstr ""
 
-#: shoestring/wizard/screens/obligatory.py:41
+#: sakuya/wizard/screens/obligatory.py:35
 msgid "wizard-obligatory-token-destination-directory"
 msgstr ""
 
-#: shoestring/wizard/screens/root_check.py:27
+#: sakuya/wizard/screens/root_check.py:27
 msgid "wizard-root-check-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/root_check.py:26
+#: sakuya/wizard/screens/root_check.py:26
 msgid "wizard-root-check-title"
 msgstr ""
 
-#: shoestring/wizard/screen_loader.py:20
+#: sakuya/wizard/screen_loader.py:20
 msgid "wizard-screen-group-certificates"
 msgstr ""
 
-#: shoestring/wizard/screen_loader.py:22
+#: sakuya/wizard/screen_loader.py:22
 msgid "wizard-screen-group-end-screen"
 msgstr ""
 
-#: shoestring/wizard/screen_loader.py:16
+#: sakuya/wizard/screen_loader.py:16
 msgid "wizard-screen-group-harvesting"
 msgstr ""
 
-#: shoestring/wizard/screen_loader.py:19
+#: sakuya/wizard/screen_loader.py:19
 msgid "wizard-screen-group-node-settings"
 msgstr ""
 
-#: shoestring/wizard/screen_loader.py:14
+#: sakuya/wizard/screen_loader.py:14
 msgid "wizard-screen-group-obligatory"
 msgstr ""
 
-#: shoestring/wizard/screen_loader.py:17
+#: sakuya/wizard/screen_loader.py:17
 msgid "wizard-screen-group-voting"
 msgstr ""
 
-#: shoestring/wizard/screen_loader.py:13
+#: sakuya/wizard/screen_loader.py:13
 msgid "wizard-screen-group-welcome"
 msgstr ""
 
-#: shoestring/wizard/styles.py:39
+#: sakuya/wizard/styles.py:39
 msgid "wizard-toggle-disabled"
 msgstr ""
 
-#: shoestring/wizard/styles.py:39
+#: sakuya/wizard/styles.py:39
 msgid "wizard-toggle-enabled"
 msgstr ""
 
-#: shoestring/wizard/__main__.py:55
+#: sakuya/wizard/__main__.py:57
 msgid "wizard-validation-error-text"
 msgstr ""
 
-#: shoestring/wizard/screens/voting.py:26
+#: sakuya/wizard/screens/voting.py:26
 msgid "wizard-voting-active"
 msgstr ""
 
-#: shoestring/wizard/screens/voting.py:31
+#: sakuya/wizard/screens/voting.py:31
 msgid "wizard-voting-title"
 msgstr ""
 
-#: shoestring/wizard/screens/voting.py:18
+#: sakuya/wizard/screens/voting.py:18
 msgid "wizard-voting-token-active"
 msgstr ""
 
-#: shoestring/wizard/screens/welcome.py:29
+#: sakuya/wizard/screens/welcome.py:29
 msgid "wizard-welcome-command-token"
 msgstr ""
 
-#: shoestring/wizard/screens/welcome.py:38
-msgid "wizard-welcome-import-bootstrap"
-msgstr ""
-
-#: shoestring/wizard/screens/welcome.py:41
+#: sakuya/wizard/screens/welcome.py:40
 msgid "wizard-welcome-renew-certificates"
 msgstr ""
 
-#: shoestring/wizard/screens/welcome.py:42
+#: sakuya/wizard/screens/welcome.py:41
 msgid "wizard-welcome-renew-voting-keys"
 msgstr ""
 
-#: shoestring/wizard/screens/welcome.py:40
+#: sakuya/wizard/screens/welcome.py:39
 msgid "wizard-welcome-reset-data"
 msgstr ""
 
-#: shoestring/wizard/screens/welcome.py:37
+#: sakuya/wizard/screens/welcome.py:37
 msgid "wizard-welcome-setup"
 msgstr ""
 
-#: shoestring/wizard/screens/welcome.py:57
+#: sakuya/wizard/screens/welcome.py:56
 msgid "wizard-welcome-title"
 msgstr ""
 
-#: shoestring/wizard/screens/welcome.py:39
+#: sakuya/wizard/screens/welcome.py:38
 msgid "wizard-welcome-upgrade"
 msgstr ""
+

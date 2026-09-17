@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.symbol.KeyPair import KeyPair
 
-from shoestring.internal.PemUtils import (
+from sakuya.internal.PemUtils import (
 	read_private_key_from_private_key_pem_file,
 	read_public_key_from_private_key_pem_file,
 	read_public_key_from_public_key_pem_file

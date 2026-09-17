@@ -1,4 +1,4 @@
-from shoestring.wizard.screens.voting import create
+from sakuya.wizard.screens.voting import create
 
 # pylint: disable=invalid-name
 

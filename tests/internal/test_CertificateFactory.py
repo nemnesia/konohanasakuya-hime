@@ -6,8 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from shoestring.internal.CertificateFactory import CertificateFactory
-from shoestring.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.CertificateFactory import CertificateFactory
+from sakuya.internal.OpensslExecutor import OpensslExecutor
 
 
 class CertificateFactoryTest(unittest.TestCase):

@@ -96,6 +96,7 @@ async def setup_mock_nodewatch_server(aiohttp_client, redirect_network_requests=
 			self.urls = []
 			self.endpoint = ''
 			self.multisig_account_addresses = []
+			self.voting_public_keys = []
 			self.request_json_payloads = []
 
 		async def api_symbol_height(self, request):
@@ -122,6 +123,14 @@ async def setup_mock_nodewatch_server(aiohttp_client, redirect_network_requests=
 			return await self._process(request, NODEWATCH_API_NODES if not redirect_network_requests else [])
 
 		async def accounts_by_id(self, request):
+			if self.voting_public_keys:
+				return await self._process(request, {
+					'account': {
+						'supplementalPublicKeys': {
+							'voting': {'publicKeys': self.voting_public_keys}
+						}
+					}
+				})
 			return await self._process(request, {
 				'code': 'ResourceNotFound',
 				'message': 'no resource exists with id \'NC5RFPFQGYFGNDOHRL7TXVKJWUBNMJCB4P3TA5X\''
@@ -162,6 +171,12 @@ async def setup_mock_nodewatch_server(aiohttp_client, redirect_network_requests=
 			self.request_json_payloads.append(request_json)
 			return await self._process(request, {'message': 'packet 9 was pushed to the network via /transactions'})
 
+		async def transaction_statuses(self, request):
+			request_json = await request.json()
+			return await self._process(request, [
+				{'hash': request_json['hashes'][0], 'group': 'confirmed'}
+			])
+
 		async def _process(self, request, response_body):
 			self.urls.append(str(request.url))
 			return web.Response(body=json.dumps(response_body), headers={'Content-Type': 'application/json'})
@@ -181,6 +196,7 @@ async def setup_mock_nodewatch_server(aiohttp_client, redirect_network_requests=
 		app.router.add_get(r'/account/{address}/multisig', mock_server.account_multisig)
 		app.router.add_put('/transactions', mock_server.announce_transaction)
 		app.router.add_put('/transactions/partial', mock_server.announce_transaction)
+		app.router.add_post('/transactionStatus', mock_server.transaction_statuses)
 
 	server = await aiohttp_client(app)  # pylint: disable=redefined-outer-name
 

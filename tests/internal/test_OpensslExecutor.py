@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from shoestring.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.OpensslExecutor import OpensslExecutor
 
 
 def _create_executor():
@@ -77,3 +77,9 @@ def test_can_propagate_dispatch_failure():
 	# Act + Assert: calling invalid command should result in error
 	with pytest.raises(RuntimeError):
 		executor.dispatch(['randy', '-hex', 10])
+
+
+def test_dispatch_redacts_password_arguments():
+	executor = OpensslExecutor('false')
+	with pytest.raises(RuntimeError, match=r'false -passin <redacted>'):
+		executor.dispatch(['-passin', 'secret'])

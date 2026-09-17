@@ -4,7 +4,7 @@ import json
 from websockets import connect  # pylint: disable=no-name-in-module,import-self
 from zenlog import log
 
-from shoestring.internal.ConfigurationManager import parse_time_span
+from sakuya.internal.ConfigurationManager import parse_time_span
 
 NAME = 'REST websockets'
 
@@ -38,5 +38,7 @@ async def validate(context):
 				log.info(_('health-websockets-received-block').format(height=height))
 			else:
 				log.error(_('health-websockets-received-wrong-topic').format(topic=topic))
+				context.failed = True
 		except asyncio.exceptions.TimeoutError:
 			log.error(_('health-websockets-timed-out'))
+			context.failed = True

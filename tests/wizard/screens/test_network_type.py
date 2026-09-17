@@ -1,4 +1,4 @@
-from shoestring.wizard.screens.network_type import create
+from sakuya.wizard.screens.network_type import create
 
 # pylint: disable=invalid-name
 

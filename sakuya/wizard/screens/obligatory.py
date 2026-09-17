@@ -10,16 +10,10 @@ from prompt_toolkit.widgets import Box, Label
 from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 
-from shoestring.wizard.MultibyteButton import MultibyteButton as Button
-from shoestring.wizard.Screen import ScreenDialog
-from shoestring.wizard.TabbedView import TabList, Tabs
-from shoestring.wizard.ValidatingTextBox import (
-	ValidatingTextBox,
-	does_not_exist,
-	is_directory_path,
-	is_file_path,
-	is_hex_private_key_string
-)
+from sakuya.wizard.MultibyteButton import MultibyteButton as Button
+from sakuya.wizard.Screen import ScreenDialog
+from sakuya.wizard.TabbedView import TabList, Tabs
+from sakuya.wizard.ValidatingTextBox import ValidatingTextBox, does_not_exist, is_directory_path, is_file_path, is_hex_private_key_string
 
 
 class ObligatorySettings:

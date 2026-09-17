@@ -2,4 +2,4 @@
 
 set -ex
 
-pybabel compile --statistics -d shoestring/lang
+pybabel compile --statistics -d sakuya/lang

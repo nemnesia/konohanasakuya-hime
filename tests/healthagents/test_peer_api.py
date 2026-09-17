@@ -1,17 +1,17 @@
 import asyncio
 import ssl
 import tempfile
-from collections import namedtuple
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from symbolchain.BufferWriter import BufferWriter
 from symbollightapi.model.PacketHeader import PacketHeader, PacketType
 
-from shoestring.healthagents.peer_api import should_run, validate
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.Preparer import Preparer
-from shoestring.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
+from sakuya.healthagents.peer_api import should_run, validate
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.Preparer import Preparer
+from sakuya.internal.ShoestringConfiguration import ImportsConfiguration, NodeConfiguration, ShoestringConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 
@@ -92,8 +92,7 @@ def test_should_run_for_all_roles():
 
 async def _dispatch_validate(port, preparer):
 	# Arrange:
-	HealthAgentContext = namedtuple('HealthAgentContext', ['peer_endpoint', 'directories'])
-	context = HealthAgentContext(('symbol.fyi', port), preparer.directories)
+	context = SimpleNamespace(peer_endpoint=('symbol.fyi', port), directories=preparer.directories, failed=False)
 
 	# Act:
 	await validate(context)

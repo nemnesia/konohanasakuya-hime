@@ -23,10 +23,17 @@ def run_main(args):
 		output_name = output_name[:-4]
 
 	filepath = Path(output_name + '.pem')
+	if filepath.is_symlink():
+		raise RuntimeError(_('pemtool-error-output-file-already-exists').format(filepath=filepath))
 	if filepath.exists() and not args.force:
 		raise FileExistsError(_('pemtool-error-output-file-already-exists').format(filepath=filepath))
 
 	private_key = PrivateKey(unhexlify(_get_private_key(args.input)))
+	# PrivateKeyStorage opens the destination for writing.  A previous pemtool
+	# invocation deliberately leaves the file owner-read-only, so --force must
+	# make it writable for the replacement first.
+	if filepath.exists() and args.force:
+		filepath.chmod(0o600)
 
 	password = None
 	if args.ask_pass:
@@ -40,11 +47,13 @@ def run_main(args):
 
 	storage = PrivateKeyStorage('.', password)
 	storage.save(output_name, private_key)
+	# 秘密鍵は所有者だけが読めるようにする。
+	filepath.chmod(0o400)
 	log.info(_('pemtool-saved-pem-file').format(filepath=filepath))
 
 
 def add_arguments(parser):
-	parser.add_argument('--output', help=_('argument-help-pemtool-output'), required=True)
+	parser.add_argument('--output', help=_('argument-help-pemtool-output'))
 	parser.add_argument('--input', help=_('argument-help-pemtool-input'))
 	parser.add_argument('--ask-pass', help=_('argument-help-pemtool-ask-pass'), action='store_true')
 	parser.add_argument('--force', help=_('argument-help-pemtool-force'), action='store_true')

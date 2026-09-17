@@ -1,18 +1,18 @@
 [tool.poetry]
-name = 'symbol-shoestring'
-version = '0.2.4'
-description = 'Symbol Shoestring Deployment Tool'
-authors = ['Symbol Contributors <contributors@symbol.dev>']
-maintainers = ['Symbol Contributors <contributors@symbol.dev>']
+name = 'symbol-sakuya'
+version = '0.1.0'
+description = 'Symbol Sakuya node deployment tool'
+authors = ['nemnesia <the.nemnesia@gmail.com>']
+maintainers = ['nemnesia <the.nemnesia@gmail.com>']
 license = 'MIT'
 
 readme = 'README.md'
 
-packages = [{ include = 'shoestring' }]
+packages = [{ include = 'sakuya' }]
 
-repository = 'https://github.com/symbol/product/tree/main/tools/shoestring'
+repository = 'https://github.com/symbol/product/tree/main/tools/konohanasakuya-hime'
 
-keywords = ['symbol', 'shoestring', 'deployment', 'node']
+keywords = ['symbol', 'sakuya', 'deployment', 'node']
 
 classifiers = [
 	'Programming Language :: Python :: 3.10',
@@ -22,12 +22,13 @@ classifiers = [
 	'Programming Language :: Python :: 3.14'
 ]
 
-include = ['shoestring/lang/*/LC_MESSAGES/messages.mo']
+include = ['sakuya/lang/*/LC_MESSAGES/messages.mo']
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
 [tool.pytest.ini_options]
+asyncio_mode = 'auto'
 filterwarnings = [
 	"ignore:The 'warn' method is deprecated:DeprecationWarning"
 ]

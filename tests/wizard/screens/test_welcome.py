@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from shoestring.wizard.screens.welcome import create
-from shoestring.wizard.ShoestringOperation import ShoestringOperation
+from sakuya.wizard.screens.welcome import create
+from sakuya.wizard.ShoestringOperation import ShoestringOperation
 
 Button = namedtuple('Button', ('text', 'operation'))
 

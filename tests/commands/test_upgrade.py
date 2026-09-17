@@ -3,9 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from shoestring.__main__ import main
-from shoestring.internal.ConfigurationManager import ConfigurationManager
-from shoestring.internal.NodeFeatures import NodeFeatures
+from sakuya.__main__ import main
+from sakuya.internal.ConfigurationManager import ConfigurationManager
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.PackageResolver import download_and_extract_package as real_download_and_extract_package
 
 from ..test.ConfigurationTestUtils import prepare_shoestring_configuration
 from ..test.FileSystemTestUtils import assert_expected_files_and_permissions
@@ -28,6 +29,17 @@ from .test_setup import (
 async def server(aiohttp_client):
 	return await setup_mock_nodewatch_server(aiohttp_client, True)
 
+
+@pytest.fixture(autouse=True)
+def local_test_package(monkeypatch):
+	from sakuya.commands import setup as setup_command
+
+	def resolve(config_filepath, _network_name):
+		return f'file://{Path(config_filepath).parent / "resources.zip"}'
+
+	monkeypatch.setattr(setup_command, 'resolve_package_identifier', resolve)
+	monkeypatch.setattr(setup_command, 'download_and_extract_package', real_download_and_extract_package)
+
 # endregion
 
 
@@ -36,61 +48,64 @@ async def server(aiohttp_client):
 PEER_CHANGED_FILES = [
 	'docker-compose-recovery.yaml',
 	'docker-compose.yaml',
-	'userconfig',
-	'userconfig/resources',
-	'userconfig/resources/config-extensions-recovery.properties',
-	'userconfig/resources/config-extensions-server.properties',
-	'userconfig/resources/config-finalization.properties',
-	'userconfig/resources/config-inflation.properties',
-	'userconfig/resources/config-logging-recovery.properties',
-	'userconfig/resources/config-logging-server.properties',
-	'userconfig/resources/config-network.properties',
-	'userconfig/resources/config-node.properties',
-	'userconfig/resources/config-task.properties',
-	'userconfig/resources/config-timesync.properties',
-	'userconfig/resources/config-user.properties',
-	'userconfig/resources/peers-p2p.json'
+	'sakuya',
+	'sakuya/node-config',
+	'sakuya/node-config/resources',
+	'sakuya/node-config/resources/config-extensions-recovery.properties',
+	'sakuya/node-config/resources/config-extensions-server.properties',
+	'sakuya/node-config/resources/config-finalization.properties',
+	'sakuya/node-config/resources/config-inflation.properties',
+	'sakuya/node-config/resources/config-logging-recovery.properties',
+	'sakuya/node-config/resources/config-logging-server.properties',
+	'sakuya/node-config/resources/config-network.properties',
+	'sakuya/node-config/resources/config-node.properties',
+	'sakuya/node-config/resources/config-task.properties',
+	'sakuya/node-config/resources/config-timesync.properties',
+	'sakuya/node-config/resources/config-user.properties',
+	'sakuya/node-config/resources/peers-p2p.json'
 ]
 
 HTTPS_CHANGED_FILES = [
-	'https-proxy',  # metadata is changed due to delete and add of file
-	'https-proxy/nginx.conf.erb'
+	'sakuya/https-proxy',
+	'sakuya/https-proxy/nginx.conf.erb'
 ]
 
 API_CHANGED_FILES = [
-	'mongo',
-	'mongo/mongoDbDrop.js',
-	'mongo/mongoDbPrepare.js',
-	'mongo/mongoLockHashDbPrepare.js',
-	'mongo/mongoLockSecretDbPrepare.js',
-	'mongo/mongoMetadataDbPrepare.js',
-	'mongo/mongoMosaicDbPrepare.js',
-	'mongo/mongoMultisigDbPrepare.js',
-	'mongo/mongoNamespaceDbPrepare.js',
-	'mongo/mongoRestrictionAccountDbPrepare.js',
-	'mongo/mongoRestrictionMosaicDbPrepare.js',
-	'startup',
-	'startup/delayrestapi.sh',
-	'startup/mongors.sh',
-	'startup/startBroker.sh',
-	'startup/startRecovery.sh',
-	'startup/startServer.sh',
-	'startup/wait.sh',
-	'userconfig/resources/config-database.properties',
-	'userconfig/resources/config-extensions-broker.properties',
-	'userconfig/resources/config-logging-broker.properties',
-	'userconfig/resources/config-messaging.properties',
-	'userconfig/resources/config-pt.properties',
-	'userconfig/resources/peers-api.json',
-	'userconfig/rest.json'
+	'sakuya/mongo',
+	'sakuya/mongo/mongoDbDrop.js',
+	'sakuya/mongo/mongoDbPrepare.js',
+	'sakuya/mongo/mongoLockHashDbPrepare.js',
+	'sakuya/mongo/mongoLockSecretDbPrepare.js',
+	'sakuya/mongo/mongoMetadataDbPrepare.js',
+	'sakuya/mongo/mongoMosaicDbPrepare.js',
+	'sakuya/mongo/mongoMultisigDbPrepare.js',
+	'sakuya/mongo/mongoNamespaceDbPrepare.js',
+	'sakuya/mongo/mongoRestrictionAccountDbPrepare.js',
+	'sakuya/mongo/mongoRestrictionMosaicDbPrepare.js',
+	'sakuya/rest-cache',
+	'sakuya/startup',
+	'sakuya/startup/delayrestapi.sh',
+	'sakuya/startup/mongors.sh',
+	'sakuya/startup/startBroker.sh',
+	'sakuya/startup/startRecovery.sh',
+	'sakuya/startup/startServer.sh',
+	'sakuya/startup/wait.sh',
+	'sakuya/node-config/resources/config-database.properties',
+	'sakuya/node-config/resources/config-extensions-broker.properties',
+	'sakuya/node-config/resources/config-logging-broker.properties',
+	'sakuya/node-config/resources/config-messaging.properties',
+	'sakuya/node-config/resources/config-pt.properties',
+	'sakuya/node-config/resources/peers-api.json',
+	'sakuya/node-config/rest.json'
 ]
 
 LIGHT_API_CHANGED_FILES = [
-	'userconfig/rest.json'
+	'sakuya/node-config/rest.json',
+	'sakuya/rest-cache'
 ]
 
 HARVESTER_CHANGED_FILES = [
-	'userconfig/resources/config-harvesting.properties'
+	'sakuya/node-config/resources/config-harvesting.properties'
 ]
 
 # endregion
@@ -155,7 +170,6 @@ async def _assert_can_upgrade_node(
 
 			common_args = [
 				'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
-				'--package', f'file://{Path(package_directory) / "resources.zip"}',
 				'--overrides', str(Path(package_directory) / 'user_overrides.ini')
 			]
 
@@ -164,13 +178,12 @@ async def _assert_can_upgrade_node(
 				await main([
 					'--directory', output_directory,
 					'setup',
-					'--security', 'insecure',
 					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
 				] + common_args)
 
 				setup_mtimes_map = _get_mtimes_map(output_directory)
 
-				config_manager = ConfigurationManager(Path(output_directory) / 'userconfig' / 'resources')
+				config_manager = ConfigurationManager(Path(output_directory) / 'sakuya' / 'node-config' / 'resources')
 				if NodeFeatures.HARVESTER in node_features:
 					setup_harvester_private_keys = _read_harvester_private_keys(config_manager)
 

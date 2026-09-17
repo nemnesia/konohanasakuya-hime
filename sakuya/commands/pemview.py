@@ -1,11 +1,12 @@
 import getpass
 from pathlib import Path
 
-from symbolchain.Network import NetworkLocator
 from symbolchain.PrivateKeyStorage import PrivateKeyStorage
 from symbolchain.symbol.KeyPair import KeyPair
 from symbolchain.symbol.Network import Network
 from zenlog import log
+
+from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
 
 
 def run_main(args):
@@ -26,7 +27,8 @@ def run_main(args):
 	log.info(_('pemview-loaded-pem-file').format(filepath=filepath))
 
 	key_pair = KeyPair(private_key)
-	network = NetworkLocator.find_by_name(Network.NETWORKS, args.network)
+	config = parse_shoestring_configuration(args.config)
+	network = config.network
 	address = network.public_key_to_address(key_pair.public_key)
 
 	log.info(_('pemview-show-address').format(address=address))
@@ -37,8 +39,8 @@ def run_main(args):
 
 
 def add_arguments(parser):
-	parser.add_argument('--input', help=_('argument-help-pemview-input'), required=True)
-	parser.add_argument('--network', help=_('argument-help-pemview-network'), required=True)
+	parser.add_argument('--config', help=_('argument-help-config'))
+	parser.add_argument('--input', help=_('argument-help-pemview-input'))
 	parser.add_argument('--ask-pass', help=_('argument-help-pemview-ask-pass'), action='store_true')
 	parser.add_argument('--show-private', help=_('argument-help-pemview-show-private'), action='store_true')
 	parser.set_defaults(func=run_main)

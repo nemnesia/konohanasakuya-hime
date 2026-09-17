@@ -2,7 +2,7 @@ import pytest
 from symbolchain.symbol.Network import Address
 from symbollightapi.connector.SymbolConnector import MultisigInfo
 
-from shoestring.internal.MultisigAnalyzer import calculate_min_cosignatures_count
+from sakuya.internal.MultisigAnalyzer import calculate_min_cosignatures_count
 
 ADDRESS_1 = Address('TBTB2IZRF4YQM3FFFGH5IUZQDSJQKU2SR77A74I')
 ADDRESS_2 = Address('TC7MJBBN52IT4434YJT5TBHV7TEVLSMBFENTSNQ')

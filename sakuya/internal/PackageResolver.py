@@ -1,4 +1,7 @@
+import configparser
 import shutil
+from pathlib import Path
+from urllib.parse import urlparse
 from zipfile import ZipFile
 
 from aiohttp import ClientSession
@@ -6,12 +9,6 @@ from aiohttp import ClientSession
 from .FileDownloader import download_file
 
 SYMBOL_GITHUB_URI = 'https://api.github.com/repos/symbol/symbol/releases'
-OFFICIAL_HASHES = {
-	'client/catapult/v1.0.3.9': (
-		'895AB5284768278BEBBEB8F40D3F15D20F78B464E705BA9AFCA444248F3C4EF2'
-		'335DEC40A5CCABFE18E6E9BBB9EA36EC495F10A77CBEDE6F30A29DEB621F97F2'
-	)
-}
 
 
 async def _get_releases(releases_uri):
@@ -41,10 +38,19 @@ def _find_asset(releases, asset_prefix):
 
 
 def _resolve_testnet_name(name):
-	if name in ('https://github.com/symbol/networks/tree/sai', 'sai'):
+	# testnet／saiはShoestring互換の固定ブランチZIPを使う。配布元に
+	# パッケージdigestのAPIがないため、digest欠落だけでは失敗させない。
+	if name in ('https://github.com/symbol/networks/tree/sai', 'sai', 'testnet'):
 		return 'https://github.com/symbol/networks/archive/refs/heads/sai.zip'
 
 	return name
+
+
+def _validate_package_source(source):
+	parsed = urlparse(source)
+	if parsed.scheme not in ('file', 'http', 'https') or not parsed.netloc and 'file' != parsed.scheme:
+		raise RuntimeError('package source must be a file:// or HTTP(S) URI')
+	return source
 
 
 async def resolve_package(package_identifier, asset_prefix='configuration-mainnet', releases_uri=SYMBOL_GITHUB_URI):
@@ -58,16 +64,35 @@ async def resolve_package(package_identifier, asset_prefix='configuration-mainne
 			'url': asset_descriptor['asset']['browser_download_url']
 		}
 
-		if asset_descriptor['tag'] in OFFICIAL_HASHES:
-			download_descriptor['hash'] = OFFICIAL_HASHES[asset_descriptor['tag']]
+		digest = asset_descriptor['asset'].get('digest')
+		if not digest or ':' not in digest:
+			raise RuntimeError('official package asset does not provide a usable digest')
+		download_descriptor['hash'] = digest
 
 		return download_descriptor
 
 	url = _resolve_testnet_name(package_identifier)
+	_validate_package_source(url)
 	return {
 		'name': 'configuration-package.zip',
 		'url': url
 	}
+
+
+def resolve_package_identifier(config_filepath, network_name):
+	"""Resolves the package source saved in the node configuration."""
+
+	if 'mainnet' == network_name:
+		return 'mainnet'
+	if 'testnet' == network_name:
+		return 'testnet'
+
+	parser = configparser.ConfigParser()
+	parser.read(config_filepath, encoding='utf8')
+	if parser.has_option('package', 'source') and parser['package']['source']:
+		return parser['package']['source']
+
+	raise RuntimeError(f'package source is required for network {network_name}')
 
 
 def _move_to_parent(destination_directory):
@@ -105,6 +130,11 @@ async def download_and_extract_package(package_identifier, destination_directory
 
 	# extract all to temp directory
 	with ZipFile(destination_directory / 'configuration-package.zip') as package:
+		destination = Path(destination_directory).absolute()
+		for member in package.infolist():
+			member_path = (destination / member.filename).resolve()
+			if destination != member_path and destination not in member_path.parents:
+				raise RuntimeError(f'package contains an unsafe path: {member.filename}')
 		package.extractall(destination_directory)
 
 	_move_to_parent(destination_directory)

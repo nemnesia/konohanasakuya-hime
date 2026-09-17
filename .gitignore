@@ -1,5 +1,6 @@
 .agents/
 docs/
+MEMORY.md
 
 # Python
 __pycache__/
@@ -15,7 +16,7 @@ env/
 build/
 dist/
 *.egg-info/
-shoestring/lang/*/LC_MESSAGES/*.mo
+sakuya/lang/*/LC_MESSAGES/*.mo
 
 # Tests and coverage
 .pytest_cache/
@@ -32,16 +33,14 @@ htmlcov/
 .env.*
 !.env.example
 
-# Shoestring local artifacts
+# Sakuya local artifacts
 /ca.key.pem
-/ca.pubkey.pem
-/node.key.pem
-/node.pubkey.pem
-/harvesters.dat
 /linking_transaction.dat
-/shoestring.ini
+/renew_voting_keys_transaction.dat
+/config.ini
 /overrides.ini
 /rest_overrides.json
+/docker-compose*.yaml
 
 # Editors and OS
 .vscode/

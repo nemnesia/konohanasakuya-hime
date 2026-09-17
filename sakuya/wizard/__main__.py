@@ -14,9 +14,9 @@ from prompt_toolkit.widgets import Label
 from prompt_toolkit.widgets.toolbars import ValidationToolbar
 from zenlog import log
 
-from shoestring.__main__ import main as shoestring_main
-from shoestring.wizard.screens.modal import create as create_message_box_float
-from shoestring.wizard.screens.modal import show as show_message_box
+from sakuya.__main__ import main as shoestring_main
+from sakuya.wizard.screens.modal import create as create_message_box_float
+from sakuya.wizard.screens.modal import show as show_message_box
 
 from . import keybindings, navigation, styles
 from .buttons import create_next_clicked_handler, create_operation_button_handler, create_prev_clicked_handler
@@ -28,7 +28,9 @@ from .TitleBar import TitleBar
 
 async def main():  # pylint: disable=too-many-locals
 	lang_directory = Path(__file__).resolve().parent.parent / 'lang'
-	lang = gettext.translation('messages', localedir=lang_directory, languages=(os.environ.get('LC_MESSAGES', 'en'), 'en'))
+	requested_language = os.environ.get('LC_MESSAGES', 'en').split('.')[0].split('_')[0]
+	language = requested_language if requested_language in ('en', 'ja') else 'en'
+	lang = gettext.translation('messages', localedir=lang_directory, languages=(language, 'en'))
 	lang.install()
 
 	message_box_float = create_message_box_float()

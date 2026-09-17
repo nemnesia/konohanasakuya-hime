@@ -1,4 +1,5 @@
 from io import StringIO
+from types import SimpleNamespace
 
 from prompt_toolkit import Application
 from prompt_toolkit.application import create_app_session
@@ -7,9 +8,10 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout.containers import HSplit
 from prompt_toolkit.layout.layout import Layout
+from prompt_toolkit.mouse_events import MouseEventType
 from prompt_toolkit.output import create_output
 
-from shoestring.wizard.TabbedView import TabList
+from sakuya.wizard.TabbedView import TabList
 
 # region TabList
 
@@ -74,6 +76,15 @@ def test_can_navigate_between_tabs_using_up_and_down_keys():  # pylint: disable=
 
 def test_can_navigate_between_tabs_using_left_and_right_keys():  # pylint: disable=invalid-name
 	assert_can_navigate_tablist(Keys.Right, Keys.Left)
+
+
+def test_can_select_tab_with_mouse_click():
+	_, tab_list = create_tab_list()
+	fragments = tab_list._get_text_fragments()  # pylint: disable=protected-access
+	handler = next(fragment[2] for fragment in fragments if len(fragment) == 3)
+	handler(SimpleNamespace(event_type=MouseEventType.MOUSE_MOVE))
+	handler(SimpleNamespace(event_type=MouseEventType.MOUSE_UP))
+	assert 0 == tab_list.current_value
 
 
 def create_mock_application(container):

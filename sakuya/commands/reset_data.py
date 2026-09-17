@@ -1,88 +1,114 @@
+import os
 import shutil
+import tempfile
 from pathlib import Path
 
 from zenlog import log
 
-from shoestring.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
 
 
-def _purge_and_recreate(directory):
-	log.info(_('reset-data-recreating-directory').format(directory=directory))
-
-	shutil.rmtree(directory)
-	directory.mkdir(mode=0o700, exist_ok=False)
+def _raise_walk_error(error):
+	raise RuntimeError(f'cannot inspect reset target: {error.filename}') from error
 
 
-class StatefulDataProcessor:
-	def __init__(self, directory, data_files_to_keep):
-		self.data_directory = directory / 'data'
-		self.backup_directory = directory / 'backup'
-		self.data_files_to_keep = ['voting_status.dat'] + data_files_to_keep
-		self.max_epoch = None
+def _validate_target(root, name):
+	"""リセット対象が管理領域内の実ディレクトリであることを確認する。"""
+	managed_root = root / 'sakuya'
+	target = managed_root / name
+	if managed_root.is_symlink() or not managed_root.is_dir():
+		raise RuntimeError(f'managed directory does not exist at path {managed_root}')
+	if target.is_symlink() or not target.is_dir():
+		raise RuntimeError(f'reset target is not a managed directory: {target}')
+	for current_root, directory_names, file_names in os.walk(target, followlinks=False, onerror=_raise_walk_error):
+		for child_name in [*directory_names, *file_names]:
+			child = Path(current_root) / child_name
+			if child.is_symlink():
+				raise RuntimeError(f'reset target contains a symbolic link: {child}')
+	return target
 
-	def backup(self):
-		for filename in self.data_files_to_keep:
-			self._copy_if(self.data_directory / filename, self.backup_directory)
 
-		self.max_epoch = self._detect_votes_backup_max_epoch()
-		if self.max_epoch:
-			self._copy_tree(self.data_directory / 'votes_backup' / str(self.max_epoch), self.backup_directory / 'votes')
+def _copy_file_if_exists(source, destination):
+	if not source.exists():
+		return
+	if source.is_symlink() or not source.is_file():
+		raise RuntimeError(f'cannot preserve unexpected path: {source}')
+	destination.parent.mkdir(parents=True, exist_ok=True)
+	shutil.copy2(source, destination)
 
-	def restore(self):
-		for filename in self.data_files_to_keep:
-			self._copy_if(self.backup_directory / filename, self.data_directory)
 
-		if self.max_epoch:
-			shutil.copytree(self.backup_directory / 'votes', self.data_directory / 'votes_backup' / str(self.max_epoch))
+def _copy_votes_backup(data_directory, backup_directory):
+	votes_backup = data_directory / 'votes_backup'
+	if not votes_backup.exists():
+		return None
+	if votes_backup.is_symlink() or not votes_backup.is_dir():
+		raise RuntimeError(f'cannot inspect unexpected path: {votes_backup}')
 
-		if self.backup_directory.exists():
-			shutil.rmtree(self.backup_directory)
+	epochs = []
+	for epoch in votes_backup.iterdir():
+		if epoch.is_symlink():
+			raise RuntimeError(f'cannot preserve unexpected path: {epoch}')
+		if not epoch.is_dir():
+			continue
+		try:
+			epochs.append(int(epoch.name))
+		except ValueError as exception:
+			raise RuntimeError(f'invalid voting backup directory: {epoch}') from exception
 
-	def _detect_votes_backup_max_epoch(self):
-		if not (self.data_directory / 'votes_backup').exists():
-			return None
+	if not epochs:
+		return None
 
-		epochs = [int(epoch.name) for epoch in (self.data_directory / 'votes_backup').iterdir() if epoch.is_dir()]
-		return None if not epochs else max(epochs)
-
-	@staticmethod
-	def _copy_if(source_path, destination_path):
-		if not source_path.exists():
-			return
-
-		if not destination_path.exists():
-			destination_path.mkdir()
-
-		log.info(_('general-copying-file').format(source_path=source_path, destination_path=destination_path))
-		shutil.copy(source_path, destination_path)
-
-	@staticmethod
-	def _copy_tree(source_path, destination_path):
-		log.info(_('general-copying-tree').format(source_path=source_path, destination_path=destination_path))
-		shutil.copytree(source_path, destination_path)
+	max_epoch = max(epochs)
+	shutil.copytree(votes_backup / str(max_epoch), backup_directory / 'votes')
+	return max_epoch
 
 
 async def run_main(args):
 	config = parse_shoestring_configuration(args.config)
-	directory = Path(args.directory)
+	root = Path(args.directory).absolute()
+	data_directory = _validate_target(root, 'data')
+	logs_directory = _validate_target(root, 'logs')
+	targets = [data_directory, logs_directory]
+	if config.node.full_api:
+		targets.append(_validate_target(root, 'dbdata'))
 
-	data_files_to_keep = []
+	data_files_to_keep = ['voting_status.dat']
 	if not args.purge_harvesters:
 		data_files_to_keep.append('harvesters.dat')
 
-	stateful_data_processor = StatefulDataProcessor(directory, data_files_to_keep)
-	stateful_data_processor.backup()
+	backup_root = Path(tempfile.mkdtemp(dir=root / 'sakuya', prefix='.reset-data-'))
+	moved_targets = []
+	try:
+		preserved_data = backup_root / 'preserved'
+		preserved_data.mkdir()
+		max_epoch = _copy_votes_backup(data_directory, preserved_data)
 
-	for name in ('data', 'logs'):
-		_purge_and_recreate(directory / name)
+		for target in targets:
+			backup = backup_root / target.name
+			os.replace(target, backup)
+			moved_targets.append((backup, target))
+			target.mkdir(mode=0o700)
 
-	if config.node.full_api:
-		_purge_and_recreate(directory / 'dbdata')
+		for filename in data_files_to_keep:
+			_copy_file_if_exists(backup_root / 'data' / filename, data_directory / filename)
+		if max_epoch is not None:
+			(data_directory / 'votes_backup').mkdir()
+			shutil.copytree(preserved_data / 'votes', data_directory / 'votes_backup' / str(max_epoch))
 
-	stateful_data_processor.restore()
+		for target in targets:
+			log.info(_('reset-data-recreating-directory').format(directory=target))
+	except Exception:
+		for _backup, target in reversed(moved_targets):
+			if target.exists() or target.is_symlink():
+				shutil.rmtree(target)
+		for backup, target in reversed(moved_targets):
+			os.replace(backup, target)
+		raise
+	finally:
+		shutil.rmtree(backup_root, ignore_errors=True)
 
 
 def add_arguments(parser):
-	parser.add_argument('--config', help=_('argument-help-config'), required=True)
+	parser.add_argument('--config', help=_('argument-help-config'))
 	parser.add_argument('--purge-harvesters', help=_('argument-help-reset-data-purge-harvesters'), action='store_true')
 	parser.set_defaults(func=run_main)

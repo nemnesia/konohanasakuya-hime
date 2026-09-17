@@ -4,7 +4,7 @@ from pathlib import Path
 
 import jinja2
 
-from shoestring.internal.FileTemplater import apply_template
+from sakuya.internal.FileTemplater import apply_template
 
 
 class PreparerTest(unittest.TestCase):

@@ -8,7 +8,7 @@ from prompt_toolkit.layout.containers import HSplit
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.output import create_output
 
-from shoestring.wizard.screens.end_screen import create
+from sakuya.wizard.screens.end_screen import create
 
 # pylint: disable=invalid-name
 

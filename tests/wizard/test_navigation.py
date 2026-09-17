@@ -1,5 +1,5 @@
-from shoestring.wizard.MultibyteButton import MultibyteButton as Button
-from shoestring.wizard.navigation import ExtendedButton, Navigation, initialize
+from sakuya.wizard.MultibyteButton import MultibyteButton as Button
+from sakuya.wizard.navigation import ExtendedButton, Navigation, initialize
 
 # pylint: disable=invalid-name
 

@@ -13,10 +13,10 @@ from symbolchain.sc import LinkAction, TransactionType
 from symbolchain.symbol.KeyPair import KeyPair
 from symbollightapi.connector.SymbolConnector import LinkedPublicKeys, VotingPublicKey
 
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.OpensslExecutor import OpensslExecutor
-from shoestring.internal.Preparer import API_EXTENSIONS, HARVESTER_EXTENSIONS, PEER_EXTENSIONS, Preparer
-from shoestring.internal.ShoestringConfiguration import (
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.Preparer import API_EXTENSIONS, HARVESTER_EXTENSIONS, PEER_EXTENSIONS, Preparer
+from sakuya.internal.ShoestringConfiguration import (
 	ImportsConfiguration,
 	NodeConfiguration,
 	ShoestringConfiguration,
@@ -74,17 +74,17 @@ class PreparerTest(unittest.TestCase):
 
 			# Assert:
 			self.assertEqual(None, preparer.directories.temp)
-			self.assertEqual(Path(output_directory) / 'seed', preparer.directories.seed)
-			self.assertEqual(Path(output_directory) / 'startup', preparer.directories.startup)
-			self.assertEqual(Path(output_directory) / 'mongo', preparer.directories.mongo)
-			self.assertEqual(Path(output_directory) / 'dbdata', preparer.directories.dbdata)
-			self.assertEqual(Path(output_directory) / 'rest-cache', preparer.directories.rest_cache)
-			self.assertEqual(Path(output_directory) / 'https-proxy', preparer.directories.https_proxy)
-			self.assertEqual(Path(output_directory) / 'userconfig', preparer.directories.userconfig)
-			self.assertEqual(Path(output_directory) / 'userconfig' / 'resources', preparer.directories.resources)
-			self.assertEqual(Path(output_directory) / 'keys', preparer.directories.keys)
-			self.assertEqual(Path(output_directory) / 'keys' / 'cert', preparer.directories.certificates)
-			self.assertEqual(Path(output_directory) / 'keys' / 'voting', preparer.directories.voting_keys)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'seed', preparer.directories.seed)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'startup', preparer.directories.startup)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'mongo', preparer.directories.mongo)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'dbdata', preparer.directories.dbdata)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'rest-cache', preparer.directories.rest_cache)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'https-proxy', preparer.directories.https_proxy)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'node-config', preparer.directories.node_config)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'node-config' / 'resources', preparer.directories.resources)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'keys', preparer.directories.keys)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'keys' / 'cert', preparer.directories.certificates)
+			self.assertEqual(Path(output_directory) / 'sakuya' / 'keys' / 'voting', preparer.directories.voting_keys)
 
 	def test_can_locate_directories_after_creating_temp_directory(self):
 		# Arrange:
@@ -94,17 +94,17 @@ class PreparerTest(unittest.TestCase):
 
 				# Assert:
 				self.assertEqual(Path(preparer.temp_directory.name), preparer.directories.temp)
-				self.assertEqual(Path(output_directory) / 'seed', preparer.directories.seed)
-				self.assertEqual(Path(output_directory) / 'startup', preparer.directories.startup)
-				self.assertEqual(Path(output_directory) / 'mongo', preparer.directories.mongo)
-				self.assertEqual(Path(output_directory) / 'dbdata', preparer.directories.dbdata)
-				self.assertEqual(Path(output_directory) / 'rest-cache', preparer.directories.rest_cache)
-				self.assertEqual(Path(output_directory) / 'https-proxy', preparer.directories.https_proxy)
-				self.assertEqual(Path(output_directory) / 'userconfig', preparer.directories.userconfig)
-				self.assertEqual(Path(output_directory) / 'userconfig' / 'resources', preparer.directories.resources)
-				self.assertEqual(Path(output_directory) / 'keys', preparer.directories.keys)
-				self.assertEqual(Path(output_directory) / 'keys' / 'cert', preparer.directories.certificates)
-				self.assertEqual(Path(output_directory) / 'keys' / 'voting', preparer.directories.voting_keys)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'seed', preparer.directories.seed)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'startup', preparer.directories.startup)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'mongo', preparer.directories.mongo)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'dbdata', preparer.directories.dbdata)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'rest-cache', preparer.directories.rest_cache)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'https-proxy', preparer.directories.https_proxy)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'node-config', preparer.directories.node_config)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'node-config' / 'resources', preparer.directories.resources)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'keys', preparer.directories.keys)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'keys' / 'cert', preparer.directories.certificates)
+				self.assertEqual(Path(output_directory) / 'sakuya' / 'keys' / 'voting', preparer.directories.voting_keys)
 
 	# endregion
 
@@ -119,7 +119,7 @@ class PreparerTest(unittest.TestCase):
 
 				# Assert:
 				created_directories = sorted(str(path.relative_to(output_directory)) for path in Path(output_directory).glob('**/*'))
-				self.assertEqual(expected_directories, created_directories)
+				self.assertEqual(sorted(expected_directories), created_directories)
 
 				# - created directories should have correct permissions
 				for name in expected_directories:
@@ -131,51 +131,58 @@ class PreparerTest(unittest.TestCase):
 
 	def test_can_create_subdirectories_peer_node(self):
 		self._assert_can_create_subdirectories(NodeFeatures.PEER, [
-			'data', 'keys', 'keys/cert', 'logs', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/keys', 'sakuya/keys/cert', 'sakuya/logs', 'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_api_node_with_https(self):
 		self._assert_can_create_subdirectories(NodeFeatures.API, [
-			'data', 'dbdata', 'https-proxy', 'keys', 'keys/cert', 'logs', 'rest-cache', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/dbdata', 'sakuya/https-proxy', 'sakuya/keys', 'sakuya/keys/cert',
+			'sakuya/logs', 'sakuya/rest-cache', 'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_api_node_without_https(self):
 		config = self._create_configuration(NodeFeatures.API, api_https=False)
 		self._assert_can_create_subdirectories_configuration(config, [
-			'data', 'dbdata', 'keys', 'keys/cert', 'logs', 'rest-cache', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/dbdata', 'sakuya/keys', 'sakuya/keys/cert', 'sakuya/logs',
+			'sakuya/rest-cache', 'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_light_node_with_https(self):
 		config = self._create_configuration(NodeFeatures.API, api_https=True, light_api=True)
 		self._assert_can_create_subdirectories_configuration(config, [
-			'data', 'https-proxy', 'keys', 'keys/cert', 'logs', 'rest-cache', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/https-proxy', 'sakuya/keys', 'sakuya/keys/cert', 'sakuya/logs',
+			'sakuya/rest-cache', 'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_light_node_without_https(self):
 		config = self._create_configuration(NodeFeatures.API, api_https=False, light_api=True)
 		self._assert_can_create_subdirectories_configuration(config, [
-			'data', 'keys', 'keys/cert', 'logs', 'rest-cache', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/keys', 'sakuya/keys/cert', 'sakuya/logs', 'sakuya/rest-cache',
+			'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_harvester_node(self):
 		self._assert_can_create_subdirectories(NodeFeatures.HARVESTER, [
-			'data', 'keys', 'keys/cert', 'logs', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/keys', 'sakuya/keys/cert', 'sakuya/logs', 'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_voter_node(self):
 		self._assert_can_create_subdirectories(NodeFeatures.VOTER, [
-			'data', 'keys', 'keys/cert', 'keys/voting', 'logs', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/keys', 'sakuya/keys/cert', 'sakuya/keys/voting', 'sakuya/logs',
+			'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_full_node(self):
 		self._assert_can_create_subdirectories(NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER, [
-			'data', 'dbdata', 'https-proxy', 'keys', 'keys/cert', 'keys/voting', 'logs', 'rest-cache', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/dbdata', 'sakuya/https-proxy', 'sakuya/keys', 'sakuya/keys/cert',
+			'sakuya/keys/voting', 'sakuya/logs', 'sakuya/rest-cache', 'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	def test_can_create_subdirectories_full_light_node(self):
 		config = self._create_configuration(NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER, api_https=True, light_api=True)
 		self._assert_can_create_subdirectories_configuration(config, [
-			'data', 'https-proxy', 'keys', 'keys/cert', 'keys/voting', 'logs', 'rest-cache', 'userconfig', 'userconfig/resources'
+			'sakuya', 'sakuya/data', 'sakuya/https-proxy', 'sakuya/keys', 'sakuya/keys/cert', 'sakuya/keys/voting',
+			'sakuya/logs', 'sakuya/rest-cache', 'sakuya/node-config', 'sakuya/node-config/resources'
 		])
 
 	# endregion
@@ -192,7 +199,7 @@ class PreparerTest(unittest.TestCase):
 				preparer.prepare_seed()
 
 				# Assert:
-				seed_files = sorted(str(path.relative_to(preparer.directories.seed)) for path in Path(output_directory).glob('seed/**/*'))
+				seed_files = sorted(str(path.relative_to(preparer.directories.seed)) for path in Path(output_directory).glob('sakuya/seed/**/*'))
 				self.assertEqual([
 					'00000',
 					'00000/00001.dat',
@@ -419,17 +426,17 @@ class PreparerTest(unittest.TestCase):
 				preparer.configure_rest()
 
 				# Assert: check userconfig files
-				userconfig_files = sorted(path.name for path in Path(output_directory).glob('userconfig/**/*') if path.is_file())
+				userconfig_files = sorted(path.name for path in Path(output_directory).glob('sakuya/node-config/**/*') if path.is_file())
 				self.assertEqual(expected_userconfig_files, userconfig_files)
 
 				# - check userconfig files permissions
-				self._assert_readonly(preparer.directories.userconfig, userconfig_files)
+				self._assert_readonly(preparer.directories.node_config, userconfig_files)
 
 				# - check mongo files
 				if expected_mongo_files:
 					self.assertTrue(preparer.directories.mongo.exists())
 
-					mongo_files = sorted(path.name for path in Path(output_directory).glob('mongo/**/*'))
+					mongo_files = sorted(path.name for path in Path(output_directory).glob('sakuya/mongo/**/*'))
 					self.assertEqual(expected_mongo_files, mongo_files)
 
 					# - check mongo files permissions
@@ -476,7 +483,7 @@ class PreparerTest(unittest.TestCase):
 				preparer.configure_rest(preparer.directories.temp / 'rest_overrides.json')
 
 				# Assert: check rest config
-				with open(preparer.directories.userconfig / 'rest.json', 'rt', encoding='utf8') as rest_config_infile:
+				with open(preparer.directories.node_config / 'rest.json', 'rt', encoding='utf8') as rest_config_infile:
 					rest_config = json.load(rest_config_infile)
 
 				self.assertEqual({
@@ -497,18 +504,19 @@ class PreparerTest(unittest.TestCase):
 		# Arrange:
 		with tempfile.TemporaryDirectory() as output_directory:
 			with Preparer(output_directory, config) as preparer:
-				(Path(output_directory) / 'https-proxy').mkdir()
+				(Path(output_directory) / 'sakuya').mkdir()
+				(Path(output_directory) / 'sakuya' / 'https-proxy').mkdir()
 
 				# Act:
 				preparer.configure_https()
 
 				# Assert: check https proxy files
-				https_proxy_files = sorted(path.name for path in Path(output_directory).glob('https-proxy/*'))
+				https_proxy_files = sorted(path.name for path in Path(output_directory).glob('sakuya/https-proxy/*'))
 				self.assertEqual(expected_files, https_proxy_files)
 
 				# - check permissions
 				for filename in expected_files:
-					assert 0o400 == (Path(output_directory) / 'https-proxy' / filename).stat().st_mode & 0o777
+					assert 0o400 == (Path(output_directory) / 'sakuya' / 'https-proxy' / filename).stat().st_mode & 0o777
 
 	def test_can_skip_configure_https_when_disabled(self):
 		self._assert_can_configure_https(self._create_configuration(NodeFeatures.PEER, False), [])
@@ -852,7 +860,7 @@ class PreparerTest(unittest.TestCase):
 				if expected_startup_files:
 					self.assertTrue(preparer.directories.startup.exists())
 
-					startup_files = sorted(path.name for path in Path(output_directory).glob('startup/**/*'))
+					startup_files = sorted(path.name for path in Path(output_directory).glob('sakuya/startup/**/*'))
 					self.assertEqual(expected_startup_files, startup_files)
 
 					# - check startup files permissions
@@ -949,7 +957,6 @@ class PreparerTest(unittest.TestCase):
 		existing_links = LinkedPublicKeys()
 		existing_links.voting_public_keys = [
 			VotingPublicKey(1111, 2222, self._random_public_key()),
-			VotingPublicKey(3333, 4444, self._random_public_key()),
 		]
 
 		# Act + Assert:
@@ -1054,7 +1061,7 @@ class PreparerTest(unittest.TestCase):
 				if expect_harvester_links:
 					expected_size += 4 * 88
 				if expect_voter_links:
-					expected_size += 2 * 88 + 2 * 8
+					expected_size += 3 * 96
 
 				expected_aggregate_descriptor = AggregateDescriptor(expected_size, 234, 2222 + 3 * 60 * 60 * 1000, account_public_key)
 				assert_aggregate_transaction(self, transaction, expected_aggregate_descriptor)
@@ -1094,15 +1101,21 @@ class PreparerTest(unittest.TestCase):
 						transaction.transactions[voter_links_start_index],
 						LinkDescriptor(TransactionType.VOTING_KEY_LINK, first_existing_voting_public_key, LinkAction.UNLINK, (1111, 2222)))
 
-					# - check voting unlinks
-					new_voting_public_key = preparer.voter_configurator.voting_public_key
+					second_existing_voting_public_key = existing_links.voting_public_keys[1].public_key
 					assert_link_transaction(
 						self,
 						transaction.transactions[voter_links_start_index + 1],
+						LinkDescriptor(TransactionType.VOTING_KEY_LINK, second_existing_voting_public_key, LinkAction.UNLINK, (3333, 4444)))
+
+					# - check voting link
+					new_voting_public_key = preparer.voter_configurator.voting_public_key
+					assert_link_transaction(
+						self,
+						transaction.transactions[voter_links_start_index + 2],
 						LinkDescriptor(TransactionType.VOTING_KEY_LINK, new_voting_public_key, LinkAction.LINK, (10, 729)))
 
 	def test_prepare_linking_transaction_can_create_aggregate_with_all_links_and_unlinks(self):
-		self._assert_prepare_linking_transaction_can_create_aggregate_with_all_links_and_unlinks(None, 6, True, True)
+		self._assert_prepare_linking_transaction_can_create_aggregate_with_all_links_and_unlinks(None, 7, True, True)
 
 	@staticmethod
 	def _write_harvester_imports_file(filepath):
@@ -1122,7 +1135,7 @@ class PreparerTest(unittest.TestCase):
 			imports_config = ImportsConfiguration(imports_harvester_filepath, None, None)
 
 			# Act + Assert: only voter (un)links are present
-			self._assert_prepare_linking_transaction_can_create_aggregate_with_all_links_and_unlinks(imports_config, 2, False, True)
+			self._assert_prepare_linking_transaction_can_create_aggregate_with_all_links_and_unlinks(imports_config, 3, False, True)
 
 	def test_prepare_linking_transaction_can_create_aggregate_with_all_links_and_unlinks_import_voter(self):
 		# Arrange:

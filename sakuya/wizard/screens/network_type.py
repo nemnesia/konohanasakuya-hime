@@ -1,6 +1,6 @@
 from prompt_toolkit.widgets import RadioList
 
-from shoestring.wizard.Screen import ScreenDialog
+from sakuya.wizard.Screen import ScreenDialog
 
 
 class NetworkTypeAccessor:

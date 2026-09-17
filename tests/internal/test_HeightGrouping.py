@@ -1,7 +1,7 @@
 import unittest
 from collections import namedtuple
 
-from shoestring.internal.HeightGrouping import calculate_finalization_epoch_for_height, calculate_grouped_height
+from sakuya.internal.HeightGrouping import calculate_finalization_epoch_for_height, calculate_grouped_height
 
 GroupingTestTraits = namedtuple('GroupingTestTraits', ['grouping', 'test_cases'])
 

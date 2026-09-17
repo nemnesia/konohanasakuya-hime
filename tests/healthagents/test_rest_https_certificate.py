@@ -1,14 +1,15 @@
 import asyncio
 import os
 import ssl
-from collections import namedtuple
+from types import SimpleNamespace
 
 import pytest
 from aiohttp import web
 
-from shoestring.healthagents.rest_https_certificate import should_run, validate
-from shoestring.internal.OpensslExecutor import OpensslExecutor
-from shoestring.internal.ShoestringConfiguration import NodeConfiguration
+from sakuya.healthagents import rest_https_certificate
+from sakuya.healthagents.rest_https_certificate import should_run, validate
+from sakuya.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.ShoestringConfiguration import NodeConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 
@@ -52,8 +53,7 @@ def _validate_thread(context):
 
 
 async def _dispatch_validate(test_args=None):
-	HealthAgentContext = namedtuple('HealthAgentContext', ['peer_endpoint', 'test_args'])
-	context = HealthAgentContext(('localhost', 7890), test_args or [])
+	context = SimpleNamespace(peer_endpoint=('localhost', 7890), test_args=test_args or [], failed=False)
 
 	await asyncio.get_running_loop().run_in_executor(None, _validate_thread, context)
 
@@ -82,5 +82,10 @@ async def test_validate_passes_when_certificate_is_valid(server, caplog):   # py
 	# Assert:
 	assert_message_is_logged('HTTPS certificate looks ok: valid from 23-06-05 to 33-06-02', caplog)
 	assert_max_log_level(LogLevel.INFO, caplog)
+
+
+def test_openssl_response_is_invalid_when_certificate_dates_cannot_be_parsed(monkeypatch):
+	monkeypatch.setattr(OpensslExecutor, 'dispatch', lambda _self, _args, **_kwargs: ['certificate data'])
+	assert (False, 'could not parse s_client response') == rest_https_certificate._openssl_run_sclient_verify('localhost', [])
 
 # endregion

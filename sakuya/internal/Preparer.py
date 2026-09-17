@@ -65,66 +65,78 @@ class Preparer:
 		def seed(self):
 			"""Block seed directory."""
 
-			return self.output_directory / 'seed'
+			return self.output_directory / 'sakuya' / 'seed'
 
 		@property
 		def startup(self):
 			"""Startup scripts directory."""
 
-			return self.output_directory / 'startup'
+			return self.output_directory / 'sakuya' / 'startup'
 
 		@property
 		def mongo(self):
 			"""Mongo scripts directory."""
 
-			return self.output_directory / 'mongo'
+			return self.output_directory / 'sakuya' / 'mongo'
 
 		@property
 		def dbdata(self):
 			"""Db data."""
 
-			return self.output_directory / 'dbdata'
+			return self.output_directory / 'sakuya' / 'dbdata'
 
 		@property
 		def rest_cache(self):
 			"""REST cache directory."""
 
-			return self.output_directory / 'rest-cache'
+			return self.output_directory / 'sakuya' / 'rest-cache'
 
 		@property
 		def https_proxy(self):
 			"""Https proxy directory."""
 
-			return self.output_directory / 'https-proxy'
+			return self.output_directory / 'sakuya' / 'https-proxy'
 
 		@property
-		def userconfig(self):
-			"""User configuration directory."""
+		def node_config(self):
+			"""Container configuration directory."""
 
-			return self.output_directory / 'userconfig'
+			return self.output_directory / 'sakuya' / 'node-config'
 
 		@property
 		def resources(self):
 			"""Resources directory."""
 
-			return self.output_directory / 'userconfig' / 'resources'
+			return self.output_directory / 'sakuya' / 'node-config' / 'resources'
 
 		@property
 		def keys(self):
 			"""Keys directory."""
-			return self.output_directory / 'keys'
+			return self.output_directory / 'sakuya' / 'keys'
 
 		@property
 		def certificates(self):
 			"""Certificates directory."""
 
-			return self.output_directory / 'keys' / 'cert'
+			return self.output_directory / 'sakuya' / 'keys' / 'cert'
 
 		@property
 		def voting_keys(self):
 			"""Voting keys directory."""
 
-			return self.output_directory / 'keys' / 'voting'
+			return self.output_directory / 'sakuya' / 'keys' / 'voting'
+
+		@property
+		def data(self):
+			"""Runtime data directory."""
+
+			return self.output_directory / 'sakuya' / 'data'
+
+		@property
+		def logs(self):
+			"""Runtime logs directory."""
+
+			return self.output_directory / 'sakuya' / 'logs'
 
 	def __init__(self, directory, config, logger=None):
 		"""Creates a preparer for preparing a Symbol node with the specified features ."""
@@ -157,11 +169,12 @@ class Preparer:
 		"""Creates all subdirectories."""
 
 		directories = [
-			self.directory / 'data',
-			self.directory / 'logs',
+			self.directory / 'sakuya',
+			self.directories.data,
+			self.directories.logs,
 			self.directories.keys,
 			self.directories.certificates,
-			self.directories.userconfig,
+			self.directories.node_config,
 			self.directories.resources
 		]
 
@@ -283,14 +296,14 @@ class Preparer:
 			return
 
 		rest_file_name = 'rest' if self.config.node.full_api else 'rest-light'
-		self._copy_file(self.directories.temp / 'rest' / f'{rest_file_name}.json', self.directories.userconfig / 'rest.json')
+		self._copy_file(self.directories.temp / 'rest' / f'{rest_file_name}.json', self.directories.node_config / 'rest.json')
 
 		if self.config.node.full_api:
 			self._copy_tree_readonly(self.directories.temp / 'mongo', self.directories.mongo)
 			self._make_files_readonly(self.directories.mongo)
 
-		if rest_overrides_filename:
-			rest_json_filepath = self.directories.userconfig / 'rest.json'
+		if rest_overrides_filename and Path(rest_overrides_filename).is_file():
+			rest_json_filepath = self.directories.node_config / 'rest.json'
 
 			# load the rest config
 			with open(rest_json_filepath, 'rt', encoding='utf8') as rest_config_infile:
@@ -304,7 +317,7 @@ class Preparer:
 			with open(rest_json_filepath, 'wt', encoding='utf8') as rest_config_outfile:
 				rest_config_outfile.write(json.dumps(rest_config, indent=2))
 
-		self._make_files_readonly(self.directories.userconfig)
+		self._make_files_readonly(self.directories.node_config)
 
 	def configure_https(self):
 		"""Configures https proxy."""
@@ -394,11 +407,9 @@ class Preparer:
 				transaction_builder.link_vrf_public_key(self.harvester_configurator.vrf_key_pair.public_key)
 
 		if not self.voter_configurator.is_imported:
-			if existing_links.voting_public_keys:
+			for voting_link in existing_links.voting_public_keys:
 				transaction_builder.unlink_voting_public_key(
-					existing_links.voting_public_keys[0].public_key,
-					existing_links.voting_public_keys[0].start_epoch,
-					existing_links.voting_public_keys[0].end_epoch)
+					voting_link.public_key, voting_link.start_epoch, voting_link.end_epoch)
 
 			if NodeFeatures.VOTER in self.config.node.features and self.new_voting_key_file_epoch_range:
 				transaction_builder.link_voting_public_key(self.voter_configurator.voting_public_key, *self.new_voting_key_file_epoch_range)

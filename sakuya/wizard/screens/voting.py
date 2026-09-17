@@ -1,8 +1,8 @@
 from prompt_toolkit.layout.containers import HSplit
 from prompt_toolkit.widgets import CheckboxList
 
-from shoestring.wizard.Screen import ScreenDialog
-from shoestring.wizard.styles import to_enabled_string
+from sakuya.wizard.Screen import ScreenDialog
+from sakuya.wizard.styles import to_enabled_string
 
 
 class VotingSettings:

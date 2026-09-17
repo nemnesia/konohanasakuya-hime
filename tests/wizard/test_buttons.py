@@ -2,10 +2,10 @@ from collections import namedtuple
 
 from prompt_toolkit.widgets import Label
 
-from shoestring.wizard.buttons import create_next_clicked_handler, create_operation_button_handler, create_prev_clicked_handler
-from shoestring.wizard.ScreenContainer import ScreenContainer
-from shoestring.wizard.ShoestringOperation import ShoestringOperation
-from shoestring.wizard.TitleBar import TitleBar
+from sakuya.wizard.buttons import create_next_clicked_handler, create_operation_button_handler, create_prev_clicked_handler
+from sakuya.wizard.ScreenContainer import ScreenContainer
+from sakuya.wizard.ShoestringOperation import ShoestringOperation
+from sakuya.wizard.TitleBar import TitleBar
 
 ChildScreen = namedtuple('ChildScreen', ['screen_id', 'accessor', 'should_show'], defaults=[None, None, lambda: True])
 
@@ -279,7 +279,7 @@ def test_can_select_operation_not_requiring_main_public_key():
 	handler()
 
 	# Assert:
-	assert ['welcome', 'obligatory', 'network-type', 'end-screen'] == context.screens.allowed_list
+	assert ['welcome', 'obligatory', 'end-screen'] == context.screens.allowed_list
 	assert 1 == context.next_call_count
 	assert [context.button] == context.screens.get('welcome').selected_buttons
 

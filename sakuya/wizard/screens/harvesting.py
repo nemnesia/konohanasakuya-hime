@@ -3,9 +3,9 @@ from prompt_toolkit.layout.containers import ConditionalContainer, HSplit, VSpli
 from prompt_toolkit.widgets import Box, CheckboxList
 from symbolchain.facade.SymbolFacade import SymbolFacade
 
-from shoestring.wizard.Screen import ScreenDialog
-from shoestring.wizard.styles import to_enabled_string
-from shoestring.wizard.ValidatingTextBox import ValidatingTextBox, is_hex_private_key_string, is_integer
+from sakuya.wizard.Screen import ScreenDialog
+from sakuya.wizard.styles import to_enabled_string
+from sakuya.wizard.ValidatingTextBox import ValidatingTextBox, is_hex_private_key_string, is_integer
 
 
 def facade(screens):

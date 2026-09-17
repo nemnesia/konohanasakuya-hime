@@ -6,12 +6,13 @@ import os
 import sys
 from pathlib import Path
 
-from shoestring.internal.Directory import resolve_directory
+from sakuya.internal.Directory import resolve_directory
 
 
 def register_subcommand(subparsers, name, help_text):
 	parser = subparsers.add_parser(name, help=help_text)
-	module = importlib.import_module(f'shoestring.commands.{name.replace("-", "_")}')
+	parser.set_defaults(command=name)
+	module = importlib.import_module(f'sakuya.commands.{name.replace("-", "_")}')
 	module.add_arguments(parser)
 
 
@@ -22,8 +23,6 @@ def parse_args(args):
 
 	register_subcommand(subparsers, 'announce-transaction', _('main-announce-transaction-help'))
 	register_subcommand(subparsers, 'health', _('main-health-help'))
-	register_subcommand(subparsers, 'import-bootstrap', _('main-import-bootstrap-help'))
-	register_subcommand(subparsers, 'import-harvesters', _('main-import-harvesters-help'))
 	register_subcommand(subparsers, 'init', _('main-init-help'))
 	register_subcommand(subparsers, 'min-cosignatures-count', _('main-min-cosignatures-count-help'))
 	register_subcommand(subparsers, 'pemtool', _('main-pemtool-help'))
@@ -37,6 +36,18 @@ def parse_args(args):
 
 	args = parser.parse_args(args)
 	args.directory = resolve_directory(args.directory)
+	command = getattr(args, 'command', None)
+	default_paths = {
+		'config': 'config.ini',
+		'overrides': 'overrides.ini',
+		'rest_overrides': 'rest_overrides.json',
+		'ca_key_path': 'ca.key.pem',
+		'input': 'ca.key.pem' if 'pemview' == command else None,
+		'output': 'ca.key.pem' if 'pemtool' == command else None
+	}
+	for name, default_name in default_paths.items():
+		if default_name and hasattr(args, name) and getattr(args, name) is None:
+			setattr(args, name, str(args.directory / default_name))
 	if not hasattr(args, 'func'):
 		parser.print_help()
 		raise SystemExit()
@@ -46,7 +57,9 @@ def parse_args(args):
 
 async def main(args):
 	lang_directory = Path(__file__).resolve().parent / 'lang'
-	lang = gettext.translation('messages', localedir=lang_directory, languages=(os.environ.get('LC_MESSAGES', 'en'), 'en'))
+	requested_language = os.environ.get('LC_MESSAGES', 'en').split('.')[0].split('_')[0]
+	language = requested_language if requested_language in ('en', 'ja') else 'en'
+	lang = gettext.translation('messages', localedir=lang_directory, languages=(language, 'en'))
 	lang.install()
 
 	args = parse_args(args)

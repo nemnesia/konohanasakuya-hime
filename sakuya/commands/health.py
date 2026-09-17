@@ -4,9 +4,9 @@ from pathlib import Path
 
 from zenlog import log
 
-from shoestring.internal.ConfigurationManager import ConfigurationManager
-from shoestring.internal.Preparer import Preparer
-from shoestring.internal.ShoestringConfiguration import parse_shoestring_configuration
+from sakuya.internal.ConfigurationManager import ConfigurationManager
+from sakuya.internal.Preparer import Preparer
+from sakuya.internal.ShoestringConfiguration import parse_shoestring_configuration
 
 
 class HealthAgentContext:
@@ -18,6 +18,7 @@ class HealthAgentContext:
 		self.directories = directories
 		self.config = config
 		self.config_manager = ConfigurationManager(self.directories.resources)
+		self.failed = False
 
 	@property
 	def peer_endpoint(self):
@@ -53,7 +54,7 @@ class HealthAgentContext:
 		if self.config.node.api_https:
 			return 3001  # assume default HTTPS port
 
-		with open(self.directories.userconfig / 'rest.json', 'rt', encoding='utf8') as infile:
+		with open(self.directories.node_config / 'rest.json', 'rt', encoding='utf8') as infile:
 			rest_json = json.loads(infile.read())
 			return int(rest_json['port'])
 
@@ -62,14 +63,22 @@ async def run_main(args):
 	config = parse_shoestring_configuration(args.config)
 	context = HealthAgentContext(Preparer.DirectoryLocator(None, Path(args.directory)), config)
 
-	for agent_name in ('peer_certificate', 'peer_api', 'voting_keys', 'rest_https_certificate', 'rest_api', 'websockets'):
-		module = importlib.import_module(f'shoestring.healthagents.{agent_name}')
+	for agent_name in ('peer_certificate', 'peer_api', 'voting_keys', 'harvesting_keys', 'rest_https_certificate', 'rest_api', 'websockets'):
+		module = importlib.import_module(f'sakuya.healthagents.{agent_name}')
 
 		if module.should_run(config.node):
 			log.debug(_('health-running-health-agent').format(module_name=module.NAME))
-			await module.validate(context)
+			try:
+				await module.validate(context)
+			except Exception:  # 各チェックを最後まで実行し、全体結果だけを最後に失敗させる。
+				context.failed = True
+				# 例外文字列に資格情報が含まれる可能性があるため、そのまま出力しない。
+				log.error(f'{module.NAME} health check failed')
+
+	if context.failed:
+		raise RuntimeError('one or more health checks failed')
 
 
 def add_arguments(parser):
-	parser.add_argument('--config', help=_('argument-help-config'), required=True)
+	parser.add_argument('--config', help=_('argument-help-config'))
 	parser.set_defaults(func=run_main)

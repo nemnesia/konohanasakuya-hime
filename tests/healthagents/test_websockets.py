@@ -1,14 +1,14 @@
 import json
 import tempfile
-from collections import namedtuple
 from pathlib import Path
+from types import SimpleNamespace
 
 from websockets.asyncio.server import serve
 
-from shoestring.healthagents.websockets import should_run, validate
-from shoestring.internal.ConfigurationManager import ConfigurationManager
-from shoestring.internal.NodeFeatures import NodeFeatures
-from shoestring.internal.ShoestringConfiguration import NodeConfiguration
+from sakuya.healthagents.websockets import should_run, validate
+from sakuya.internal.ConfigurationManager import ConfigurationManager
+from sakuya.internal.NodeFeatures import NodeFeatures
+from sakuya.internal.ShoestringConfiguration import NodeConfiguration
 
 from ..test.LogTestUtils import LogLevel, assert_max_log_level, assert_message_is_logged
 
@@ -61,8 +61,10 @@ def _write_resources(directory, block_generation_target_time):
 
 async def _dispatch_validate(resources_directory):
 	# Arrange:
-	HealthAgentContext = namedtuple('HealthAgentContext', ['websocket_endpoint', 'config_manager'])
-	context = HealthAgentContext(f'ws://localhost:{WEBSOCKET_PORT}/ws', ConfigurationManager(resources_directory))
+	context = SimpleNamespace(
+		websocket_endpoint=f'ws://localhost:{WEBSOCKET_PORT}/ws',
+		config_manager=ConfigurationManager(resources_directory),
+		failed=False)
 
 	# Act:
 	await validate(context)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from zenlog import log
 
-from shoestring.internal.OpensslExecutor import OpensslExecutor
+from sakuya.internal.OpensslExecutor import OpensslExecutor
 
 NAME = 'REST HTTPS certificate'
 
@@ -94,6 +94,7 @@ async def validate(context):
 
 	if not result:
 		log.warning(_('health-rest-https-certificate-invalid').format(error_message=dates_or_error))
+		context.failed = True
 	else:
 		date_range = dates_or_error[-1]
 		log.info(_('health-rest-https-certificate-valid').format(

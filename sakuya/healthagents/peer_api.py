@@ -23,3 +23,4 @@ async def validate(context):
 		log.info(_('health-peer-api-success').format(height=chain_statistics.height))
 	except NodeException:
 		log.error(_('health-peer-api-error').format(host=host, port=port))
+		context.failed = True

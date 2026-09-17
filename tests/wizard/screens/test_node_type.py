@@ -1,4 +1,4 @@
-from shoestring.wizard.screens.node_type import create
+from sakuya.wizard.screens.node_type import create
 
 # pylint: disable=invalid-name
 
