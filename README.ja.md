@@ -21,6 +21,10 @@ python3 -m pip install symbol-sakuya
 python3 -m sakuya --help
 ```
 
+Sakuya は Symbol Shoestring を基にした派生プロジェクトです。上流の MIT ライセンスと
+Symbol Contributors の帰属表示は [LICENSE](LICENSE) に保持し、Sakuya 固有の変更は
+nemnesia が管理しています。
+
 ソースツリーから実行する場合:
 
 ```sh

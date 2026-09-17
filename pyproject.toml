@@ -10,7 +10,7 @@ readme = 'README.md'
 
 packages = [{ include = 'sakuya' }]
 
-repository = 'https://github.com/symbol/product/tree/main/tools/konohanasakuya-hime'
+repository = 'https://github.com/nemnesia/konohanasakuya-hime'
 
 keywords = ['symbol', 'sakuya', 'deployment', 'node']
 
@@ -26,6 +26,19 @@ include = ['sakuya/lang/*/LC_MESSAGES/messages.mo']
 
 [tool.poetry.dependencies]
 python = "^3.10"
+aiohttp = "~=3.14.0"
+Jinja2 = "~=3.1.2"
+prompt_toolkit = "~=3.0.39"
+PyYAML = "~=6.0.1"
+requests = "~=2.34.2"
+symbol-lightapi = "~=0.0.9"
+symbol-sdk-python = "~=3.3.1"
+websockets = "~=16.0"
+zenlog = "~=1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 asyncio_mode = 'auto'
