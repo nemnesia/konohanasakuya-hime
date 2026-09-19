@@ -1,6 +1,7 @@
 .agents/
 docs/
 MEMORY.md
+test-sakuya/
 
 # Python
 __pycache__/
