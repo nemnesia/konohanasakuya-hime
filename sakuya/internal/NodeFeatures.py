@@ -1,6 +1,8 @@
 from enum import IntFlag
 from functools import reduce
 
+NODE_ROLES = ('dual', 'peer', 'light')
+
 
 class NodeFeatures(IntFlag):
 	"""Optional node features."""
@@ -47,3 +49,12 @@ class NodeFeatures(IntFlag):
 			raise ValueError(ex) from ex
 
 		return reduce(lambda rhs, lhs: rhs | lhs, values, NodeFeatures.PEER)
+
+
+def features_for_node_role(role):
+	"""Returns the node features represented by a node role."""
+
+	if role in ('dual', 'light'):
+		return NodeFeatures.API
+
+	return NodeFeatures.PEER

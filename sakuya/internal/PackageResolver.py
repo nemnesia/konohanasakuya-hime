@@ -9,6 +9,7 @@ from aiohttp import ClientSession
 from .FileDownloader import download_file
 
 SYMBOL_GITHUB_URI = 'https://api.github.com/repos/symbol/symbol/releases'
+NETWORK_NAMES = ('mainnet', 'testnet', 'sai')
 
 
 async def _get_releases(releases_uri):

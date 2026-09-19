@@ -1,5 +1,6 @@
 from prompt_toolkit.widgets import RadioList
 
+from sakuya.internal.NodeFeatures import NODE_ROLES
 from sakuya.wizard.Screen import ScreenDialog
 
 
@@ -21,11 +22,7 @@ class NodeTypeAccessor:
 
 def create(_screens):
 	node_type_radio = RadioList(
-		values=[
-			('dual', _('wizard-node-type-dual')),
-			('peer', _('wizard-node-type-peer')),
-			('light', _('wizard-node-type-light'))
-		],
+		values=[(role, _(f'wizard-node-type-{role}')) for role in NODE_ROLES],
 		default='peer'
 	)
 
