@@ -18,9 +18,11 @@ async def dispatch_sakuya_command(screens, executor):
 
 	if SakuyaOperation.SETUP == operation:
 		with tempfile.TemporaryDirectory() as temp_directory:
+			# init は managed output のいずれかが存在すると再実行を拒否するため、
+			# Wizard 固有の overrides は init 完了後に上書きする。
+			await prepare_sakuya_files(screens, Path(temp_directory))
 			has_custom_rest_overrides = try_prepare_rest_overrides_file(screens, Path(temp_directory) / 'rest_overrides.json')
 			prepare_overrides_file(screens, Path(temp_directory) / 'overrides.ini')
-			await prepare_sakuya_files(screens, Path(temp_directory))
 
 			sakuya_args = build_sakuya_command(
 				operation,

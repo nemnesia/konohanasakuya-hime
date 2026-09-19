@@ -1,3 +1,4 @@
+import json
 import tempfile
 from collections import namedtuple
 from pathlib import Path
@@ -79,6 +80,8 @@ async def test_can_dispatch_setup_command():
 			assert (sakuya_directory / 'config.ini').exists()
 			assert (sakuya_directory / 'overrides.ini').exists()
 			assert (sakuya_directory / 'rest_overrides.json').exists()
+			assert '[node.localnode]' in (sakuya_directory / 'overrides.ini').read_text(encoding='utf8')
+			assert {} == json.loads((sakuya_directory / 'rest_overrides.json').read_text(encoding='utf8'))['nodeMetadata']
 
 
 async def test_can_dispatch_setup_command_with_custom_rest_overrides():
@@ -112,6 +115,9 @@ async def test_can_dispatch_setup_command_with_custom_rest_overrides():
 			assert (sakuya_directory / 'config.ini').exists()
 			assert (sakuya_directory / 'overrides.ini').exists()
 			assert (sakuya_directory / 'rest_overrides.json').exists()
+			assert 'host = symbol.fyi' in (sakuya_directory / 'overrides.ini').read_text(encoding='utf8')
+			assert {'animal': 'wolf'} == json.loads(
+				(sakuya_directory / 'rest_overrides.json').read_text(encoding='utf8'))['nodeMetadata']
 
 
 def _prepare_sakuya_file(output_filename):

@@ -107,6 +107,14 @@ def _cli_log_path(args):
 	return None if directory is None else Path(directory) / 'cli.log'
 
 
+def _print_cli_failure(log_filepath):
+	"""例外の詳細を隠し、利用者向けの失敗メッセージだけを表示する。"""
+
+	print(_('init-failed'))
+	if log_filepath:
+		print(_('init-log-file').format(filepath=log_filepath))
+
+
 @contextmanager
 def _init_logging(args):
 	"""init の詳細ログを cli.log へ送り、コンソールへの出力を抑制する。"""
@@ -115,6 +123,8 @@ def _init_logging(args):
 	if log_filepath is None:
 		yield None
 		return
+	if log_filepath.is_symlink():
+		raise RuntimeError('init refuses to use a symbolic link for cli.log')
 
 	log_filepath.parent.mkdir(parents=True, exist_ok=True)
 	file_handler = _CliLogHandler(log_filepath)
@@ -439,23 +449,30 @@ async def run_main(args):
 	"""画面向けの簡潔な出力と、ファイル向けの詳細ログを伴って init を実行する。"""
 
 	is_cli = _is_cli_invocation(args)
-	with _init_logging(args) as log_filepath:
-		try:
-			managed_paths = await _run_main(args)
-		except Exception as ex:
-			if log_filepath:
-				log.error(_('init-failure-detail').format(reason=ex))
-			if is_cli:
-				print(_('init-failed').format(reason=ex))
-				raise SystemExit(1) from None
-			raise
+	try:
+		with _init_logging(args) as active_log_filepath:
+			try:
+				managed_paths = await _run_main(args)
+			except Exception as ex:
+				if active_log_filepath:
+					log.logger.exception(_('init-failure-detail').format(reason=ex))
+				if is_cli:
+					_print_cli_failure(active_log_filepath)
+					raise SystemExit(1) from None
+				raise
 
-		if is_cli and managed_paths:
-			for filepath in managed_paths:
-				print(_('init-created-file').format(filepath=filepath))
-			print(_('init-success'))
-			if log_filepath:
-				print(_('init-log-file').format(filepath=log_filepath))
+			if is_cli and managed_paths:
+				for filepath in managed_paths:
+					print(_('init-created-file').format(filepath=filepath))
+				print(_('init-success'))
+				if active_log_filepath:
+					print(_('init-log-file').format(filepath=active_log_filepath))
+	except Exception:
+		if not is_cli:
+			raise
+		# ログハンドラの初期化に失敗した場合は、存在しないログを案内しない。
+		_print_cli_failure(None)
+		raise SystemExit(1) from None
 
 
 def add_arguments(parser):

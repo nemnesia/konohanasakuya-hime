@@ -91,6 +91,8 @@ async def test_cli_init_shows_user_summary_and_writes_detailed_log(capsys):
 		prepare_testnet_package(package_directory, 'resources.zip')
 		with tempfile.TemporaryDirectory() as output_directory:
 			config_filepath = Path(output_directory) / 'config.ini'
+			log_filepath = Path(output_directory) / 'cli.log'
+			log_filepath.write_text('existing log\n', encoding='utf8')
 			await main([
 				'--directory', output_directory,
 				'init',
@@ -102,8 +104,8 @@ async def test_cli_init_shows_user_summary_and_writes_detailed_log(capsys):
 			assert 'Sakuya initialization completed.' in captured.out
 			assert 'copying FILE' not in captured.out
 			assert 'copying FILE' not in captured.err
-			log_filepath = Path(output_directory) / 'cli.log'
 			assert stat.S_IMODE(log_filepath.stat().st_mode) == 0o600
+			assert 'existing log' in log_filepath.read_text(encoding='utf8')
 			assert 'copying FILE' in log_filepath.read_text(encoding='utf8')
 
 
@@ -151,7 +153,14 @@ async def test_second_init_is_rejected_without_changing_existing_configuration(c
 				await main(['--directory', output_directory, 'init', '--package', package_uri, '--config', str(config_filepath)])
 
 			assert 1 == error.value.code
-			assert 'Sakuya has already been initialized.' in capsys.readouterr().out
+			captured = capsys.readouterr()
+			assert 'Sakuya initialization failed.' in captured.out
+			assert 'Detailed log:' in captured.out
+			assert 'Sakuya has already been initialized.' not in captured.out
+			assert 'Traceback' not in captured.out
+			log_contents = (Path(output_directory) / 'cli.log').read_text(encoding='utf8')
+			assert 'Sakuya has already been initialized.' in log_contents
+			assert 'Traceback' in log_contents
 
 			assert original_config == config_filepath.read_bytes()
 
@@ -296,6 +305,30 @@ async def test_cli_prompt_cancellation_does_not_show_exception(cancel_exception,
 		assert not (Path(output_directory) / 'config.ini').exists()
 		assert not (Path(output_directory) / 'overrides.ini').exists()
 		assert not (Path(output_directory) / 'rest_overrides.json').exists()
+
+
+async def test_cli_log_symlink_is_rejected_without_touching_target(capsys):
+	with tempfile.TemporaryDirectory() as output_directory:
+		output_directory = Path(output_directory)
+		target_filepath = output_directory / 'target.log'
+		log_filepath = output_directory / 'cli.log'
+		target_filepath.write_text('do not change', encoding='utf8')
+		os.chmod(target_filepath, 0o640)
+		original_mode = stat.S_IMODE(target_filepath.stat().st_mode)
+		log_filepath.symlink_to(target_filepath)
+
+		with pytest.raises(SystemExit) as error:
+			await init_command.run_main(SimpleNamespace(
+				command='init',
+				directory=output_directory,
+				config=output_directory / 'config.ini'))
+
+		assert 1 == error.value.code
+		captured = capsys.readouterr()
+		assert 'Sakuya initialization failed.' in captured.out
+		assert 'Detailed log:' not in captured.out
+		assert 'do not change' == target_filepath.read_text(encoding='utf8')
+		assert original_mode == stat.S_IMODE(target_filepath.stat().st_mode)
 
 
 async def test_init_rejects_duplicate_output_paths():
