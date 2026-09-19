@@ -1,7 +1,7 @@
 from enum import IntFlag
 from functools import reduce
 
-NODE_ROLES = ('dual', 'peer', 'light')
+NODE_ROLES = ('light', 'dual', 'peer')
 
 
 class NodeFeatures(IntFlag):

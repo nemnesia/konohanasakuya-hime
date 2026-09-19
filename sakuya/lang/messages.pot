@@ -13,7 +13,7 @@ msgid "argument-help-ca-key-path"
 msgstr ""
 
 #: sakuya/commands/announce_transaction.py:81 sakuya/commands/health.py:83
-#: sakuya/commands/init.py:70 sakuya/commands/min_cosignatures_count.py:34
+#: sakuya/commands/init.py:438 sakuya/commands/min_cosignatures_count.py:34
 #: sakuya/commands/pemview.py:41 sakuya/commands/renew_certificates.py:53
 #: sakuya/commands/renew_voting_keys.py:218 sakuya/commands/reset_data.py:112
 #: sakuya/commands/setup.py:220 sakuya/commands/signer.py:92
@@ -76,7 +76,7 @@ msgstr ""
 msgid "argument-help-setup-overrides"
 msgstr ""
 
-#: sakuya/commands/init.py:69
+#: sakuya/commands/init.py:433
 msgid "argument-help-setup-package"
 msgstr ""
 
@@ -111,7 +111,7 @@ msgstr ""
 msgid "general-connecting-to-node"
 msgstr ""
 
-#: sakuya/commands/init.py:55 sakuya/internal/Preparer.py:206
+#: sakuya/commands/init.py:342 sakuya/internal/Preparer.py:206
 #: sakuya/internal/VoterConfigurator.py:55
 msgid "general-copying-file"
 msgstr ""
@@ -225,6 +225,154 @@ msgstr ""
 
 #: sakuya/healthagents/websockets.py:43
 msgid "health-websockets-timed-out"
+msgstr ""
+
+#: sakuya/commands/init.py:363
+msgid "init-cancelled"
+msgstr ""
+
+#: sakuya/commands/init.py:425
+msgid "init-created-file"
+msgstr ""
+
+#: sakuya/commands/init.py:419
+msgid "init-failed"
+msgstr ""
+
+#: sakuya/commands/init.py:417
+msgid "init-failure-detail"
+msgstr ""
+
+#: sakuya/commands/init.py:428
+msgid "init-log-file"
+msgstr ""
+
+#: sakuya/commands/init.py:366
+msgid "init-start"
+msgstr ""
+
+#: sakuya/commands/init.py:426
+msgid "init-success"
+msgstr ""
+
+#: sakuya/commands/init.py:205
+msgid "init-wizard-cancel"
+msgstr ""
+
+#: sakuya/commands/init.py:174
+msgid "init-wizard-choice-error"
+msgstr ""
+
+#: sakuya/commands/init.py:194
+msgid "init-wizard-confirmation"
+msgstr ""
+
+#: sakuya/commands/init.py:261
+msgid "init-wizard-friendly-default"
+msgstr ""
+
+#: sakuya/commands/init.py:260
+msgid "init-wizard-friendly-instruction"
+msgstr ""
+
+#: sakuya/commands/init.py:262
+msgid "init-wizard-friendly-prompt"
+msgstr ""
+
+#: sakuya/commands/init.py:188
+msgid "init-wizard-host-error"
+msgstr ""
+
+#: sakuya/commands/init.py:183
+msgid "init-wizard-host-examples"
+msgstr ""
+
+#: sakuya/commands/init.py:182
+msgid "init-wizard-host-instruction"
+msgstr ""
+
+#: sakuya/commands/init.py:184
+msgid "init-wizard-host-prompt"
+msgstr ""
+
+#: sakuya/commands/init.py:202
+msgid "init-wizard-intro"
+msgstr ""
+
+#: sakuya/commands/init.py:204
+msgid "init-wizard-metadata"
+msgstr ""
+
+#: sakuya/commands/init.py:249
+msgid "init-wizard-network-instruction"
+msgstr ""
+
+#: sakuya/commands/init.py:203
+msgid "init-wizard-output-files"
+msgstr ""
+
+#: sakuya/commands/init.py:56
+msgid "init-wizard-role-dual-description"
+msgstr ""
+
+#: sakuya/commands/init.py:254
+msgid "init-wizard-role-instruction"
+msgstr ""
+
+#: sakuya/commands/init.py:55
+msgid "init-wizard-role-light-description"
+msgstr ""
+
+#: sakuya/commands/init.py:57
+msgid "init-wizard-role-peer-description"
+msgstr ""
+
+#: sakuya/commands/init.py:166
+msgid "init-wizard-selection-prompt"
+msgstr ""
+
+#: sakuya/commands/init.py:259
+msgid "init-wizard-step-friendly"
+msgstr ""
+
+#: sakuya/commands/init.py:181
+msgid "init-wizard-step-host"
+msgstr ""
+
+#: sakuya/commands/init.py:247
+msgid "init-wizard-step-network"
+msgstr ""
+
+#: sakuya/commands/init.py:252
+msgid "init-wizard-step-role"
+msgstr ""
+
+#: sakuya/commands/init.py:278
+msgid "init-wizard-summary-friendly"
+msgstr ""
+
+#: sakuya/commands/init.py:277
+msgid "init-wizard-summary-host"
+msgstr ""
+
+#: sakuya/commands/init.py:279
+msgid "init-wizard-summary-metadata"
+msgstr ""
+
+#: sakuya/commands/init.py:275
+msgid "init-wizard-summary-network"
+msgstr ""
+
+#: sakuya/commands/init.py:276
+msgid "init-wizard-summary-role"
+msgstr ""
+
+#: sakuya/commands/init.py:274
+msgid "init-wizard-summary-title"
+msgstr ""
+
+#: sakuya/commands/init.py:201
+msgid "init-wizard-title"
 msgstr ""
 
 #: sakuya/__main__.py:24
@@ -615,23 +763,11 @@ msgstr ""
 msgid "wizard-node-settings-token-metadata"
 msgstr ""
 
-#: sakuya/wizard/screens/node_type.py:25
-msgid "wizard-node-type-dual"
-msgstr ""
-
-#: sakuya/wizard/screens/node_type.py:27
-msgid "wizard-node-type-light"
-msgstr ""
-
-#: sakuya/wizard/screens/node_type.py:26
-msgid "wizard-node-type-peer"
-msgstr ""
-
-#: sakuya/wizard/screens/node_type.py:34
+#: sakuya/wizard/screens/node_type.py:31
 msgid "wizard-node-type-title"
 msgstr ""
 
-#: sakuya/wizard/screens/node_type.py:16
+#: sakuya/wizard/screens/node_type.py:17
 msgid "wizard-node-type-token"
 msgstr ""
 

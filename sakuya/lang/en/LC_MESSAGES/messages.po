@@ -21,7 +21,7 @@ msgid "argument-help-ca-key-path"
 msgstr "path to main private key PEM file"
 
 #: sakuya/commands/announce_transaction.py:81 sakuya/commands/health.py:83
-#: sakuya/commands/init.py:70 sakuya/commands/min_cosignatures_count.py:34
+#: sakuya/commands/init.py:438 sakuya/commands/min_cosignatures_count.py:34
 #: sakuya/commands/pemview.py:41 sakuya/commands/renew_certificates.py:53
 #: sakuya/commands/renew_voting_keys.py:218 sakuya/commands/reset_data.py:112
 #: sakuya/commands/setup.py:220 sakuya/commands/signer.py:92
@@ -86,7 +86,7 @@ msgstr "only output linking transaction from a previous setup"
 msgid "argument-help-setup-overrides"
 msgstr "path to custom user settings"
 
-#: sakuya/commands/init.py:69
+#: sakuya/commands/init.py:433
 msgid "argument-help-setup-package"
 msgstr ""
 "Network configuration package. Possible values: (name | file:///filename "
@@ -123,7 +123,7 @@ msgstr "downloaded file ({descriptor_name}) has invalid hash"
 msgid "general-connecting-to-node"
 msgstr "connecting to {endpoint}"
 
-#: sakuya/commands/init.py:55 sakuya/internal/Preparer.py:206
+#: sakuya/commands/init.py:342 sakuya/internal/Preparer.py:206
 #: sakuya/internal/VoterConfigurator.py:55
 msgid "general-copying-file"
 msgstr "copying FILE {source_path} into {destination_path}"
@@ -244,6 +244,156 @@ msgid "health-websockets-timed-out"
 msgstr ""
 "timeout when waiting for a block, this might indicate a problem between "
 "broker <-> REST"
+
+#: sakuya/commands/init.py:363
+msgid "init-cancelled"
+msgstr "Sakuya initialization cancelled."
+
+#: sakuya/commands/init.py:425
+msgid "init-created-file"
+msgstr "Created: {filepath}"
+
+#: sakuya/commands/init.py:419
+msgid "init-failed"
+msgstr "Sakuya initialization failed: {reason}"
+
+#: sakuya/commands/init.py:417
+msgid "init-failure-detail"
+msgstr "Initialization failed: {reason}"
+
+#: sakuya/commands/init.py:428
+msgid "init-log-file"
+msgstr "Detailed log: {filepath}"
+
+#: sakuya/commands/init.py:366
+msgid "init-start"
+msgstr "Initializing Sakuya..."
+
+#: sakuya/commands/init.py:426
+msgid "init-success"
+msgstr "Sakuya initialization completed."
+
+#: sakuya/commands/init.py:205
+msgid "init-wizard-cancel"
+msgstr "Press Ctrl-C at any prompt to cancel."
+
+#: sakuya/commands/init.py:174
+msgid "init-wizard-choice-error"
+msgstr "Please choose a number from 1 to {count}."
+
+#: sakuya/commands/init.py:194
+msgid "init-wizard-confirmation"
+msgstr "Create this configuration? [Y/n]: "
+
+#: sakuya/commands/init.py:261
+msgid "init-wizard-friendly-default"
+msgstr "Press Enter to use the host ({hostname})."
+
+#: sakuya/commands/init.py:260
+msgid "init-wizard-friendly-instruction"
+msgstr "Enter a short name shown when identifying this node."
+
+#: sakuya/commands/init.py:262
+msgid "init-wizard-friendly-prompt"
+msgstr "Friendly name [{hostname}]"
+
+#: sakuya/commands/init.py:188
+msgid "init-wizard-host-error"
+msgstr "A valid hostname or IP address is required."
+
+#: sakuya/commands/init.py:183
+msgid "init-wizard-host-examples"
+msgstr "Examples: node.example.com, 203.0.113.10, 2001:db8::10"
+
+#: sakuya/commands/init.py:182
+msgid "init-wizard-host-instruction"
+msgstr "Enter the hostname or IP address used by this node."
+
+#: sakuya/commands/init.py:184
+msgid "init-wizard-host-prompt"
+msgstr "Host (hostname or IP address):"
+
+#: sakuya/commands/init.py:202
+msgid "init-wizard-intro"
+msgstr "This wizard will create the initial Sakuya configuration."
+
+#: sakuya/commands/init.py:204
+msgid "init-wizard-metadata"
+msgstr "You can edit rest_overrides.json after initialization."
+
+#: sakuya/commands/init.py:249
+msgid "init-wizard-network-instruction"
+msgstr "Choose the network configuration package for this node."
+
+#: sakuya/commands/init.py:203
+msgid "init-wizard-output-files"
+msgstr ""
+"The generated files are config.ini, overrides.ini, and "
+"rest_overrides.json."
+
+#: sakuya/commands/init.py:56
+msgid "init-wizard-role-dual-description"
+msgstr "Choose this if you want to contribute to application development."
+
+#: sakuya/commands/init.py:254
+msgid "init-wizard-role-instruction"
+msgstr "Choose the capabilities this node should provide."
+
+#: sakuya/commands/init.py:55
+msgid "init-wizard-role-light-description"
+msgstr "Recommended for typical use."
+
+#: sakuya/commands/init.py:57
+msgid "init-wizard-role-peer-description"
+msgstr "Choose this for a peer-only node."
+
+#: sakuya/commands/init.py:166
+msgid "init-wizard-selection-prompt"
+msgstr "Selection"
+
+#: sakuya/commands/init.py:259
+msgid "init-wizard-step-friendly"
+msgstr "Step 4 of 4: Friendly name"
+
+#: sakuya/commands/init.py:181
+msgid "init-wizard-step-host"
+msgstr "Step 3 of 4: Host"
+
+#: sakuya/commands/init.py:247
+msgid "init-wizard-step-network"
+msgstr "Step 1 of 4: Network"
+
+#: sakuya/commands/init.py:252
+msgid "init-wizard-step-role"
+msgstr "Step 2 of 4: Node role"
+
+#: sakuya/commands/init.py:278
+msgid "init-wizard-summary-friendly"
+msgstr "Friendly name"
+
+#: sakuya/commands/init.py:277
+msgid "init-wizard-summary-host"
+msgstr "Hostname"
+
+#: sakuya/commands/init.py:279
+msgid "init-wizard-summary-metadata"
+msgstr "Metadata: edit rest_overrides.json after initialization"
+
+#: sakuya/commands/init.py:275
+msgid "init-wizard-summary-network"
+msgstr "Network"
+
+#: sakuya/commands/init.py:276
+msgid "init-wizard-summary-role"
+msgstr "Role"
+
+#: sakuya/commands/init.py:274
+msgid "init-wizard-summary-title"
+msgstr "Configuration summary"
+
+#: sakuya/commands/init.py:201
+msgid "init-wizard-title"
+msgstr "Sakuya initialization"
 
 #: sakuya/__main__.py:24
 msgid "main-announce-transaction-help"
@@ -641,23 +791,11 @@ msgstr "https"
 msgid "wizard-node-settings-token-metadata"
 msgstr "metadata"
 
-#: sakuya/wizard/screens/node_type.py:25
-msgid "wizard-node-type-dual"
-msgstr "Dual (peer + api) node"
-
-#: sakuya/wizard/screens/node_type.py:27
-msgid "wizard-node-type-light"
-msgstr "Light node"
-
-#: sakuya/wizard/screens/node_type.py:26
-msgid "wizard-node-type-peer"
-msgstr "Peer node"
-
-#: sakuya/wizard/screens/node_type.py:34
+#: sakuya/wizard/screens/node_type.py:31
 msgid "wizard-node-type-title"
 msgstr "Choose node type"
 
-#: sakuya/wizard/screens/node_type.py:16
+#: sakuya/wizard/screens/node_type.py:17
 msgid "wizard-node-type-token"
 msgstr "node type"
 
@@ -915,3 +1053,11 @@ msgstr "upgrade"
 #~ msgid "wizard-welcome-import-bootstrap"
 #~ msgstr "setup from bootstrap"
 
+#~ msgid "wizard-node-type-dual"
+#~ msgstr "Dual (peer + api) node"
+
+#~ msgid "wizard-node-type-light"
+#~ msgstr "Light node"
+
+#~ msgid "wizard-node-type-peer"
+#~ msgstr "Peer node"

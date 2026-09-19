@@ -19,7 +19,7 @@ msgid "argument-help-ca-key-path"
 msgstr "メイン秘密鍵PEMファイルへのパス"
 
 #: sakuya/commands/announce_transaction.py:81 sakuya/commands/health.py:83
-#: sakuya/commands/init.py:70 sakuya/commands/min_cosignatures_count.py:34
+#: sakuya/commands/init.py:438 sakuya/commands/min_cosignatures_count.py:34
 #: sakuya/commands/pemview.py:41 sakuya/commands/renew_certificates.py:53
 #: sakuya/commands/renew_voting_keys.py:218 sakuya/commands/reset_data.py:112
 #: sakuya/commands/setup.py:220 sakuya/commands/signer.py:92
@@ -82,7 +82,7 @@ msgstr "リンクトランザクションのみを再生成する"
 msgid "argument-help-setup-overrides"
 msgstr "カスタムユーザー設定ファイルへのパス"
 
-#: sakuya/commands/init.py:69
+#: sakuya/commands/init.py:433
 msgid "argument-help-setup-package"
 msgstr ""
 "ネットワーク構成パッケージ。可能な値：（name | file:///filename | "
@@ -119,7 +119,7 @@ msgstr "ダウンロードされたファイル ({descriptor_name}) に無効な
 msgid "general-connecting-to-node"
 msgstr "ノード {endpoint} へ接続中"
 
-#: sakuya/commands/init.py:55 sakuya/internal/Preparer.py:206
+#: sakuya/commands/init.py:342 sakuya/internal/Preparer.py:206
 #: sakuya/internal/VoterConfigurator.py:55
 msgid "general-copying-file"
 msgstr "ファイル {source_path} を {destination_path} へコピー中"
@@ -236,6 +236,154 @@ msgstr "メッセージを受信しましたが、トピック '{topic}' が間�
 #: sakuya/healthagents/websockets.py:43
 msgid "health-websockets-timed-out"
 msgstr "ブロックを待機中にタイムアウトしました。これは、broker <-> REST の間に問題があることを示している可能性があります"
+
+#: sakuya/commands/init.py:363
+msgid "init-cancelled"
+msgstr "Sakuyaの初期設定をキャンセルしました。"
+
+#: sakuya/commands/init.py:425
+msgid "init-created-file"
+msgstr "作成しました: {filepath}"
+
+#: sakuya/commands/init.py:419
+msgid "init-failed"
+msgstr "Sakuyaの初期設定に失敗しました: {reason}"
+
+#: sakuya/commands/init.py:417
+msgid "init-failure-detail"
+msgstr "初期設定に失敗しました: {reason}"
+
+#: sakuya/commands/init.py:428
+msgid "init-log-file"
+msgstr "詳細ログ: {filepath}"
+
+#: sakuya/commands/init.py:366
+msgid "init-start"
+msgstr "Sakuyaを初期化しています..."
+
+#: sakuya/commands/init.py:426
+msgid "init-success"
+msgstr "Sakuyaの初期設定が完了しました。"
+
+#: sakuya/commands/init.py:205
+msgid "init-wizard-cancel"
+msgstr "各入力でCtrl-Cを押すとキャンセルできます。"
+
+#: sakuya/commands/init.py:174
+msgid "init-wizard-choice-error"
+msgstr "1から{count}までの番号を選択してください。"
+
+#: sakuya/commands/init.py:194
+msgid "init-wizard-confirmation"
+msgstr "この設定を作成しますか？ [Y/n]: "
+
+#: sakuya/commands/init.py:261
+msgid "init-wizard-friendly-default"
+msgstr "Enterだけを押すとホスト名を使用します（{hostname}）。"
+
+#: sakuya/commands/init.py:260
+msgid "init-wizard-friendly-instruction"
+msgstr "このノードを識別するときに表示する短い名前を入力してください。"
+
+#: sakuya/commands/init.py:262
+msgid "init-wizard-friendly-prompt"
+msgstr "フレンドリーネーム [{hostname}]"
+
+#: sakuya/commands/init.py:188
+msgid "init-wizard-host-error"
+msgstr "有効なホスト名またはIPアドレスを入力してください。"
+
+#: sakuya/commands/init.py:183
+msgid "init-wizard-host-examples"
+msgstr "例: node.example.com、203.0.113.10、2001:db8::10"
+
+#: sakuya/commands/init.py:182
+msgid "init-wizard-host-instruction"
+msgstr "このノードで使用するホスト名またはIPアドレスを入力してください。"
+
+#: sakuya/commands/init.py:184
+msgid "init-wizard-host-prompt"
+msgstr "ホスト（ホスト名またはIPアドレス）:"
+
+#: sakuya/commands/init.py:202
+msgid "init-wizard-intro"
+msgstr "このウィザードでSakuyaの初期設定を作成します。"
+
+#: sakuya/commands/init.py:204
+msgid "init-wizard-metadata"
+msgstr "初期化後にrest_overrides.jsonを編集できます。"
+
+#: sakuya/commands/init.py:249
+msgid "init-wizard-network-instruction"
+msgstr "このノードで使用するネットワーク構成パッケージを選択してください。"
+
+#: sakuya/commands/init.py:203
+msgid "init-wizard-output-files"
+msgstr "次のファイルが生成されます: config.ini、overrides.ini、rest_overrides.json。"
+
+#: sakuya/commands/init.py:56
+msgid "init-wizard-role-dual-description"
+msgstr "アプリ開発への貢献など、APIも提供したい場合に選択します。"
+
+#: sakuya/commands/init.py:254
+msgid "init-wizard-role-instruction"
+msgstr "このノードに持たせる機能を選択してください。"
+
+#: sakuya/commands/init.py:55
+msgid "init-wizard-role-light-description"
+msgstr "通常利用ではこちらを推奨します。"
+
+#: sakuya/commands/init.py:57
+msgid "init-wizard-role-peer-description"
+msgstr "Peer専用ノードとして使用する場合に選択します。"
+
+#: sakuya/commands/init.py:166
+msgid "init-wizard-selection-prompt"
+msgstr "選択"
+
+#: sakuya/commands/init.py:259
+msgid "init-wizard-step-friendly"
+msgstr "ステップ4/4: フレンドリーネーム"
+
+#: sakuya/commands/init.py:181
+msgid "init-wizard-step-host"
+msgstr "ステップ3/4: ホスト"
+
+#: sakuya/commands/init.py:247
+msgid "init-wizard-step-network"
+msgstr "ステップ1/4: ネットワーク"
+
+#: sakuya/commands/init.py:252
+msgid "init-wizard-step-role"
+msgstr "ステップ2/4: ノードロール"
+
+#: sakuya/commands/init.py:278
+msgid "init-wizard-summary-friendly"
+msgstr "フレンドリーネーム"
+
+#: sakuya/commands/init.py:277
+msgid "init-wizard-summary-host"
+msgstr "ホスト名"
+
+#: sakuya/commands/init.py:279
+msgid "init-wizard-summary-metadata"
+msgstr "メタデータ: 初期化後にrest_overrides.jsonを編集してください"
+
+#: sakuya/commands/init.py:275
+msgid "init-wizard-summary-network"
+msgstr "ネットワーク"
+
+#: sakuya/commands/init.py:276
+msgid "init-wizard-summary-role"
+msgstr "ロール"
+
+#: sakuya/commands/init.py:274
+msgid "init-wizard-summary-title"
+msgstr "設定概要"
+
+#: sakuya/commands/init.py:201
+msgid "init-wizard-title"
+msgstr "Sakuyaの初期設定"
 
 #: sakuya/__main__.py:24
 msgid "main-announce-transaction-help"
@@ -625,23 +773,11 @@ msgstr "https"
 msgid "wizard-node-settings-token-metadata"
 msgstr "メタデータ"
 
-#: sakuya/wizard/screens/node_type.py:25
-msgid "wizard-node-type-dual"
-msgstr "デュアル（ピア + API）ノード"
-
-#: sakuya/wizard/screens/node_type.py:27
-msgid "wizard-node-type-light"
-msgstr "ライトノード"
-
-#: sakuya/wizard/screens/node_type.py:26
-msgid "wizard-node-type-peer"
-msgstr "ピアノード"
-
-#: sakuya/wizard/screens/node_type.py:34
+#: sakuya/wizard/screens/node_type.py:31
 msgid "wizard-node-type-title"
 msgstr "ノードタイプを選択"
 
-#: sakuya/wizard/screens/node_type.py:16
+#: sakuya/wizard/screens/node_type.py:17
 msgid "wizard-node-type-token"
 msgstr "ノードタイプ"
 
@@ -895,3 +1031,11 @@ msgstr "アップグレード"
 #~ msgid "wizard-welcome-import-bootstrap"
 #~ msgstr "bootstrapからインポート"
 
+#~ msgid "wizard-node-type-dual"
+#~ msgstr "デュアル（ピア + API）ノード"
+
+#~ msgid "wizard-node-type-light"
+#~ msgstr "ライトノード"
+
+#~ msgid "wizard-node-type-peer"
+#~ msgstr "ピアノード"
