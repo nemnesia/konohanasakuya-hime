@@ -17,7 +17,7 @@ from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.PackageResolver import download_and_extract_package as real_download_and_extract_package
 
 from ..test.CertificateTestUtils import assert_certificate_properties
-from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration, prepare_sakuya_setup_configuration
 from ..test.FileSystemTestUtils import assert_expected_files_and_permissions
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 from ..test.TestPackager import prepare_testnet_package
@@ -139,6 +139,12 @@ STATE_CHANGE_OUTPUT_FILES = {
 	'linking_transaction.dat': 0o600
 }
 
+SETUP_STATE_OUTPUT_FILES = {
+	'cli.log': 0o600,
+	'.sakuya': 0o755,
+	'.sakuya/setup-complete': 0o400
+}
+
 # endregion
 
 
@@ -175,11 +181,10 @@ async def _assert_can_prepare_node(
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			ca_password = 'abcd' if CaMode.WITH_PASSWORD == ca_mode else ''
-			prepare_sakuya_configuration(
+			prepare_sakuya_setup_configuration(
 				package_directory,
 				node_features,
 				server.make_url(''),
-				include_init_files=True,
 				ca_password=ca_password,
 				api_https=api_https,
 				ca_common_name='my CA CN',
@@ -206,9 +211,7 @@ async def _assert_can_prepare_node(
 				# Assert: spot check all expected output files and permissions
 				assert_expected_files_and_permissions(output_directory, {
 					**expected_output_files,
-					'cli.log': 0o600,
-					'.sakuya': 0o755,
-					'.sakuya/setup-complete': 0o400
+					**SETUP_STATE_OUTPUT_FILES
 				})
 				assert (Path(output_directory) / '.sakuya' / 'setup-complete').is_file()
 
@@ -311,9 +314,7 @@ async def test_can_prepare_node_with_relative_output_directory(server):  # pylin
 				# Assert: spot check all expected output files and permissions
 				assert_expected_files_and_permissions(output_directory, {
 					**PEER_OUTPUT_FILES,
-					'cli.log': 0o600,
-					'.sakuya': 0o755,
-					'.sakuya/setup-complete': 0o400
+					**SETUP_STATE_OUTPUT_FILES
 				})
 
 				# - spot check all expected CA files are present
@@ -507,62 +508,6 @@ async def test_cannot_rerun_setup_when_directory_exists(server):  # pylint: disa
 # endregion
 
 
-# region output-transaction-only
-
-def _read_file_contents(filepath):
-	with open(filepath, 'rb') as infile:
-		return infile.read()
-
-
-async def _assert_can_regenerate_links(server, node_features):  # pylint: disable=redefined-outer-name
-	# Arrange:
-	with tempfile.TemporaryDirectory() as output_directory:
-		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), include_init_files=True, api_https=False)
-			_prepare_overrides(package_directory)
-			prepare_testnet_package(package_directory, 'resources.zip')
-
-			with tempfile.TemporaryDirectory() as ca_directory:
-				# - run initial setup
-				setup_command_args = [
-					'--directory', output_directory,
-					'setup',
-					'--config', str(Path(package_directory) / 'sai.shoestring.ini'),
-					'--ca-key-path', str(Path(ca_directory) / 'xyz.key.pem'),
-					'--overrides', str(Path(package_directory) / 'user_overrides.ini')
-				]
-				await main(setup_command_args)
-
-				# - read (and delete) generated transaction
-				transaction_filepath = Path(output_directory) / 'linking_transaction.dat'
-				original_transaction = _read_file_contents(transaction_filepath)
-				transaction_filepath.unlink()
-
-				# Sanity:
-				assert not transaction_filepath.exists()
-
-				# Act: rerun with --output-transaction-only
-				await main(setup_command_args + ['--output-transaction-only'])
-
-				# Assert: same transaction was generated
-				assert transaction_filepath.exists()
-
-				regenerated_transaction = _read_file_contents(transaction_filepath)
-				assert original_transaction == regenerated_transaction
-
-
-async def test_can_regenerate_links_harvester_node(server):  # pylint: disable=redefined-outer-name
-	await _assert_can_regenerate_links(server, NodeFeatures.HARVESTER)
-
-
-async def test_can_regenerate_links_voter_node(server):  # pylint: disable=redefined-outer-name
-	await _assert_can_regenerate_links(server, NodeFeatures.VOTER)
-
-
-async def test_can_regenerate_links_full_node(server):  # pylint: disable=redefined-outer-name
-	await _assert_can_regenerate_links(server, NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER)
-
-
 async def test_linking_transaction_rejects_imported_harvesting_keys_that_do_not_match(monkeypatch, tmp_path):
 	preparer = SimpleNamespace(
 		config=SimpleNamespace(network=SimpleNamespace(name='testnet')),
@@ -622,7 +567,6 @@ async def test_initial_setup_rejects_symbolic_link_ca_key(tmp_path):
 		await setup_command._run_initial_setup_atomically(SimpleNamespace(
 			directory=output_directory,
 			ca_key_path=ca_key_path,
-			output_transaction_only=False,
 			command='setup'))
 
 
@@ -644,7 +588,6 @@ async def test_initial_setup_removes_published_ca_key_when_commit_fails(monkeypa
 		await setup_command._run_initial_setup_atomically(SimpleNamespace(
 			directory=output_directory,
 			ca_key_path=ca_key_path,
-			output_transaction_only=False,
 			command='setup'))
 
 	assert not ca_key_path.exists()
@@ -671,7 +614,6 @@ async def test_initial_setup_publishes_ca_key_in_output_directory(monkeypatch, t
 	await setup_command._run_initial_setup_atomically(SimpleNamespace(
 		directory=output_directory,
 		ca_key_path=ca_key_path,
-		output_transaction_only=False,
 		command='setup'))
 
 	assert ca_key_path.read_text(encoding='utf8') == 'generated'
@@ -690,7 +632,6 @@ async def test_initial_setup_publishes_completion_marker(monkeypatch, tmp_path):
 	await setup_command._run_initial_setup_atomically(SimpleNamespace(
 		directory=output_directory,
 		ca_key_path=ca_key_path,
-		output_transaction_only=False,
 		command='setup'))
 
 	assert (output_directory / '.sakuya' / 'setup-complete').is_file()
@@ -707,8 +648,7 @@ async def test_setup_requires_init_before_starting(monkeypatch, tmp_path, capsys
 	args = SimpleNamespace(
 		command='setup',
 		directory=tmp_path,
-		config=tmp_path / 'config.ini',
-		output_transaction_only=False)
+		config=tmp_path / 'config.ini')
 
 	with pytest.raises(SystemExit) as ex_info:
 		await setup_command.run_main(args)
@@ -735,8 +675,7 @@ async def test_cli_setup_shows_user_summary_and_writes_detailed_log(monkeypatch,
 		config=config_directory / 'config.ini',
 		overrides=config_directory / 'overrides.ini',
 		rest_overrides=config_directory / 'rest_overrides.json',
-		ca_key_path=output_directory / 'ca.key.pem',
-		output_transaction_only=False))
+		ca_key_path=output_directory / 'ca.key.pem'))
 
 	captured = capsys.readouterr()
 	assert 'Setting up Sakuya...' in captured.out
@@ -766,12 +705,12 @@ async def test_cli_setup_hides_failure_details_from_console_and_logs_them(monkey
 			config=config_directory / 'config.ini',
 			overrides=config_directory / 'overrides.ini',
 			rest_overrides=config_directory / 'rest_overrides.json',
-			ca_key_path=output_directory / 'ca.key.pem',
-			output_transaction_only=False))
+			ca_key_path=output_directory / 'ca.key.pem'))
 
 	assert 1 == ex_info.value.code
 	captured = capsys.readouterr()
-	assert 'Error: setup failed: expected setup failure' in captured.out
+	assert 'Error: setup failed.' in captured.out
+	assert 'expected setup failure' not in captured.out
 	assert 'Detailed log:' in captured.out
 	assert 'Traceback' not in captured.out
 	log_contents = (output_directory / 'cli.log').read_text(encoding='utf8')
@@ -803,8 +742,7 @@ async def test_setup_rejects_second_run_without_changing_files(tmp_path, capsys)
 			config=config_directory / 'config.ini',
 			overrides=config_directory / 'overrides.ini',
 			rest_overrides=config_directory / 'rest_overrides.json',
-			ca_key_path=ca_key_path,
-			output_transaction_only=False))
+			ca_key_path=ca_key_path))
 
 	assert 1 == ex_info.value.code
 	assert original_marker == (output_directory / '.sakuya' / 'setup-complete').read_bytes()
@@ -829,8 +767,7 @@ async def test_completed_setup_with_missing_ca_key_is_rejected_without_regenerat
 			config=config_directory / 'config.ini',
 			overrides=config_directory / 'overrides.ini',
 			rest_overrides=config_directory / 'rest_overrides.json',
-			ca_key_path=output_directory / 'ca.key.pem',
-			output_transaction_only=False))
+			ca_key_path=output_directory / 'ca.key.pem'))
 
 	assert 1 == ex_info.value.code
 	assert not (output_directory / 'ca.key.pem').exists()
@@ -855,8 +792,7 @@ async def test_run_setup_rejects_existing_resources_on_initial_setup(monkeypatch
 		await setup_command._run_setup(SimpleNamespace(
 			config=tmp_path / 'config.ini',
 			directory=tmp_path,
-			command='setup',
-			output_transaction_only=False))
+			command='setup'))
 
 	assert 1 == ex_info.value.code
 

@@ -73,13 +73,14 @@ python3 -m sakuya --directory /srv/symbol setup
 
 `setup` and `upgrade` resolve the package from `config.ini`; they do not take
 a package option. Setup generation is staged and published only after it
-completes successfully. The generated linking transaction is written to the
+completes successfully. `setup` is a one-time command and is rejected after a
+successful completion. The generated linking transaction is written to the
 root and can be signed and announced separately.
 
-To generate only the setup transaction:
+To regenerate only the linking transaction from an existing setup:
 
 ```sh
-python3 -m sakuya --directory /srv/symbol setup --output-transaction-only
+python3 -m sakuya --directory /srv/symbol generate-linking-transaction
 ```
 
 ## Commands
@@ -89,6 +90,7 @@ The available commands are:
 ```text
 init
 setup
+generate-linking-transaction
 upgrade
 signer
 announce-transaction

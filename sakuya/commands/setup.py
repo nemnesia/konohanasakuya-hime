@@ -15,7 +15,7 @@ from sakuya.internal.ConfigurationManager import ConfigurationManager, load_patc
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.NodewatchClient import get_current_finalization_epoch
 from sakuya.internal.PackageResolver import download_and_extract_package, resolve_package_identifier
-from sakuya.internal.PeerDownloader import download_peers, find_api_node
+from sakuya.internal.PeerDownloader import download_peers
 from sakuya.internal.PemUtils import read_public_key_from_public_key_pem_file
 from sakuya.internal.Preparer import Preparer
 from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
@@ -25,6 +25,10 @@ from sakuya.internal.VoterConfigurator import inspect_voting_key_files
 _SETUP_STATE_DIRECTORY = '.sakuya'
 _SETUP_COMPLETE_MARKER = 'setup-complete'
 _INIT_MANAGED_FILENAMES = ('overrides.ini', 'rest_overrides.json')
+
+
+class _SetupUserError(RuntimeError):
+	"""利用者にそのまま表示してよい setup の事前検証エラー。"""
 
 
 def _setup_complete_marker(output_directory):
@@ -44,7 +48,7 @@ def _require_initialization(args):
 	"""生成物を変更する前に init 済みであることを確認する。"""
 
 	if not all(filepath.is_file() for filepath in _initialization_files(args)):
-		raise RuntimeError(_('setup-initialization-required'))
+		raise _SetupUserError(_('setup-initialization-required'))
 
 
 def _check_setup_state(output_directory, ca_key_path):
@@ -53,15 +57,28 @@ def _check_setup_state(output_directory, ca_key_path):
 	state_directory = output_directory / _SETUP_STATE_DIRECTORY
 	marker = _setup_complete_marker(output_directory)
 	if state_directory.is_symlink() or (state_directory.exists() and not state_directory.is_dir()):
-		raise RuntimeError(_('setup-state-inconsistent'))
+		raise _SetupUserError(_('setup-state-inconsistent'))
 
-	if marker.is_symlink():
-		raise RuntimeError(_('setup-state-inconsistent'))
+	if marker.is_symlink() or (marker.exists() and not marker.is_file()):
+		raise _SetupUserError(_('setup-state-inconsistent'))
 
 	if marker.exists():
 		if ca_key_path.is_symlink() or not ca_key_path.is_file():
-			raise RuntimeError(_('setup-state-missing-ca-key'))
-		raise RuntimeError(_('setup-already-completed'))
+			raise _SetupUserError(_('setup-state-missing-ca-key'))
+		raise _SetupUserError(_('setup-already-completed'))
+
+
+def _require_setup_completed(output_directory):
+	"""既存 setup の生成物を使う処理の開始前に完了状態を確認する。"""
+
+	state_directory = output_directory / _SETUP_STATE_DIRECTORY
+	marker = _setup_complete_marker(output_directory)
+	if state_directory.is_symlink() or (state_directory.exists() and not state_directory.is_dir()):
+		raise _SetupUserError(_('setup-state-inconsistent'))
+	if marker.is_symlink() or (marker.exists() and not marker.is_file()):
+		raise _SetupUserError(_('setup-state-inconsistent'))
+	if not marker.is_file():
+		raise _SetupUserError(_('setup-not-completed'))
 
 
 def _write_setup_complete_marker(staged_directory):
@@ -166,40 +183,34 @@ async def _run_setup_with_cli_logging(args):
 
 	try:
 		_require_initialization(args)
-		if not args.output_transaction_only:
-			_check_setup_state(Path(args.directory).absolute(), Path(args.ca_key_path).absolute())
-	except Exception as ex:
-		message = str(ex) or _('setup-failed')
-		print(message)
+		_check_setup_state(Path(args.directory).absolute(), Path(args.ca_key_path).absolute())
+	except _SetupUserError as ex:
+		print(str(ex))
+		raise SystemExit(1) from None
+	except Exception:
+		print(_('setup-failed'))
 		raise SystemExit(1) from None
 
 	try:
 		with _init_logging(args) as active_log_filepath:
 			print(_('setup-start'))
 			try:
-				if args.output_transaction_only:
-					# transaction-only は既存の出力を読むため、一時出力への初期化を行わない。
-					await _run_setup(args)
-				else:
-					await _run_initial_setup_atomically(args)
+				await _run_initial_setup_atomically(args)
 			except SystemExit:
-				log.logger.exception(_('setup-failure-detail').format(reason=_('setup-failed')))
+				log.logger.exception(_('setup-failure-detail'))
 				print(_('setup-failed'))
 				print(_('init-log-file').format(filepath=active_log_filepath))
 				raise
-			except Exception as ex:
-				log.logger.exception(_('setup-failure-detail').format(reason=ex))
-				print(_('setup-failed-with-reason').format(reason=ex))
+			except Exception:
+				log.logger.exception(_('setup-failure-detail'))
+				print(_('setup-failed'))
 				print(_('init-log-file').format(filepath=active_log_filepath))
 				raise SystemExit(1) from None
 
 			print(_('setup-success'))
 			print(_('init-log-file').format(filepath=active_log_filepath))
-	except Exception as ex:
-		message = str(ex) or _('setup-failed')
-		if not message.startswith('Error:'):
-			message = _('setup-failed-with-reason').format(reason=message)
-		print(message)
+	except Exception:
+		print(_('setup-failed'))
 		raise SystemExit(1) from None
 
 
@@ -253,16 +264,6 @@ async def _run_setup(args):
 
 	config = parse_sakuya_configuration(args.config)
 	is_initial_setup = 'setup' == getattr(args, 'command', 'setup')
-
-	if is_initial_setup and args.output_transaction_only:
-		log.info(_('setup-status-output-transaction-only'))
-
-		api_endpoint = await find_api_node(config.services.nodewatch)
-		preparer = Preparer(Path(args.directory), config, log)
-		preparer.load_keys()
-
-		await _prepare_linking_transaction(preparer, api_endpoint)
-		return
 
 	with Preparer(Path(args.directory), config, log) as preparer:
 		if is_initial_setup and preparer.directories.resources.exists():
@@ -329,5 +330,4 @@ def add_arguments(parser, is_initial_setup=True):
 
 	if is_initial_setup:
 		parser.add_argument('--ca-key-path', help=_('argument-help-ca-key-path'))
-		parser.add_argument('--output-transaction-only', help=_('argument-help-setup-output-transaction-only'), action='store_true')
 		parser.set_defaults(func=run_main)

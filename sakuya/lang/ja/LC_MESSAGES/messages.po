@@ -13,16 +13,18 @@ msgid "argument-help-announce-transaction-transaction"
 msgstr "送信するシリアライズ済みトランザクションファイル"
 
 #: sakuya/commands/min_cosignatures_count.py:35
-#: sakuya/commands/renew_certificates.py:54 sakuya/commands/setup.py:225
+#: sakuya/commands/renew_certificates.py:54 sakuya/commands/setup.py:332
 #: sakuya/commands/signer.py:93
 msgid "argument-help-ca-key-path"
 msgstr "メイン秘密鍵PEMファイルへのパス"
 
-#: sakuya/commands/announce_transaction.py:81 sakuya/commands/health.py:83
-#: sakuya/commands/init.py:488 sakuya/commands/min_cosignatures_count.py:34
-#: sakuya/commands/pemview.py:41 sakuya/commands/renew_certificates.py:53
+#: sakuya/commands/announce_transaction.py:81
+#: sakuya/commands/generate_linking_transaction.py:26
+#: sakuya/commands/health.py:83 sakuya/commands/init.py:487
+#: sakuya/commands/min_cosignatures_count.py:34 sakuya/commands/pemview.py:41
+#: sakuya/commands/renew_certificates.py:53
 #: sakuya/commands/renew_voting_keys.py:218 sakuya/commands/reset_data.py:112
-#: sakuya/commands/setup.py:220 sakuya/commands/signer.py:92
+#: sakuya/commands/setup.py:327 sakuya/commands/signer.py:92
 msgid "argument-help-config"
 msgstr "Sakuya設定ファイルへのパス"
 
@@ -74,59 +76,19 @@ msgstr "Node Keyを更新"
 msgid "argument-help-reset-data-purge-harvesters"
 msgstr "harvesters.datファイルを削除"
 
-#: sakuya/commands/setup.py:226
-msgid "argument-help-setup-output-transaction-only"
-msgstr "リンクトランザクションのみを再生成する"
-
-#: sakuya/commands/setup.py:221
+#: sakuya/commands/setup.py:328
 msgid "argument-help-setup-overrides"
 msgstr "カスタムユーザー設定ファイルへのパス"
 
-#: sakuya/commands/init.py:483
+#: sakuya/commands/init.py:482
 msgid "argument-help-setup-package"
 msgstr ""
 "ネットワーク構成パッケージ。可能な値：（name | file:///filename | "
 "http(s)://uri）（デフォルト：mainnet）"
 
-#: sakuya/commands/setup.py:222
+#: sakuya/commands/setup.py:329
 msgid "argument-help-setup-rest-overrides"
 msgstr "カスタムユーザーREST設定へのパス（これはAPIロールにのみ有効）"
-
-#: sakuya/commands/setup.py
-msgid "setup-already-completed"
-msgstr "エラー: セットアップはすでに完了しています。既存のセットアップファイルは上書きから保護されています。"
-
-#: sakuya/commands/setup.py
-msgid "setup-failed"
-msgstr "エラー: セットアップに失敗しました。"
-
-#: sakuya/commands/setup.py
-msgid "setup-failed-with-reason"
-msgstr "エラー: セットアップに失敗しました: {reason}"
-
-#: sakuya/commands/setup.py
-msgid "setup-failure-detail"
-msgstr "セットアップに失敗しました: {reason}"
-
-#: sakuya/commands/setup.py
-msgid "setup-initialization-required"
-msgstr "エラー: 初期化が完了していません。\n先に `sakuya init` を実行してください。"
-
-#: sakuya/commands/setup.py
-msgid "setup-state-inconsistent"
-msgstr "エラー: セットアップ状態が不整合です。既存ファイルを上書きしません。"
-
-#: sakuya/commands/setup.py
-msgid "setup-state-missing-ca-key"
-msgstr "エラー: セットアップ状態が不整合です。CA鍵がありません。新しいCA鍵は自動生成しません。"
-
-#: sakuya/commands/setup.py
-msgid "setup-start"
-msgstr "Sakuyaをセットアップしています..."
-
-#: sakuya/commands/setup.py
-msgid "setup-success"
-msgstr "Sakuyaのセットアップが完了しました。"
 
 #: sakuya/commands/signer.py:95
 msgid "argument-help-signer-filename"
@@ -151,7 +113,7 @@ msgstr "ダウンロードされたファイル ({descriptor_name}) に無効な
 #: sakuya/commands/announce_transaction.py:59
 #: sakuya/commands/min_cosignatures_count.py:18
 #: sakuya/commands/renew_voting_keys.py:36
-#: sakuya/commands/renew_voting_keys.py:45 sakuya/commands/setup.py:65
+#: sakuya/commands/renew_voting_keys.py:45 sakuya/commands/setup.py:138
 msgid "general-connecting-to-node"
 msgstr "ノード {endpoint} へ接続中"
 
@@ -277,7 +239,7 @@ msgstr "ブロックを待機中にタイムアウトしました。これは、
 msgid "init-cancelled"
 msgstr "Sakuyaの初期設定をキャンセルしました。"
 
-#: sakuya/commands/init.py:467
+#: sakuya/commands/init.py:466
 msgid "init-created-file"
 msgstr "作成しました: {filepath}"
 
@@ -285,11 +247,13 @@ msgstr "作成しました: {filepath}"
 msgid "init-failed"
 msgstr "Sakuyaの初期設定に失敗しました。"
 
-#: sakuya/commands/init.py:459
+#: sakuya/commands/init.py:458
 msgid "init-failure-detail"
 msgstr "初期設定に失敗しました: {reason}"
 
-#: sakuya/commands/init.py:115 sakuya/commands/init.py:470
+#: sakuya/commands/init.py:115 sakuya/commands/init.py:469
+#: sakuya/commands/setup.py:202 sakuya/commands/setup.py:207
+#: sakuya/commands/setup.py:211
 msgid "init-log-file"
 msgstr "詳細ログ: {filepath}"
 
@@ -297,7 +261,7 @@ msgstr "詳細ログ: {filepath}"
 msgid "init-start"
 msgstr "Sakuyaを初期化しています..."
 
-#: sakuya/commands/init.py:468
+#: sakuya/commands/init.py:467
 msgid "init-success"
 msgstr "Sakuyaの初期設定が完了しました。"
 
@@ -425,6 +389,10 @@ msgstr "Sakuyaの初期設定"
 msgid "main-announce-transaction-help"
 msgstr "トランザクションをネットワークにアナウンスします"
 
+#: sakuya/__main__.py:27
+msgid "main-generate-linking-transaction-help"
+msgstr "完了済みのセットアップからリンクトランザクションを再生成します"
+
 #: sakuya/__main__.py:25
 msgid "main-health-help"
 msgstr "ヘルスチェックを実行します"
@@ -433,35 +401,35 @@ msgstr "ヘルスチェックを実行します"
 msgid "main-init-help"
 msgstr "パッケージからSakuya設定ファイルのテンプレートを抽出します"
 
-#: sakuya/__main__.py:27
+#: sakuya/__main__.py:28
 msgid "main-min-cosignatures-count-help"
 msgstr "アカウントに必要な最小連署者数を検出します"
 
-#: sakuya/__main__.py:28
+#: sakuya/__main__.py:29
 msgid "main-pemtool-help"
 msgstr "PEMファイルを生成します"
 
-#: sakuya/__main__.py:29
+#: sakuya/__main__.py:30
 msgid "main-pemview-help"
 msgstr "PEMファイルの内容を表示します"
 
-#: sakuya/__main__.py:30
+#: sakuya/__main__.py:31
 msgid "main-renew-certificates-help"
 msgstr "証明書を更新します"
 
-#: sakuya/__main__.py:31
+#: sakuya/__main__.py:32
 msgid "main-renew-voting-keys-help"
 msgstr "投票キーを更新します"
 
-#: sakuya/__main__.py:32
+#: sakuya/__main__.py:33
 msgid "main-reset-data-help"
 msgstr "データをリセットして最初から再同期できるようにします"
 
-#: sakuya/__main__.py:33
+#: sakuya/__main__.py:34
 msgid "main-setup-help"
 msgstr "ノードをセットアップします"
 
-#: sakuya/__main__.py:34
+#: sakuya/__main__.py:35
 msgid "main-signer-help"
 msgstr "トランザクションに署名します"
 
@@ -473,7 +441,7 @@ msgstr "有効なサブコマンド"
 msgid "main-title"
 msgstr "Sakuya Tool"
 
-#: sakuya/__main__.py:35
+#: sakuya/__main__.py:36
 msgid "main-upgrade-help"
 msgstr "ノードを最新のクライアントバージョンにアップグレードします"
 
@@ -561,17 +529,53 @@ msgstr "投票鍵更新トランザクションがまだ確定していません
 msgid "reset-data-recreating-directory"
 msgstr "ディレクトリ {directory} を削除しています"
 
-#: sakuya/commands/setup.py:95
+#: sakuya/commands/setup.py:68
+msgid "setup-already-completed"
+msgstr "エラー: セットアップはすでに完了しています。既存のセットアップファイルは上書きから保護されています。"
+
+#: sakuya/commands/setup.py:191 sakuya/commands/setup.py:201
+#: sakuya/commands/setup.py:206 sakuya/commands/setup.py:213
+msgid "setup-failed"
+msgstr "エラー: セットアップに失敗しました。"
+
+#: sakuya/commands/setup.py:200 sakuya/commands/setup.py:205
+msgid "setup-failure-detail"
+msgstr "セットアップに予期しないエラーが発生しました。"
+
+#: sakuya/commands/setup.py:51
+msgid "setup-initialization-required"
+msgstr ""
+"エラー: 初期化が完了していません。\n"
+"先に `sakuya init` を実行してください。"
+
+#: sakuya/commands/setup.py:168
 msgid "setup-no-state-changes-required"
 msgstr "アカウントは既に適切に設定されているため、トランザクションを生成しません"
 
-#: sakuya/commands/setup.py:116 sakuya/commands/setup.py:165
+#: sakuya/commands/setup.py:81
+msgid "setup-not-completed"
+msgstr "エラー: セットアップが完了していません。先に `sakuya setup` を実行してください。"
+
+#: sakuya/commands/setup.py:225 sakuya/commands/setup.py:270
 msgid "setup-resources-directory-exists"
 msgstr "リソースディレクトリ {directory} はすでに存在するため、セットアップに失敗しました。アップグレードを実行するつもりでしたか？"
 
-#: sakuya/commands/setup.py:154
-msgid "setup-status-output-transaction-only"
-msgstr "既存のノードからリンクトランザクションを生成中..."
+#: sakuya/commands/setup.py:196
+msgid "setup-start"
+msgstr "Sakuyaをセットアップしています..."
+
+#: sakuya/commands/setup.py:60 sakuya/commands/setup.py:63
+#: sakuya/commands/setup.py:77 sakuya/commands/setup.py:79
+msgid "setup-state-inconsistent"
+msgstr "エラー: セットアップ状態が不整合です。既存ファイルを上書きしません。"
+
+#: sakuya/commands/setup.py:67
+msgid "setup-state-missing-ca-key"
+msgstr "エラー: セットアップ状態が不整合です。CA鍵がありません。新しいCA鍵は自動生成しません。"
+
+#: sakuya/commands/setup.py:210
+msgid "setup-success"
+msgstr "Sakuyaのセットアップが完了しました。"
 
 #: sakuya/commands/signer.py:32
 msgid "signer-aggregate-transaction"

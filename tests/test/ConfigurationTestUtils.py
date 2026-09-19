@@ -35,3 +35,10 @@ def prepare_sakuya_configuration(directory, node_features, services_nodewatch=''
 		(output_filepath.parent / 'rest_overrides.json').write_text('{"nodeMetadata": {}}\n', encoding='utf8')
 
 	return output_filepath
+
+
+def prepare_sakuya_setup_configuration(directory, node_features, services_nodewatch='', **node_kwargs):
+	"""Prepares a Sakuya configuration together with the files created by init."""
+
+	node_kwargs['include_init_files'] = True
+	return prepare_sakuya_configuration(directory, node_features, services_nodewatch, **node_kwargs)

@@ -76,13 +76,13 @@ python3 -m sakuya --directory /srv/symbol setup
 
 `setup` と `upgrade` は `config.ini` からパッケージを解決します。これらのコマンドに
 `--package` オプションはありません。セットアップの生成結果は処理が正常に完了した後に
-公開されます。生成された linking トランザクションはノードルートに保存され、別途署名・
-アナウンスできます。
+公開されます。`setup` は初回セットアップ専用で、正常完了後の再実行は拒否されます。
+生成された linking トランザクションはノードルートに保存され、別途署名・アナウンスできます。
 
-セットアップトランザクションだけを生成する場合:
+セットアップ済み環境で linking トランザクションだけを再生成する場合:
 
 ```sh
-python3 -m sakuya --directory /srv/symbol setup --output-transaction-only
+python3 -m sakuya --directory /srv/symbol generate-linking-transaction
 ```
 
 ## コマンド
@@ -92,6 +92,7 @@ python3 -m sakuya --directory /srv/symbol setup --output-transaction-only
 ```text
 init
 setup
+generate-linking-transaction
 upgrade
 signer
 announce-transaction

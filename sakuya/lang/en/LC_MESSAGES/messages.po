@@ -15,16 +15,18 @@ msgid "argument-help-announce-transaction-transaction"
 msgstr "file containing serialized transaction to send"
 
 #: sakuya/commands/min_cosignatures_count.py:35
-#: sakuya/commands/renew_certificates.py:54 sakuya/commands/setup.py:225
+#: sakuya/commands/renew_certificates.py:54 sakuya/commands/setup.py:332
 #: sakuya/commands/signer.py:93
 msgid "argument-help-ca-key-path"
 msgstr "path to main private key PEM file"
 
-#: sakuya/commands/announce_transaction.py:81 sakuya/commands/health.py:83
-#: sakuya/commands/init.py:488 sakuya/commands/min_cosignatures_count.py:34
-#: sakuya/commands/pemview.py:41 sakuya/commands/renew_certificates.py:53
+#: sakuya/commands/announce_transaction.py:81
+#: sakuya/commands/generate_linking_transaction.py:26
+#: sakuya/commands/health.py:83 sakuya/commands/init.py:487
+#: sakuya/commands/min_cosignatures_count.py:34 sakuya/commands/pemview.py:41
+#: sakuya/commands/renew_certificates.py:53
 #: sakuya/commands/renew_voting_keys.py:218 sakuya/commands/reset_data.py:112
-#: sakuya/commands/setup.py:220 sakuya/commands/signer.py:92
+#: sakuya/commands/setup.py:327 sakuya/commands/signer.py:92
 msgid "argument-help-config"
 msgstr "path to Sakuya configuration file"
 
@@ -78,59 +80,19 @@ msgstr "renew node key"
 msgid "argument-help-reset-data-purge-harvesters"
 msgstr "purge harvesters.dat file"
 
-#: sakuya/commands/setup.py:226
-msgid "argument-help-setup-output-transaction-only"
-msgstr "only output linking transaction from a previous setup"
-
-#: sakuya/commands/setup.py:221
+#: sakuya/commands/setup.py:328
 msgid "argument-help-setup-overrides"
 msgstr "path to custom user settings"
 
-#: sakuya/commands/init.py:483
+#: sakuya/commands/init.py:482
 msgid "argument-help-setup-package"
 msgstr ""
 "Network configuration package. Possible values: (name | file:///filename "
 "| http(s)://uri) (default: mainnet)"
 
-#: sakuya/commands/setup.py:222
+#: sakuya/commands/setup.py:329
 msgid "argument-help-setup-rest-overrides"
 msgstr "path to custom user REST settings (this is only valid for API roles)"
-
-#: sakuya/commands/setup.py
-msgid "setup-already-completed"
-msgstr "Error: setup has already been completed. Existing setup files are protected from being overwritten."
-
-#: sakuya/commands/setup.py
-msgid "setup-failed"
-msgstr "Error: setup failed."
-
-#: sakuya/commands/setup.py
-msgid "setup-failed-with-reason"
-msgstr "Error: setup failed: {reason}"
-
-#: sakuya/commands/setup.py
-msgid "setup-failure-detail"
-msgstr "Setup failed: {reason}"
-
-#: sakuya/commands/setup.py
-msgid "setup-initialization-required"
-msgstr "Error: initialization has not been completed.\nRun `sakuya init` first."
-
-#: sakuya/commands/setup.py
-msgid "setup-state-inconsistent"
-msgstr "Error: setup state is inconsistent. Setup will not overwrite existing files."
-
-#: sakuya/commands/setup.py
-msgid "setup-state-missing-ca-key"
-msgstr "Error: setup state is inconsistent because the CA key is missing. A new CA key will not be generated automatically."
-
-#: sakuya/commands/setup.py
-msgid "setup-start"
-msgstr "Setting up Sakuya..."
-
-#: sakuya/commands/setup.py
-msgid "setup-success"
-msgstr "Sakuya setup completed."
 
 #: sakuya/commands/signer.py:95
 msgid "argument-help-signer-filename"
@@ -155,7 +117,7 @@ msgstr "downloaded file ({descriptor_name}) has invalid hash"
 #: sakuya/commands/announce_transaction.py:59
 #: sakuya/commands/min_cosignatures_count.py:18
 #: sakuya/commands/renew_voting_keys.py:36
-#: sakuya/commands/renew_voting_keys.py:45 sakuya/commands/setup.py:65
+#: sakuya/commands/renew_voting_keys.py:45 sakuya/commands/setup.py:138
 msgid "general-connecting-to-node"
 msgstr "connecting to {endpoint}"
 
@@ -285,7 +247,7 @@ msgstr ""
 msgid "init-cancelled"
 msgstr "Sakuya initialization cancelled."
 
-#: sakuya/commands/init.py:467
+#: sakuya/commands/init.py:466
 msgid "init-created-file"
 msgstr "Created: {filepath}"
 
@@ -293,11 +255,13 @@ msgstr "Created: {filepath}"
 msgid "init-failed"
 msgstr "Sakuya initialization failed."
 
-#: sakuya/commands/init.py:459
+#: sakuya/commands/init.py:458
 msgid "init-failure-detail"
 msgstr "Initialization failed: {reason}"
 
-#: sakuya/commands/init.py:115 sakuya/commands/init.py:470
+#: sakuya/commands/init.py:115 sakuya/commands/init.py:469
+#: sakuya/commands/setup.py:202 sakuya/commands/setup.py:207
+#: sakuya/commands/setup.py:211
 msgid "init-log-file"
 msgstr "Detailed log: {filepath}"
 
@@ -305,7 +269,7 @@ msgstr "Detailed log: {filepath}"
 msgid "init-start"
 msgstr "Initializing Sakuya..."
 
-#: sakuya/commands/init.py:468
+#: sakuya/commands/init.py:467
 msgid "init-success"
 msgstr "Sakuya initialization completed."
 
@@ -435,6 +399,10 @@ msgstr "Sakuya initialization"
 msgid "main-announce-transaction-help"
 msgstr "announces a transaction to the network"
 
+#: sakuya/__main__.py:27
+msgid "main-generate-linking-transaction-help"
+msgstr "regenerates the linking transaction from an existing setup"
+
 #: sakuya/__main__.py:25
 msgid "main-health-help"
 msgstr "does health check"
@@ -443,35 +411,35 @@ msgstr "does health check"
 msgid "main-init-help"
 msgstr "extracts a template Sakuya configuration file from a package"
 
-#: sakuya/__main__.py:27
+#: sakuya/__main__.py:28
 msgid "main-min-cosignatures-count-help"
 msgstr "detects minimum cosignatures required for an account"
 
-#: sakuya/__main__.py:28
+#: sakuya/__main__.py:29
 msgid "main-pemtool-help"
 msgstr "generates PEM files"
 
-#: sakuya/__main__.py:29
+#: sakuya/__main__.py:30
 msgid "main-pemview-help"
 msgstr "view a PEM file"
 
-#: sakuya/__main__.py:30
+#: sakuya/__main__.py:31
 msgid "main-renew-certificates-help"
 msgstr "renews certificates"
 
-#: sakuya/__main__.py:31
+#: sakuya/__main__.py:32
 msgid "main-renew-voting-keys-help"
 msgstr "renews voting keys"
 
-#: sakuya/__main__.py:32
+#: sakuya/__main__.py:33
 msgid "main-reset-data-help"
 msgstr "resets data to allow a resync from scratch"
 
-#: sakuya/__main__.py:33
+#: sakuya/__main__.py:34
 msgid "main-setup-help"
 msgstr "sets up a node"
 
-#: sakuya/__main__.py:34
+#: sakuya/__main__.py:35
 msgid "main-signer-help"
 msgstr "signs a transaction"
 
@@ -483,7 +451,7 @@ msgstr "valid subcommands"
 msgid "main-title"
 msgstr "Sakuya Tool"
 
-#: sakuya/__main__.py:35
+#: sakuya/__main__.py:36
 msgid "main-upgrade-help"
 msgstr "upgrades a node to the latest client version"
 
@@ -573,21 +541,63 @@ msgstr "pending voting key transaction is not confirmed yet"
 msgid "reset-data-recreating-directory"
 msgstr "purging and recreating DIRECTORY {directory}"
 
-#: sakuya/commands/setup.py:95
+#: sakuya/commands/setup.py:68
+msgid "setup-already-completed"
+msgstr ""
+"Error: setup has already been completed. Existing setup files are "
+"protected from being overwritten."
+
+#: sakuya/commands/setup.py:191 sakuya/commands/setup.py:201
+#: sakuya/commands/setup.py:206 sakuya/commands/setup.py:213
+msgid "setup-failed"
+msgstr "Error: setup failed."
+
+#: sakuya/commands/setup.py:200 sakuya/commands/setup.py:205
+msgid "setup-failure-detail"
+msgstr "Setup failed unexpectedly."
+
+#: sakuya/commands/setup.py:51
+msgid "setup-initialization-required"
+msgstr ""
+"Error: initialization has not been completed.\n"
+"Run `sakuya init` first."
+
+#: sakuya/commands/setup.py:168
 msgid "setup-no-state-changes-required"
 msgstr ""
 "no transaction has been generated because account is already properly "
 "configured"
 
-#: sakuya/commands/setup.py:116 sakuya/commands/setup.py:165
+#: sakuya/commands/setup.py:81
+msgid "setup-not-completed"
+msgstr "Error: setup has not been completed. Run `sakuya setup` first."
+
+#: sakuya/commands/setup.py:225 sakuya/commands/setup.py:270
 msgid "setup-resources-directory-exists"
 msgstr ""
 "setup failed because resources directory {directory} already exists, did "
 "you intend to run upgrade?"
 
-#: sakuya/commands/setup.py:154
-msgid "setup-status-output-transaction-only"
-msgstr "generating linking transaction from previous setup..."
+#: sakuya/commands/setup.py:196
+msgid "setup-start"
+msgstr "Setting up Sakuya..."
+
+#: sakuya/commands/setup.py:60 sakuya/commands/setup.py:63
+#: sakuya/commands/setup.py:77 sakuya/commands/setup.py:79
+msgid "setup-state-inconsistent"
+msgstr ""
+"Error: setup state is inconsistent. Setup will not overwrite existing "
+"files."
+
+#: sakuya/commands/setup.py:67
+msgid "setup-state-missing-ca-key"
+msgstr ""
+"Error: setup state is inconsistent because the CA key is missing. A new "
+"CA key will not be generated automatically."
+
+#: sakuya/commands/setup.py:210
+msgid "setup-success"
+msgstr "Sakuya setup completed."
 
 #: sakuya/commands/signer.py:32
 msgid "signer-aggregate-transaction"

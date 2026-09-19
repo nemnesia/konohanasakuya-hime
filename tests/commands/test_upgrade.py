@@ -10,7 +10,7 @@ from sakuya.internal.ConfigurationManager import ConfigurationManager
 from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.PackageResolver import download_and_extract_package as real_download_and_extract_package
 
-from ..test.ConfigurationTestUtils import prepare_sakuya_configuration
+from ..test.ConfigurationTestUtils import prepare_sakuya_configuration, prepare_sakuya_setup_configuration
 from ..test.FileSystemTestUtils import assert_expected_files_and_permissions
 from ..test.MockNodewatchServer import setup_mock_nodewatch_server
 from ..test.TestPackager import prepare_testnet_package
@@ -20,6 +20,7 @@ from .test_setup import (
 	HTTPS_OUTPUT_FILES,
 	LIGHT_API_OUTPUT_FILES,
 	PEER_OUTPUT_FILES,
+	SETUP_STATE_OUTPUT_FILES,
 	STATE_CHANGE_OUTPUT_FILES,
 	VOTER_OUTPUT_FILES
 )
@@ -197,11 +198,10 @@ async def _assert_can_upgrade_node(
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_sakuya_configuration(
+			prepare_sakuya_setup_configuration(
 				package_directory,
 				node_features,
 				server.make_url(''),
-				include_init_files=True,
 				api_https=api_https,
 				light_api=light_api)
 			_prepare_overrides(package_directory, 'name from setup')
@@ -240,9 +240,7 @@ async def _assert_can_upgrade_node(
 				# Assert: spot check all expected output files and permissions
 				assert_expected_files_and_permissions(output_directory, {
 					**expected_output_files,
-					'cli.log': 0o600,
-					'.sakuya': 0o755,
-					'.sakuya/setup-complete': 0o400
+					**SETUP_STATE_OUTPUT_FILES
 				})
 
 				# - check expected changed files are changed
