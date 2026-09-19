@@ -1,4 +1,3 @@
-import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,25 +9,27 @@ from sakuya.internal.NodeFeatures import NodeFeatures
 from sakuya.internal.Preparer import Preparer
 
 
-def test_prepare_staged_directories_preserves_dbdata():
-	with tempfile.TemporaryDirectory() as output_directory:
-		root = Path(output_directory) / 'sakuya'
-		for name in ('node-config', 'startup', 'mongo', 'https-proxy', 'rest-cache', 'dbdata'):
-			(root / name).mkdir(parents=True)
-		(root / 'dbdata' / 'database.dat').write_text('keep', encoding='utf8')
+def test_prepare_staged_directories_only_creates_generated_parents(tmp_path):
+	root = tmp_path / 'sakuya'
+	for name in ('data', 'dbdata', 'logs', 'keys', 'seed', 'rest-cache'):
+		(root / name).mkdir(parents=True)
+	(root / 'data' / 'runtime.dat').write_text('keep', encoding='utf8')
+	(root / 'dbdata' / 'database.dat').write_text('keep', encoding='utf8')
 
-		config = SimpleNamespace(node=SimpleNamespace(
-			features=NodeFeatures.API,
-			full_api=True,
-			api_https=False
-		))
-		_prepare_staged_directories(Preparer.DirectoryLocator(None, Path(output_directory)), config)
+	config = SimpleNamespace(node=SimpleNamespace(
+		features=NodeFeatures.API,
+		full_api=True,
+		api_https=True
+	))
+	_prepare_staged_directories(Preparer.DirectoryLocator(None, tmp_path), config)
 
-		assert 'keep' == (root / 'dbdata' / 'database.dat').read_text(encoding='utf8')
-		assert (root / 'node-config').is_dir()
-		assert (root / 'rest-cache').is_dir()
-		assert (root / 'startup').is_dir() is False
-		assert (root / 'mongo').is_dir() is False
+	assert 'keep' == (root / 'data' / 'runtime.dat').read_text(encoding='utf8')
+	assert 'keep' == (root / 'dbdata' / 'database.dat').read_text(encoding='utf8')
+	assert (root / 'node-config').is_dir()
+	assert (root / 'https-proxy').is_dir()
+	for name in ('startup', 'mongo'):
+		assert (root / name).is_dir() is False
+	assert (root / 'rest-cache').is_dir()
 
 
 def test_prepare_staged_directories_creates_full_api_and_https_directories(tmp_path):
@@ -39,9 +40,10 @@ def test_prepare_staged_directories_creates_full_api_and_https_directories(tmp_p
 	directories = Preparer.DirectoryLocator(None, tmp_path)
 	upgrade_command._prepare_staged_directories(directories, config)
 
-	assert directories.dbdata.is_dir()
-	assert directories.rest_cache.is_dir()
+	assert directories.node_config.is_dir()
 	assert directories.https_proxy.is_dir()
+	assert directories.dbdata.is_dir() is False
+	assert directories.rest_cache.is_dir() is False
 
 
 async def test_upgrade_requires_existing_node_configuration(monkeypatch, tmp_path):
