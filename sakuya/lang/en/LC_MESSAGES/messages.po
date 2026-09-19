@@ -96,6 +96,42 @@ msgstr ""
 msgid "argument-help-setup-rest-overrides"
 msgstr "path to custom user REST settings (this is only valid for API roles)"
 
+#: sakuya/commands/setup.py
+msgid "setup-already-completed"
+msgstr "Error: setup has already been completed. Existing setup files are protected from being overwritten."
+
+#: sakuya/commands/setup.py
+msgid "setup-failed"
+msgstr "Error: setup failed."
+
+#: sakuya/commands/setup.py
+msgid "setup-failed-with-reason"
+msgstr "Error: setup failed: {reason}"
+
+#: sakuya/commands/setup.py
+msgid "setup-failure-detail"
+msgstr "Setup failed: {reason}"
+
+#: sakuya/commands/setup.py
+msgid "setup-initialization-required"
+msgstr "Error: initialization has not been completed.\nRun `sakuya init` first."
+
+#: sakuya/commands/setup.py
+msgid "setup-state-inconsistent"
+msgstr "Error: setup state is inconsistent. Setup will not overwrite existing files."
+
+#: sakuya/commands/setup.py
+msgid "setup-state-missing-ca-key"
+msgstr "Error: setup state is inconsistent because the CA key is missing. A new CA key will not be generated automatically."
+
+#: sakuya/commands/setup.py
+msgid "setup-start"
+msgstr "Setting up Sakuya..."
+
+#: sakuya/commands/setup.py
+msgid "setup-success"
+msgstr "Sakuya setup completed."
+
 #: sakuya/commands/signer.py:95
 msgid "argument-help-signer-filename"
 msgstr "transaction binary payload"

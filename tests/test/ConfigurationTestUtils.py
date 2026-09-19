@@ -5,6 +5,8 @@ from pathlib import Path
 def prepare_sakuya_configuration(directory, node_features, services_nodewatch='', **node_kwargs):
 	"""Prepares a Sakuya configuration using the upstream-compatible format."""
 
+	include_init_files = node_kwargs.pop('include_init_files', False)
+
 	parser = configparser.ConfigParser()
 	parser.optionxform = str
 	parser.read(Path('tests/resources/sai.shoestring.ini').absolute())
@@ -28,5 +30,8 @@ def prepare_sakuya_configuration(directory, node_features, services_nodewatch=''
 	output_filepath = Path(directory) / node_kwargs.get('filename', 'sai.shoestring.ini')
 	with open(output_filepath, 'wt', encoding='utf8') as outfile:
 		parser.write(outfile)
+	if include_init_files:
+		(output_filepath.parent / 'overrides.ini').write_text('', encoding='utf8')
+		(output_filepath.parent / 'rest_overrides.json').write_text('{"nodeMetadata": {}}\n', encoding='utf8')
 
 	return output_filepath

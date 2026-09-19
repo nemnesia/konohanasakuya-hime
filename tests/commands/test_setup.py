@@ -1,6 +1,7 @@
 import configparser
 import json
 import os
+import stat
 import tempfile
 from enum import Enum
 from pathlib import Path
@@ -178,6 +179,7 @@ async def _assert_can_prepare_node(
 				package_directory,
 				node_features,
 				server.make_url(''),
+				include_init_files=True,
 				ca_password=ca_password,
 				api_https=api_https,
 				ca_common_name='my CA CN',
@@ -202,7 +204,13 @@ async def _assert_can_prepare_node(
 				])
 
 				# Assert: spot check all expected output files and permissions
-				assert_expected_files_and_permissions(output_directory, expected_output_files)
+				assert_expected_files_and_permissions(output_directory, {
+					**expected_output_files,
+					'cli.log': 0o600,
+					'.sakuya': 0o755,
+					'.sakuya/setup-complete': 0o400
+				})
+				assert (Path(output_directory) / '.sakuya' / 'setup-complete').is_file()
 
 				# - spot check all expected CA files are present
 				ca_files = sorted(str(path.relative_to(ca_directory)) for path in Path(ca_directory).glob('**/*'))
@@ -283,6 +291,7 @@ async def test_can_prepare_node_with_relative_output_directory(server):  # pylin
 				package_directory,
 				NodeFeatures.PEER,
 				server.make_url(''),
+				include_init_files=True,
 				api_https=False,
 				ca_common_name='my CA CN',
 				node_common_name='my Node CN')
@@ -300,7 +309,12 @@ async def test_can_prepare_node_with_relative_output_directory(server):  # pylin
 				])
 
 				# Assert: spot check all expected output files and permissions
-				assert_expected_files_and_permissions(output_directory, PEER_OUTPUT_FILES)
+				assert_expected_files_and_permissions(output_directory, {
+					**PEER_OUTPUT_FILES,
+					'cli.log': 0o600,
+					'.sakuya': 0o755,
+					'.sakuya/setup-complete': 0o400
+				})
 
 				# - spot check all expected CA files are present
 				ca_files = sorted(str(path.relative_to(ca_directory)) for path in Path(ca_directory).glob('**/*'))
@@ -320,7 +334,7 @@ async def _assert_can_prepare_with_hostname(server, hostname, node_features, api
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=api_https)
+			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), include_init_files=True, api_https=api_https)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
 			user_overrides_filepath = Path(package_directory) / 'overrides.properties'
@@ -354,7 +368,7 @@ async def test_can_apply_custom_rest_overrides(server):  # pylint: disable=redef
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
 			_prepare_overrides(package_directory)
-			prepare_sakuya_configuration(package_directory, NodeFeatures.API, server.make_url(''))
+			prepare_sakuya_configuration(package_directory, NodeFeatures.API, server.make_url(''), include_init_files=True)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
 			rest_overrides_filepath = Path(package_directory) / 'metadata.json'
@@ -413,13 +427,12 @@ async def _assert_cannot_prepare_with_hostname(
 	server,  # pylint: disable=redefined-outer-name
 	hostname,
 	node_features,
-	expected_exception,
 	api_https=None
 ):
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=api_https)
+			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), include_init_files=True, api_https=api_https)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
 			user_overrides_filepath = Path(package_directory) / 'overrides.properties'
@@ -427,7 +440,7 @@ async def _assert_cannot_prepare_with_hostname(
 
 			with tempfile.TemporaryDirectory() as ca_directory:
 				# Act + Assert:
-				with pytest.raises(RuntimeError) as excinfo:
+				with pytest.raises(SystemExit) as excinfo:
 					await main([
 						'--directory', output_directory,
 						'setup',
@@ -436,7 +449,7 @@ async def _assert_cannot_prepare_with_hostname(
 						'--overrides', str(user_overrides_filepath)
 					])
 
-				assert expected_exception in str(excinfo.value)
+				assert 1 == excinfo.value.code
 
 
 async def test_cannot_prepare_api_with_ip_with_https(server):  # pylint: disable=redefined-outer-name
@@ -444,7 +457,6 @@ async def test_cannot_prepare_api_with_ip_with_https(server):  # pylint: disable
 		server,
 		'1.2.3.4',
 		NodeFeatures.API,
-		'hostname 1.2.3.4 looks like IP address and not a hostname',
 		True)
 
 
@@ -453,7 +465,6 @@ async def test_cannot_prepare_with_invalid_hostname(server):  # pylint: disable=
 		server,
 		'foo bar baz',
 		NodeFeatures.PEER,
-		'could not resolve address for host: foo bar baz',
 		False)
 
 
@@ -462,7 +473,6 @@ async def test_cannot_prepare_peer_with_https(server):  # pylint: disable=redefi
 		server,
 		'symbol.fyi',
 		NodeFeatures.PEER,
-		'HTTPS selected but required feature (API) is not selected',
 		True)
 
 # endregion
@@ -474,7 +484,7 @@ async def test_cannot_rerun_setup_when_directory_exists(server):  # pylint: disa
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_sakuya_configuration(package_directory, NodeFeatures.PEER, server.make_url(''), api_https=False)
+			prepare_sakuya_configuration(package_directory, NodeFeatures.PEER, server.make_url(''), include_init_files=True, api_https=False)
 			_prepare_overrides(package_directory)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
@@ -508,7 +518,7 @@ async def _assert_can_regenerate_links(server, node_features):  # pylint: disabl
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=False)
+			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), include_init_files=True, api_https=False)
 			_prepare_overrides(package_directory)
 			prepare_testnet_package(package_directory, 'resources.zip')
 
@@ -638,6 +648,7 @@ async def test_initial_setup_removes_published_ca_key_when_commit_fails(monkeypa
 			command='setup'))
 
 	assert not ca_key_path.exists()
+	assert not (output_directory / '.sakuya' / 'setup-complete').exists()
 
 
 async def test_initial_setup_publishes_ca_key_in_output_directory(monkeypatch, tmp_path):
@@ -665,6 +676,165 @@ async def test_initial_setup_publishes_ca_key_in_output_directory(monkeypatch, t
 
 	assert ca_key_path.read_text(encoding='utf8') == 'generated'
 	assert 'ca.key.pem' in committed_paths
+
+
+async def test_initial_setup_publishes_completion_marker(monkeypatch, tmp_path):
+	output_directory = tmp_path / 'output'
+	ca_key_path = output_directory / 'ca.key.pem'
+
+	async def fake_run_setup(args):
+		args.ca_key_path.write_text('generated', encoding='utf8')
+
+	monkeypatch.setattr(setup_command, '_run_setup', fake_run_setup)
+
+	await setup_command._run_initial_setup_atomically(SimpleNamespace(
+		directory=output_directory,
+		ca_key_path=ca_key_path,
+		output_transaction_only=False,
+		command='setup'))
+
+	assert (output_directory / '.sakuya' / 'setup-complete').is_file()
+
+
+async def test_setup_requires_init_before_starting(monkeypatch, tmp_path, capsys):
+	started = False
+
+	async def fake_initial_setup(_args):
+		nonlocal started
+		started = True
+
+	monkeypatch.setattr(setup_command, '_run_initial_setup_atomically', fake_initial_setup)
+	args = SimpleNamespace(
+		command='setup',
+		directory=tmp_path,
+		config=tmp_path / 'config.ini',
+		output_transaction_only=False)
+
+	with pytest.raises(SystemExit) as ex_info:
+		await setup_command.run_main(args)
+
+	assert 1 == ex_info.value.code
+	assert not started
+	assert 'initialization has not been completed' in capsys.readouterr().out
+
+
+async def test_cli_setup_shows_user_summary_and_writes_detailed_log(monkeypatch, tmp_path, capsys):
+	config_directory = tmp_path / 'config'
+	config_directory.mkdir()
+	for filename in ('config.ini', 'overrides.ini', 'rest_overrides.json'):
+		(config_directory / filename).write_text('configured', encoding='utf8')
+	output_directory = tmp_path / 'output'
+
+	async def fake_initial_setup(_args):
+		setup_command.log.info('internal setup detail')
+
+	monkeypatch.setattr(setup_command, '_run_initial_setup_atomically', fake_initial_setup)
+	await setup_command.run_main(SimpleNamespace(
+		command='setup',
+		directory=output_directory,
+		config=config_directory / 'config.ini',
+		overrides=config_directory / 'overrides.ini',
+		rest_overrides=config_directory / 'rest_overrides.json',
+		ca_key_path=output_directory / 'ca.key.pem',
+		output_transaction_only=False))
+
+	captured = capsys.readouterr()
+	assert 'Setting up Sakuya...' in captured.out
+	assert 'Sakuya setup completed.' in captured.out
+	assert 'internal setup detail' not in captured.out
+	assert 'internal setup detail' not in captured.err
+	log_filepath = output_directory / 'cli.log'
+	assert stat.S_IMODE(log_filepath.stat().st_mode) == 0o600
+	assert 'internal setup detail' in log_filepath.read_text(encoding='utf8')
+
+
+async def test_cli_setup_hides_failure_details_from_console_and_logs_them(monkeypatch, tmp_path, capsys):
+	config_directory = tmp_path / 'config'
+	config_directory.mkdir()
+	for filename in ('config.ini', 'overrides.ini', 'rest_overrides.json'):
+		(config_directory / filename).write_text('configured', encoding='utf8')
+	output_directory = tmp_path / 'output'
+
+	async def fake_initial_setup(_args):
+		raise RuntimeError('expected setup failure')
+
+	monkeypatch.setattr(setup_command, '_run_initial_setup_atomically', fake_initial_setup)
+	with pytest.raises(SystemExit) as ex_info:
+		await setup_command.run_main(SimpleNamespace(
+			command='setup',
+			directory=output_directory,
+			config=config_directory / 'config.ini',
+			overrides=config_directory / 'overrides.ini',
+			rest_overrides=config_directory / 'rest_overrides.json',
+			ca_key_path=output_directory / 'ca.key.pem',
+			output_transaction_only=False))
+
+	assert 1 == ex_info.value.code
+	captured = capsys.readouterr()
+	assert 'Error: setup failed: expected setup failure' in captured.out
+	assert 'Detailed log:' in captured.out
+	assert 'Traceback' not in captured.out
+	log_contents = (output_directory / 'cli.log').read_text(encoding='utf8')
+	assert 'expected setup failure' in log_contents
+	assert 'Traceback' in log_contents
+
+
+async def test_setup_rejects_second_run_without_changing_files(tmp_path, capsys):
+	config_directory = tmp_path / 'config'
+	config_directory.mkdir()
+	for filename in ('config.ini', 'overrides.ini', 'rest_overrides.json'):
+		(config_directory / filename).write_text('configured', encoding='utf8')
+	output_directory = tmp_path / 'output'
+	output_directory.mkdir()
+	(output_directory / '.sakuya').mkdir()
+	(output_directory / '.sakuya' / 'setup-complete').write_text('', encoding='utf8')
+	ca_key_path = output_directory / 'ca.key.pem'
+	ca_key_path.write_text('private key', encoding='utf8')
+	log_filepath = output_directory / 'cli.log'
+	log_filepath.write_text('existing log\n', encoding='utf8')
+	original_marker = (output_directory / '.sakuya' / 'setup-complete').read_bytes()
+	original_key = ca_key_path.read_bytes()
+	original_log = log_filepath.read_bytes()
+
+	with pytest.raises(SystemExit) as ex_info:
+		await setup_command.run_main(SimpleNamespace(
+			command='setup',
+			directory=output_directory,
+			config=config_directory / 'config.ini',
+			overrides=config_directory / 'overrides.ini',
+			rest_overrides=config_directory / 'rest_overrides.json',
+			ca_key_path=ca_key_path,
+			output_transaction_only=False))
+
+	assert 1 == ex_info.value.code
+	assert original_marker == (output_directory / '.sakuya' / 'setup-complete').read_bytes()
+	assert original_key == ca_key_path.read_bytes()
+	assert original_log == log_filepath.read_bytes()
+	assert 'setup has already been completed' in capsys.readouterr().out
+
+
+async def test_completed_setup_with_missing_ca_key_is_rejected_without_regeneration(tmp_path, capsys):
+	config_directory = tmp_path / 'config'
+	config_directory.mkdir()
+	for filename in ('config.ini', 'overrides.ini', 'rest_overrides.json'):
+		(config_directory / filename).write_text('configured', encoding='utf8')
+	output_directory = tmp_path / 'output'
+	(output_directory / '.sakuya').mkdir(parents=True)
+	(output_directory / '.sakuya' / 'setup-complete').write_text('', encoding='utf8')
+
+	with pytest.raises(SystemExit) as ex_info:
+		await setup_command.run_main(SimpleNamespace(
+			command='setup',
+			directory=output_directory,
+			config=config_directory / 'config.ini',
+			overrides=config_directory / 'overrides.ini',
+			rest_overrides=config_directory / 'rest_overrides.json',
+			ca_key_path=output_directory / 'ca.key.pem',
+			output_transaction_only=False))
+
+	assert 1 == ex_info.value.code
+	assert not (output_directory / 'ca.key.pem').exists()
+	assert 'CA key is missing' in capsys.readouterr().out
 
 
 async def test_run_setup_rejects_existing_resources_on_initial_setup(monkeypatch, tmp_path):

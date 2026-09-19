@@ -84,6 +84,42 @@ msgstr ""
 msgid "argument-help-setup-rest-overrides"
 msgstr ""
 
+#: sakuya/commands/setup.py
+msgid "setup-already-completed"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-failed"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-failed-with-reason"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-failure-detail"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-initialization-required"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-state-inconsistent"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-state-missing-ca-key"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-start"
+msgstr ""
+
+#: sakuya/commands/setup.py
+msgid "setup-success"
+msgstr ""
+
 #: sakuya/commands/signer.py:95
 msgid "argument-help-signer-filename"
 msgstr ""
@@ -932,4 +968,3 @@ msgstr ""
 #: sakuya/wizard/screens/welcome.py:38
 msgid "wizard-welcome-upgrade"
 msgstr ""
-

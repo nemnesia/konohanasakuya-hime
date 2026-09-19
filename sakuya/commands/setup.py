@@ -9,6 +9,7 @@ from pathlib import Path
 from symbollightapi.connector.SymbolConnector import SymbolConnector
 from zenlog import log
 
+from sakuya.commands.init import _init_logging
 from sakuya.internal.AtomicFileSystem import replace_paths
 from sakuya.internal.ConfigurationManager import ConfigurationManager, load_patches_from_file
 from sakuya.internal.NodeFeatures import NodeFeatures
@@ -20,6 +21,57 @@ from sakuya.internal.Preparer import Preparer
 from sakuya.internal.SakuyaConfiguration import parse_sakuya_configuration
 from sakuya.internal.TransactionSerializer import write_transaction_to_file
 from sakuya.internal.VoterConfigurator import inspect_voting_key_files
+
+_SETUP_STATE_DIRECTORY = '.sakuya'
+_SETUP_COMPLETE_MARKER = 'setup-complete'
+_INIT_MANAGED_FILENAMES = ('overrides.ini', 'rest_overrides.json')
+
+
+def _setup_complete_marker(output_directory):
+	"""正常に完了した setup を記録する marker のパスを返す。"""
+
+	return Path(output_directory) / _SETUP_STATE_DIRECTORY / _SETUP_COMPLETE_MARKER
+
+
+def _initialization_files(args):
+	"""setup 設定に対して init が作成するファイルのパスを返す。"""
+
+	config_filepath = Path(args.config).absolute()
+	return (config_filepath, *(config_filepath.parent / filename for filename in _INIT_MANAGED_FILENAMES))
+
+
+def _require_initialization(args):
+	"""生成物を変更する前に init 済みであることを確認する。"""
+
+	if not all(filepath.is_file() for filepath in _initialization_files(args)):
+		raise RuntimeError(_('setup-initialization-required'))
+
+
+def _check_setup_state(output_directory, ca_key_path):
+	"""staging を開始する前に、setup 完了済みまたは安全でない状態を拒否する。"""
+
+	state_directory = output_directory / _SETUP_STATE_DIRECTORY
+	marker = _setup_complete_marker(output_directory)
+	if state_directory.is_symlink() or (state_directory.exists() and not state_directory.is_dir()):
+		raise RuntimeError(_('setup-state-inconsistent'))
+
+	if marker.is_symlink():
+		raise RuntimeError(_('setup-state-inconsistent'))
+
+	if marker.exists():
+		if ca_key_path.is_symlink() or not ca_key_path.is_file():
+			raise RuntimeError(_('setup-state-missing-ca-key'))
+		raise RuntimeError(_('setup-already-completed'))
+
+
+def _write_setup_complete_marker(staged_directory):
+	"""公開前の staging 領域に setup 完了 marker を作成する。"""
+
+	marker = _setup_complete_marker(staged_directory)
+	marker.parent.mkdir(mode=0o700)
+	marker.parent.chmod(0o700)
+	marker.touch()
+	marker.chmod(0o400)
 
 
 def _resolve_hostname_and_configure_https(config, preparer):
@@ -53,15 +105,19 @@ def _resolve_hostname_and_configure_https(config, preparer):
 
 
 async def _prepare_keys_and_certificates(config, preparer, ca_key_path):
-	# detect the current finalization epoch
+	"""鍵と証明書を準備する。"""
+
+	# 現在の finalization epoch を取得する。
 	current_finalization_epoch = await get_current_finalization_epoch(config.services.nodewatch, preparer.config_manager)
 
-	# prepare keys and certificates
+	# 鍵と証明書を準備する。
 	preparer.configure_keys(current_finalization_epoch)
 	preparer.generate_certificates(ca_key_path, require_ca=False)
 
 
 async def _prepare_linking_transaction(preparer, api_endpoint):
+	"""アカウントの linking transaction を準備し、必要な場合に保存する。"""
+
 	log.info(_('general-connecting-to-node').format(endpoint=api_endpoint))
 	connector = SymbolConnector(api_endpoint)
 
@@ -96,20 +152,62 @@ async def _prepare_linking_transaction(preparer, api_endpoint):
 
 
 async def run_main(args):
+	"""setup または upgrade のメイン処理を実行する。"""
+
 	if 'setup' == getattr(args, 'command', 'setup'):
-		# transaction-only は既存の出力を読むため、一時出力への初期化を行わない。
-		if args.output_transaction_only:
-			await _run_setup(args)
-			return
-		await _run_initial_setup_atomically(args)
+		await _run_setup_with_cli_logging(args)
 		return
 
 	await _run_setup(args)
 
 
+async def _run_setup_with_cli_logging(args):
+	"""setup を実行し、init と同じ画面表示と詳細ログを提供する。"""
+
+	try:
+		_require_initialization(args)
+		if not args.output_transaction_only:
+			_check_setup_state(Path(args.directory).absolute(), Path(args.ca_key_path).absolute())
+	except Exception as ex:
+		message = str(ex) or _('setup-failed')
+		print(message)
+		raise SystemExit(1) from None
+
+	try:
+		with _init_logging(args) as active_log_filepath:
+			print(_('setup-start'))
+			try:
+				if args.output_transaction_only:
+					# transaction-only は既存の出力を読むため、一時出力への初期化を行わない。
+					await _run_setup(args)
+				else:
+					await _run_initial_setup_atomically(args)
+			except SystemExit:
+				log.logger.exception(_('setup-failure-detail').format(reason=_('setup-failed')))
+				print(_('setup-failed'))
+				print(_('init-log-file').format(filepath=active_log_filepath))
+				raise
+			except Exception as ex:
+				log.logger.exception(_('setup-failure-detail').format(reason=ex))
+				print(_('setup-failed-with-reason').format(reason=ex))
+				print(_('init-log-file').format(filepath=active_log_filepath))
+				raise SystemExit(1) from None
+
+			print(_('setup-success'))
+			print(_('init-log-file').format(filepath=active_log_filepath))
+	except Exception as ex:
+		message = str(ex) or _('setup-failed')
+		if not message.startswith('Error:'):
+			message = _('setup-failed-with-reason').format(reason=message)
+		print(message)
+		raise SystemExit(1) from None
+
+
 async def _run_initial_setup_atomically(args):
 	"""初期セットアップを一時ディレクトリで実行してから公開する。"""
 	output_directory = Path(args.directory).absolute()
+	ca_key_path = Path(args.ca_key_path).absolute()
+	_check_setup_state(output_directory, ca_key_path)
 	output_directory.mkdir(parents=True, exist_ok=True)
 	managed_paths = ('sakuya', 'docker-compose.yaml', 'docker-compose-recovery.yaml', 'linking_transaction.dat')
 	if any((output_directory / path).exists() or (output_directory / path).is_symlink() for path in managed_paths):
@@ -117,7 +215,6 @@ async def _run_initial_setup_atomically(args):
 		sys.exit(1)
 
 	staged_directory = Path(tempfile.mkdtemp(dir=output_directory.parent, prefix='.sakuya-setup-'))
-	ca_key_path = Path(args.ca_key_path).absolute()
 	if ca_key_path.is_symlink():
 		raise RuntimeError(f'CA key path must not be a symbolic link: {ca_key_path}')
 	ca_key_was_generated = not ca_key_path.exists()
@@ -134,10 +231,15 @@ async def _run_initial_setup_atomically(args):
 			ca_key_path.chmod(0o400)
 		elif ca_key_was_generated:
 			managed_paths += (ca_key_path.name,)
+			staged_args.ca_key_path.chmod(0o400)
+		else:
+			ca_key_path.chmod(0o400)
+
+		_write_setup_complete_marker(staged_directory)
+		managed_paths += (f'{_SETUP_STATE_DIRECTORY}/{_SETUP_COMPLETE_MARKER}',)
 		replace_paths(staged_directory, output_directory, managed_paths)
-		ca_key_path.chmod(0o400)
-	# The generated CA key is published in the same critical section as the
-	# staged node files.  Clean it up for every interruption or failure.
+	# 生成した CA key は node 生成物と同じ公開境界で公開する。
+	# 中断または失敗時は、公開済みの CA key を削除する。
 	except BaseException:
 		if ca_key_published:
 			ca_key_path.unlink(missing_ok=True)
@@ -147,6 +249,8 @@ async def _run_initial_setup_atomically(args):
 
 
 async def _run_setup(args):
+	"""設定に基づいてノード生成物を準備する。"""
+
 	config = parse_sakuya_configuration(args.config)
 	is_initial_setup = 'setup' == getattr(args, 'command', 'setup')
 
@@ -166,10 +270,10 @@ async def _run_setup(args):
 			sys.exit(1)
 
 		if is_initial_setup:
-			# setup basic directories
+			# 基本ディレクトリを作成する。
 			preparer.create_subdirectories()
 
-		# download resource package(s) and peers file(s)
+		# resource package と peers file をダウンロードする。
 		api_endpoints = await download_peers(
 			config.services.nodewatch,
 			preparer.directories.resources,
@@ -177,7 +281,7 @@ async def _run_setup(args):
 		package_identifier = resolve_package_identifier(args.config, config.network.name)
 		await download_and_extract_package(package_identifier, preparer.directories.temp)
 
-		# prepare nemesis data and resources
+		# nemesis data と resource を準備する。
 		if is_initial_setup:
 			preparer.prepare_seed()
 
@@ -209,14 +313,16 @@ async def _run_setup(args):
 		})
 
 		if is_initial_setup:
-			# prepare keys and certificates
+			# 鍵と証明書を準備する。
 			await _prepare_keys_and_certificates(config, preparer, args.ca_key_path)
 
-			# generate transaction
+			# linking transaction を生成する。
 			await _prepare_linking_transaction(preparer, api_endpoints[0])
 
 
 def add_arguments(parser, is_initial_setup=True):
+	"""setup/upgrade のコマンドライン引数を登録する。"""
+
 	parser.add_argument('--config', help=_('argument-help-config'))
 	parser.add_argument('--overrides', help=_('argument-help-setup-overrides'))
 	parser.add_argument('--rest-overrides', help=_('argument-help-setup-rest-overrides'))

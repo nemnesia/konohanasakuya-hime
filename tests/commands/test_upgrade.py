@@ -173,7 +173,7 @@ def _snapshot_files(output_directory, relative_paths):
 
 async def _prepare_full_https_node(server, output_directory, package_directory, ca_directory):
 	node_features = NodeFeatures.API | NodeFeatures.HARVESTER | NodeFeatures.VOTER
-	prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=True)
+	prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), include_init_files=True, api_https=True)
 	_prepare_overrides(package_directory, 'name from setup')
 	prepare_testnet_package(package_directory, 'resources.zip')
 	await main([
@@ -197,7 +197,13 @@ async def _assert_can_upgrade_node(
 	# Arrange:
 	with tempfile.TemporaryDirectory() as output_directory:
 		with tempfile.TemporaryDirectory() as package_directory:
-			prepare_sakuya_configuration(package_directory, node_features, server.make_url(''), api_https=api_https, light_api=light_api)
+			prepare_sakuya_configuration(
+				package_directory,
+				node_features,
+				server.make_url(''),
+				include_init_files=True,
+				api_https=api_https,
+				light_api=light_api)
 			_prepare_overrides(package_directory, 'name from setup')
 			prepare_testnet_package(package_directory, 'resources.zip')
 
@@ -232,7 +238,12 @@ async def _assert_can_upgrade_node(
 				await main(['--directory', output_directory, 'upgrade'] + common_args)
 
 				# Assert: spot check all expected output files and permissions
-				assert_expected_files_and_permissions(output_directory, expected_output_files)
+				assert_expected_files_and_permissions(output_directory, {
+					**expected_output_files,
+					'cli.log': 0o600,
+					'.sakuya': 0o755,
+					'.sakuya/setup-complete': 0o400
+				})
 
 				# - check expected changed files are changed
 				_assert_changed_files(setup_mtimes_map, output_directory, expected_changed_files)
@@ -352,7 +363,7 @@ async def test_upgrade_preserves_runtime_state_and_replaces_only_generated_artif
 						'sakuya/https-proxy/certificates'
 					])
 
-					prepare_sakuya_configuration(peer_package_directory, NodeFeatures.PEER, server.make_url(''), api_https=False)
+					prepare_sakuya_configuration(peer_package_directory, NodeFeatures.PEER, server.make_url(''), include_init_files=True, api_https=False)
 					_prepare_overrides(peer_package_directory, 'name from upgrade')
 					prepare_testnet_package(peer_package_directory, 'resources.zip')
 
@@ -418,7 +429,7 @@ async def test_upgrade_rolls_back_generated_artifacts_without_touching_runtime_s
 					runtime_snapshot = _snapshot_files(output_directory, runtime_paths)
 					generated_snapshot = _snapshot_files(output_directory, upgrade_command.UPGRADE_MANAGED_PATHS)
 
-					prepare_sakuya_configuration(peer_package_directory, NodeFeatures.PEER, server.make_url(''), api_https=False)
+					prepare_sakuya_configuration(peer_package_directory, NodeFeatures.PEER, server.make_url(''), include_init_files=True, api_https=False)
 					_prepare_overrides(peer_package_directory, 'name from upgrade')
 					prepare_testnet_package(peer_package_directory, 'resources.zip')
 

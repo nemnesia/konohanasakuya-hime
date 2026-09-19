@@ -92,6 +92,42 @@ msgstr ""
 msgid "argument-help-setup-rest-overrides"
 msgstr "カスタムユーザーREST設定へのパス（これはAPIロールにのみ有効）"
 
+#: sakuya/commands/setup.py
+msgid "setup-already-completed"
+msgstr "エラー: セットアップはすでに完了しています。既存のセットアップファイルは上書きから保護されています。"
+
+#: sakuya/commands/setup.py
+msgid "setup-failed"
+msgstr "エラー: セットアップに失敗しました。"
+
+#: sakuya/commands/setup.py
+msgid "setup-failed-with-reason"
+msgstr "エラー: セットアップに失敗しました: {reason}"
+
+#: sakuya/commands/setup.py
+msgid "setup-failure-detail"
+msgstr "セットアップに失敗しました: {reason}"
+
+#: sakuya/commands/setup.py
+msgid "setup-initialization-required"
+msgstr "エラー: 初期化が完了していません。\n先に `sakuya init` を実行してください。"
+
+#: sakuya/commands/setup.py
+msgid "setup-state-inconsistent"
+msgstr "エラー: セットアップ状態が不整合です。既存ファイルを上書きしません。"
+
+#: sakuya/commands/setup.py
+msgid "setup-state-missing-ca-key"
+msgstr "エラー: セットアップ状態が不整合です。CA鍵がありません。新しいCA鍵は自動生成しません。"
+
+#: sakuya/commands/setup.py
+msgid "setup-start"
+msgstr "Sakuyaをセットアップしています..."
+
+#: sakuya/commands/setup.py
+msgid "setup-success"
+msgstr "Sakuyaのセットアップが完了しました。"
+
 #: sakuya/commands/signer.py:95
 msgid "argument-help-signer-filename"
 msgstr "トランザクションバイナリペイロード"
